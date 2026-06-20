@@ -1,0 +1,13 @@
+{
+  "name": "eslint-plugin-assay",
+  "version": "0.1.0",
+  "description": "Static coverage rule for Assay (AVP) — require a co-located verification for the archetypes a feature must cover.",
+  "main": "index.cjs",
+  "private": true,
+  "scripts": {
+    "test": "node index.test.cjs"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  }
+}

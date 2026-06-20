@@ -1,0 +1,33 @@
+{
+  "name": "assay",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "examples/*"
+  ],
+  "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
+  "type": "module",
+  "bin": {
+    "assay": "bin/assay.mjs"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tanstack/react-router": "^1.170.16",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/node": "^22.10.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "jsdom": "^25.0.1",
+    "msw": "^2.6.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

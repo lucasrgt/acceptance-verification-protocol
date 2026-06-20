@@ -1,0 +1,314 @@
+{
+  "protocol": "AVP",
+  "protocolVersion": "0.1.0",
+  "conditionAxes": {
+    "fault": [
+      "success",
+      "api-error",
+      "slow",
+      "offline"
+    ],
+    "data": [
+      "empty",
+      "partial"
+    ],
+    "interaction": [
+      "retry",
+      "token-expired"
+    ]
+  },
+  "oracleKinds": [
+    "mechanical",
+    "model",
+    "human"
+  ],
+  "archetypes": [
+    {
+      "archetype": "action-effect",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "fires-primary-effect",
+          "statement": "The action fires its primary effect; no visible action is a no-op.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "615ed1a7",
+            "92d99ad2"
+          ]
+        },
+        {
+          "id": "no-phantom-success",
+          "statement": "On failure, the user input persists and an error is visible — never a phantom success.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "seenIn": [
+            "04677bf9"
+          ]
+        },
+        {
+          "id": "error-is-specific",
+          "statement": "On failure, the error message names the real problem and a next step — not a generic \"something went wrong\".",
+          "oracle": "model",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          }
+        },
+        {
+          "id": "projections-converge",
+          "statement": "After a successful mutation, sibling projections of the data (lists, badges, counts) reflect the change without a manual reload.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "b9659b46",
+            "5a0f2acb"
+          ]
+        },
+        {
+          "id": "request-accepted",
+          "statement": "The request the UI sends is well-formed enough for the backend to accept it — no 400 from a malformed body (e.g. a datetime where a date-only field is expected).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "c1849234"
+          ]
+        },
+        {
+          "id": "idempotent-retry",
+          "statement": "A retry after a partial failure does not duplicate the effect — the same logical action fires once.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "retry"
+          },
+          "seenIn": [
+            "0188869f"
+          ]
+        },
+        {
+          "id": "survives-token-refresh",
+          "statement": "An expired token mid-action recovers via a refresh-and-retry instead of erroring the user.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "token-expired"
+          },
+          "seenIn": [
+            "b4b0fc07"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "data-honesty",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "no-fixture-fallback",
+          "statement": "When the API returns no rows, the UI renders the empty state — it never falls back to fixture/demo rows.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "empty"
+          },
+          "seenIn": [
+            "8ec5dae5",
+            "74f546d1"
+          ]
+        },
+        {
+          "id": "no-fabricated-media",
+          "statement": "A missing image renders a neutral placeholder — never a stock photo or a randomly generated face.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "partial"
+          },
+          "seenIn": [
+            "dfb23261"
+          ]
+        },
+        {
+          "id": "no-raw-id-flash",
+          "statement": "A detail view renders resolved data (a name) or a skeleton — never a raw entity id flashed before the name resolves.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "projp:ce04d0f",
+            "projp:33a0d5a"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "persona-scoped-visibility",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "no-cross-persona-affordance",
+          "statement": "Rendered as one actor, no affordance scoped to another actor (or tier) is visible or reachable.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "16c6cd43",
+            "1e6ba089",
+            "projf:5512811"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "navigation-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "target-resolves",
+          "statement": "Every navigation affordance targets a registered route; no tap lands on not-found.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "287ab352",
+            "2a3f9251",
+            "projp:7ba900d"
+          ]
+        },
+        {
+          "id": "nested-renders",
+          "statement": "Navigating to a nested route renders its content — the parent layout renders its outlet, not a blank screen.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "projp:37af286",
+            "projp:039aaf2"
+          ]
+        },
+        {
+          "id": "back-has-fallback",
+          "statement": "Back is never a dead no-op: opened deep with no history, it lands on a real fallback instead of doing nothing.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "3aa1c80a"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "mount-stability",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "settles-without-storm",
+          "statement": "Mounting a screen settles to a bounded number of requests — no refetch/redirect storm that freezes the screen.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "e6c81abe",
+            "projp:626c8ce"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "authorization",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "own-resource-only",
+          "statement": "A write resolves the target scoped to the caller; another account's id is refused (401/403/404), never a cross-account write.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "1db3c2fd",
+            "bitwarden:0ad7a10c"
+          ]
+        },
+        {
+          "id": "role-required",
+          "statement": "An endpoint enforces the role its operation implies; a privileged op called as a lesser role is refused — \"any authenticated\" is not a policy.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "d36af822",
+            "gitea:171df0c9"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "integration-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "webhook-signature-verified",
+          "statement": "An inbound webhook with a forged or absent signature is rejected; only an authentically-signed callback is accepted and allowed to mutate state.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "692d85af",
+            "documenso:3887aa67"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "second-order-effects",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "notifies-all-parties",
+          "statement": "Every state transition notifies every party it concerns — both sides of a booking, both ends of a message — not one party or none.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "81c919ed",
+            "fbc56236"
+          ]
+        }
+      ]
+    }
+  ]
+}
