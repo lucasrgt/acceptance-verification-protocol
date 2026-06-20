@@ -161,8 +161,13 @@ hierarchy discrepancy that motivated the idea.)
      every colour is on the ACTIVE theme's scale; a light value stranded in dark is the
      escape. Mutation 4/4 (stuck bg, stuck text, all-light, raw step), false-alarm 0.
      Ground truth extended with per-theme colour scales (`themes`/`themeColorScale`).
-     `bench/theme-parity.test.ts`. **Design catalog: 2/2 detection, 9/9 mutants killed.**
-   - Remaining: type-hierarchy, color-hierarchy-contrast (axe-core), state-coverage,
+     `bench/theme-parity.test.ts`.
+   - **type-hierarchy** — ✅ **DONE.** Reads heading sizes + levels and asserts visual
+     size matches semantic level (h1 > h2 > h3; same level, same size) — distinct from
+     token-adherence's membership check. Mutation 4/4 (inverted title, equal-weight,
+     subtitle-beats-title, inconsistent same-level), false-alarm 0.
+     `bench/type-hierarchy.test.ts`. **Design catalog: 3/3 detection, 13/13 mutants killed.**
+   - Remaining: color-hierarchy-contrast (axe-core), state-coverage,
      composition-canonical structure.
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
    layout-integrity), reusing the `proof` plugin's browser harness.

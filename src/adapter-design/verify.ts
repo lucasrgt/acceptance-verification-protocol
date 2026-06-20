@@ -3,6 +3,7 @@ import type { Verdict } from '../core/types';
 import { runVerification, type VerifyHooks } from '../core/run';
 import { tokenAdherenceHooks } from './token-adherence';
 import { themeParityHooks } from './theme-parity';
+import { typeHierarchyHooks } from './type-hierarchy';
 
 type NamedSubject = { readonly name: string };
 
@@ -16,6 +17,7 @@ type NamedSubject = { readonly name: string };
 const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
   'token-adherence': tokenAdherenceHooks as (subject: never) => VerifyHooks,
   'theme-parity': themeParityHooks as (subject: never) => VerifyHooks,
+  'type-hierarchy': typeHierarchyHooks as (subject: never) => VerifyHooks,
 };
 
 /** Runs a design archetype against a surface (jsdom + computed style) and returns a Verdict. */
