@@ -6,6 +6,8 @@ export interface IntegrationExpect {
   webhookSignatureVerified(): void;
   /** A checkout/OAuth flow's return URLs are present, absolute, and bound to a real environment. */
   redirectUrlsBound(): void;
+  /** A callback that can't be tied to a domain entity is refused — never accepted-and-misapplied. */
+  callbackResolvesEntity(): void;
 }
 
 /**
@@ -35,6 +37,16 @@ export const integrationIntegrity = archetype('integration-integrity', '0.1.0', 
     mechanical<IntegrationExpect>(async ({ act, expect }) => {
       await act();
       expect.redirectUrlsBound();
+    }),
+  );
+
+  criterion(
+    'callback-resolves-entity',
+    'An inbound callback carries enough to resolve the domain entity it concerns: a callback with a missing or unknown reference is refused, never accepted and silently dropped or applied to the wrong entity.',
+    { under: 'success', scope: 'invariant', requires: 'resolve', seenIn: ['documenso:a99bdf5e', 'documenso:8fbace0f'] },
+    mechanical<IntegrationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.callbackResolvesEntity();
     }),
   );
 });

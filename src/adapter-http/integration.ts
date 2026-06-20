@@ -59,6 +59,8 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
   let forged: number | null = null;
   let valid: number | null = null;
   let returnUrls: Partial<Record<ReturnTransition, string | null | undefined>> | null = null;
+  let unresolvable: number | null = null;
+  let resolvable: number | null = null;
 
   return {
     async act() {
@@ -68,6 +70,8 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
         const body = await fetchJson(subject.checkout);
         returnUrls = subject.readReturnUrls ? subject.readReturnUrls(body) : {};
       }
+      if (subject.unresolvable) unresolvable = await send(subject.unresolvable);
+      if (subject.resolvable) resolvable = await send(subject.resolvable);
     },
     expect: {
       webhookSignatureVerified() {
@@ -100,6 +104,21 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
           );
         }
       },
+      callbackResolvesEntity() {
+        if (unresolvable === null) throw new AvpFail('probe used before act() — no unresolvable callback declared.');
+        if (ok(unresolvable)) {
+          throw new AvpFail(
+            `A callback that can't be tied to a domain entity (missing/unknown reference) was accepted (${unresolvable}) — the event is silently dropped or applied to the wrong entity. Resolve the reference and refuse (422) when it doesn't map to a known entity.`,
+            { unresolvable },
+          );
+        }
+        if (resolvable !== null && !ok(resolvable)) {
+          throw new AvpFail(
+            `A callback that DOES resolve to a real entity was refused (${resolvable}) — the endpoint rejects everything, not only unresolvable callbacks. Accept callbacks that carry a valid reference.`,
+            { resolvable },
+          );
+        }
+      },
     },
   };
 }
@@ -110,6 +129,7 @@ export function webhookHooks(subject: HttpIntegrationSubject): VerifyHooks {
     applies: (c) => {
       if (c.requires === 'webhook' && !subject.forged) return 'Subject declares no webhook — not applicable.';
       if (c.requires === 'checkout' && !subject.checkout) return 'Subject declares no checkout request — not applicable.';
+      if (c.requires === 'resolve' && !subject.unresolvable) return 'Subject declares no unresolvable callback — not applicable.';
       return null;
     },
   };

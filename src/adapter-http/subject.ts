@@ -73,6 +73,10 @@ export interface HttpIntegrationSubject {
   readonly requiredTransitions?: readonly ReturnTransition[];
   /** Checkout seam (optional, stricter): the app origin every return URL must belong to. */
   readonly expectedOrigin?: string;
+  /** Resolve seam: a callback that can't be tied to an entity (missing/unknown ref) — must be refused. */
+  readonly unresolvable?: HttpRequestSpec;
+  /** Resolve seam: a callback that resolves to a real entity — must be accepted. */
+  readonly resolvable?: HttpRequestSpec;
 }
 
 /**

@@ -340,6 +340,19 @@
             "bitwarden:aa1665065",
             "bitwarden:004e3c58e"
           ]
+        },
+        {
+          "id": "callback-resolves-entity",
+          "statement": "An inbound callback carries enough to resolve the domain entity it concerns: a callback with a missing or unknown reference is refused, never accepted and silently dropped or applied to the wrong entity.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:a99bdf5e",
+            "documenso:8fbace0f"
+          ]
         }
       ]
     },
