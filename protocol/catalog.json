@@ -309,6 +309,25 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "money-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "split-invariant",
+          "statement": "A money split sums to the whole, exact to the cent: over every total, platform + host === total, each share is non-negative, and the platform share matches the policy fraction to the cent — no float-rounding leak.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "bitwarden:2e0e10307",
+            "bitwarden:6d69c9bb9"
+          ]
+        }
+      ]
     }
   ]
 }

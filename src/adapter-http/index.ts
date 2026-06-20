@@ -5,4 +5,5 @@ export { verifyHttp } from './verify';
 export { httpProbe } from './probe';
 export { webhookProbe } from './integration';
 export { notifyProbe } from './second-order';
-export type { HttpAuthSubject, HttpWebhookSubject, HttpNotifySubject, HttpRequestSpec } from './subject';
+export { moneyProbe } from './money';
+export type { HttpAuthSubject, HttpWebhookSubject, HttpNotifySubject, HttpMoneySubject, HttpRequestSpec } from './subject';

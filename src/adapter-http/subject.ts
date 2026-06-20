@@ -40,3 +40,21 @@ export interface HttpNotifySubject {
   readonly trigger: HttpRequestSpec;
   readonly inboxes: readonly { readonly party: string; readonly url: string }[];
 }
+
+/**
+ * `money-integrity` subject: an endpoint that splits a total (in cents) into a
+ * platform share and a host share, plus the policy fraction in basis points. The
+ * probe fires the endpoint over a range of totals and checks the split is exact to
+ * the cent and respects the policy — no float-rounding leak.
+ */
+export interface HttpMoneySubject {
+  readonly name: string;
+  /** Builds the split request for a given total in cents (POST { totalCents } by convention). */
+  readonly splitRequest: (totalCents: number) => HttpRequestSpec;
+  /** Reads the platform/host cents out of the response body. */
+  readonly readShares: (body: unknown) => { platformCents: number; hostCents: number };
+  /** Platform fee in basis points (1500 = 15%). The remainder is the host's payout. */
+  readonly platformBps: number;
+  /** Totals (in cents) to probe. Include leak-prone and exact cases. */
+  readonly totals: readonly number[];
+}

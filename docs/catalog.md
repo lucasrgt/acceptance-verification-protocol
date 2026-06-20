@@ -182,20 +182,26 @@ criterion and a fix passes it, in `bench/`.
 | **authorization** (HTTP adapter) | own-resource-only (IDOR), role-required | `bench/authorization.test.ts` 2/2 |
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified | `bench/integration.test.ts` 1/1 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
+| **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
 
-Total executed detection: **20/20, false-alarm 0**, across 8 archetypes and 3
+Total executed detection: **21/21, false-alarm 0**, across 9 archetypes and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
-runner (`src/core/run.ts`). That a backend archetype (authorization over the wire)
-runs through the same runner as the DOM archetypes is the proof the core is
+runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
+rest) run through the same runner as the DOM archetypes is the proof the core is
 substrate-neutral, not React-shaped. Probe substrates so far: RTL+MSW drive ·
 render-vs-API · render-as-actor · navigate-spy · mount-and-count · a real mounted
-TanStack router · a paint-timing harness · a **real HTTP request**.
+TanStack router · a paint-timing harness · a **real HTTP request** · an
+**integer-cent split over the wire, swept across a range of totals**.
 
 Catalogued but not yet executed: action-effect's `optimistic-reconcile` /
 `cache-cleared-on-identity`; navigation's `no-redirect-loop` /
-`required-params-guarded`; data-honesty's `count-matches-source`; all BE archetypes
-(Assay.NET); all STATIC archetypes (host doctor).
+`required-params-guarded`; data-honesty's `count-matches-source`; the HTTP-reachable
+BE criteria still open (authorization's `server-is-authoritative`, integration's
+`callback-resolves-entity` / `redirect-urls-bound`, lifecycle's
+`gate-enforced-server-side`); all STATIC archetypes (host doctor). money-integrity's
+`split-invariant` is now executed over the HTTP adapter (the others — `money-is-typed`,
+`money-formatted-once` — are STATIC, host-doctor territory).
 
 The neutral core (`src/core/run.ts`) runs every archetype through one runner; each
 new archetype/probe is one hooks entry in `src/adapter-react/verify.ts`, and

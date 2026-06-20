@@ -3,3 +3,6 @@ dist/
 coverage/
 *.log
 .DS_Store
+
+# Mining acervo — blobless scratch clones (never committed)
+dev/_acervo/

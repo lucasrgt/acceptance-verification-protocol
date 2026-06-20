@@ -8,6 +8,7 @@ import { mountStability } from './archetypes/mount-stability';
 import { authorization } from './archetypes/authorization';
 import { integrationIntegrity } from './archetypes/integration-integrity';
 import { secondOrderEffects } from './archetypes/second-order-effects';
+import { moneyIntegrity } from './archetypes/money-integrity';
 
 /**
  * The PROTOCOL surface — the language-neutral truth, emitted FROM the archetypes so
@@ -29,6 +30,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   authorization,
   integrationIntegrity,
   secondOrderEffects,
+  moneyIntegrity,
 ];
 
 /** The condition vocabulary, by axis — the preconditions an adapter must be able to force. */

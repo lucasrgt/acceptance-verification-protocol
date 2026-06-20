@@ -13,3 +13,4 @@ export { mountStability, type MountStabilityExpect } from './archetypes/mount-st
 export { authorization, type AuthorizationExpect } from './archetypes/authorization';
 export { integrationIntegrity, type IntegrationExpect } from './archetypes/integration-integrity';
 export { secondOrderEffects, type SecondOrderExpect } from './archetypes/second-order-effects';
+export { moneyIntegrity, type MoneyExpect } from './archetypes/money-integrity';
