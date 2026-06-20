@@ -186,6 +186,19 @@
             "1e6ba089",
             "projf:5512811"
           ]
+        },
+        {
+          "id": "no-cross-persona-route",
+          "statement": "A route scoped to one actor refuses another actor at the guard: opened as actor X, an actor-Y route redirects X to its own area — it never renders Y's screen.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:2ba0f48c",
+            "bitwarden:e4359f071"
+          ]
         }
       ]
     },
