@@ -6,6 +6,7 @@ import { themeParityHooks } from './theme-parity';
 import { typeHierarchyHooks } from './type-hierarchy';
 import { compositionHooks } from './composition-canonical';
 import { stateCoverageHooks } from './state-coverage';
+import { colorContrastHooks } from './color-contrast';
 
 type NamedSubject = { readonly name: string };
 
@@ -22,6 +23,7 @@ const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
   'type-hierarchy': typeHierarchyHooks as (subject: never) => VerifyHooks,
   'composition-canonical': compositionHooks as (subject: never) => VerifyHooks,
   'state-coverage': stateCoverageHooks as (subject: never) => VerifyHooks,
+  'color-contrast': colorContrastHooks as (subject: never) => VerifyHooks,
 };
 
 /** Runs a design archetype against a surface (jsdom + computed style) and returns a Verdict. */

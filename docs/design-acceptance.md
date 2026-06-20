@@ -177,8 +177,12 @@ hierarchy discrepancy that motivated the idea.)
      each is visually distinct (the runtime sibling of LZFE010): a `disabled` button
      that isn't dimmed or a loading button with no spinner is the escape. Mutation 3/3
      (disabled-not-dimmed, loading-no-spinner, all-flat), false-alarm 0.
-     `bench/state-coverage.test.ts`. **Design catalog: 5/5 detection, 20/20 mutants killed.**
-   - Remaining jsdom: color-hierarchy-contrast (compute the WCAG ratio directly).
+     `bench/state-coverage.test.ts`.
+   - **color-contrast** — ✅ **DONE.** Computes the WCAG AA ratio of each text/background
+     pair directly (`src/design/contrast.ts`, no axe dep) — distinct from token/theme
+     checks since an on-scale pair (muted text on white) can still fail. Mutation 4/4
+     (muted-on-white, light-on-white, dark-on-dark, light-danger), false-alarm 0.
+     `bench/color-contrast.test.ts`. **jsdom tier COMPLETE — design catalog: 6/6 detection, 24/24 mutants killed.**
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
    layout-integrity) — the only criteria with no jsdom path (offsetWidth = 0), reusing
    the `proof` plugin's browser harness. The next architectural step.
