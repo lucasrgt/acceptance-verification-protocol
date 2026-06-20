@@ -29,7 +29,7 @@ export const layoutShiftIntegrity = archetype('layout-shift-integrity', '0.1.0',
   criterion(
     'reserved-space-stable',
     'Async content reserves its space: an element that loads or mounts late (image, widget, banner) does not move the content below it — a downstream anchor keeps the same position between the loading and loaded states. Content that jumps when media arrives is the escape (cumulative layout shift). Reserve the box up front with explicit dimensions, aspect-ratio, or a fixed-height skeleton.',
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['mastodon:511e10df', 'gitea:32fdfb0b', 'documenso:1a23744d'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['mastodon:511e10df', 'gitea:32fdfb0b', 'documenso:1a23744d'] },
     mechanical<LayoutShiftExpect>(async ({ act, expect }) => {
       await act();
       expect.reservedSpaceStable();

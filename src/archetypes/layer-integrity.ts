@@ -22,7 +22,7 @@ export const layerIntegrity = archetype('layer-integrity', '0.1.0', () => {
   criterion(
     'no-unintended-overlap',
     'Declared in-flow regions do not visually overlap: the bounding boxes of the regions that should stack/sit beside each other do not intersect. A control sitting on top of another (a button over a textarea, text over a button) — from absolute positioning, a negative margin, or a transform — is the escape.',
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['calcom:44ccc72f', 'calcom:794046cf', 'calcom:0e900a73'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['calcom:44ccc72f', 'calcom:794046cf', 'calcom:0e900a73'] },
     mechanical<LayerIntegrityExpect>(async ({ act, expect }) => {
       await act();
       expect.noUnintendedOverlap();

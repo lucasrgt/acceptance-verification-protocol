@@ -23,7 +23,7 @@ export const compositionCanonical = archetype('composition-canonical', '0.1.0', 
   criterion(
     'canonical-composition',
     'Every declared landmark slot is present, in the declared order, and is the canonical design-system component — not a hand-rolled fork. The back affordance comes before the title, the screen icon is present, and each slot is the DS component it should be (a bespoke element where a DS one exists is the escape).',
-    { under: 'success', scope: 'invariant', requires: 'composition', seenIn: ['897c6aa0', '2c9376e7', 'c596531b'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'composition', seenIn: ['897c6aa0', '2c9376e7', 'c596531b'] },
     mechanical<CompositionExpect>(async ({ act, expect }) => {
       await act();
       expect.canonicalComposition();

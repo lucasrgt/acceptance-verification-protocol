@@ -1,4 +1,4 @@
-import type { ConditionId, Criterion, Scope, Specification } from './types';
+import type { ConditionId, Criterion, Scope, Specification, Substrate } from './types';
 
 /**
  * Declarative authoring surface — reads like a Vitest/Jest file (`archetype`
@@ -68,6 +68,8 @@ export interface CriterionOptions {
   readonly scope?: Scope;
   /** Applicability gate (a seam key) → the adapter skips the criterion when the subject lacks this seam. */
   readonly requires?: string;
+  /** The engine that can decide this criterion (the layered-determinism axis). */
+  readonly substrate?: Substrate;
   /** Evidence: commits where the absence of this criterion caused an escape. */
   readonly seenIn?: readonly string[];
 }
@@ -107,6 +109,7 @@ export function archetype(name: string, version: string, define: () => void): Ar
       oracle: c.oracle,
       scope: c.scope,
       condition: c.condition,
+      ...(c.substrate ? { substrate: c.substrate } : {}),
       ...(c.seenIn ? { seenIn: c.seenIn } : {}),
     })),
   };
@@ -122,6 +125,7 @@ export function criterion(id: string, statement: string, options: CriterionOptio
     oracle: oracle.kind,
     scope: options.scope ?? 'invariant',
     condition: { id: options.under ?? 'success' },
+    substrate: options.substrate,
     seenIn: options.seenIn,
     requires: options.requires,
     oracleSpec: oracle,

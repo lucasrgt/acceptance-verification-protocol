@@ -31,7 +31,7 @@ export const tapTargetIntegrity = archetype('tap-target-integrity', '0.1.0', () 
   criterion(
     'targets-meet-minimum-size',
     `Every interactive control meets the minimum tap-target size: its rendered box is at least ${MIN_TAP_TARGET_PX}×${MIN_TAP_TARGET_PX} CSS px on both axes (WCAG 2.5.5). A bare icon button, a thin link, or a control shrunk to its glyph is the escape — too small to reliably tap on touch or for users with motor impairments. Give the control padding or an explicit min-width/min-height.`,
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['mastodon:2b93a221', 'mastodon:a8330be9', 'gitea:8703b6c9', 'gitea:06eaf74e'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['mastodon:2b93a221', 'mastodon:a8330be9', 'gitea:8703b6c9', 'gitea:06eaf74e'] },
     mechanical<TapTargetExpect>(async ({ act, expect }) => {
       await act();
       expect.targetsMeetMinimumSize();

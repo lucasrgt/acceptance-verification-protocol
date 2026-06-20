@@ -11,6 +11,21 @@
 /** What decides pass/fail. `mechanical` is deterministic; `model` is an LLM-as-judge (probabilistic); `human` is manual. */
 export type OracleKind = 'mechanical' | 'model' | 'human';
 
+/**
+ * The engine an adapter needs to DECIDE a criterion — the layered-determinism axis ("the
+ * determinism lives in the verifier, at the cheapest engine that can decide it"). A criterion
+ * declares the minimum substrate; an implementation covers a substrate by binding hooks to it.
+ *  - `static`   — decided without running the app (the host's linter/doctor).
+ *  - `dom`      — DOM events + the rendered tree (a React/DOM adapter).
+ *  - `http`     — requests/responses (an HTTP or in-process backend adapter).
+ *  - `style`    — the resolved computed style, no layout engine (jsdom): colours, tokens,
+ *                 hierarchy, declared spacing, contrast.
+ *  - `geometry` — the real layout (a headless browser): overflow, overlap, responsive,
+ *                 reading order, RTL mirroring, hit-area, layout shift.
+ *  - `model`    — an LLM-as-judge for a semantic call no mechanism can make (icon meaning-fit).
+ */
+export type Substrate = 'static' | 'dom' | 'http' | 'style' | 'geometry' | 'model';
+
 /** `invariant` holds over all states; `example` is a specific case. */
 export type Scope = 'invariant' | 'example';
 
@@ -44,6 +59,8 @@ export interface Criterion {
   readonly oracle: OracleKind;
   readonly scope: Scope;
   readonly condition: Condition;
+  /** The engine that can decide this criterion (omitted on the original DOM/HTTP archetypes). */
+  readonly substrate?: Substrate;
   /** Empirical evidence: commits where the absence of this criterion caused an escape. */
   readonly seenIn?: readonly string[];
 }

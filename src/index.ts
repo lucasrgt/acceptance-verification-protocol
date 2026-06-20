@@ -3,7 +3,16 @@
 export * from './core/dsl';
 export * from './core/types';
 export { runVerification, type VerifyHooks } from './core/run';
-export { buildCatalog, ARCHETYPES, PROTOCOL_VERSION, type ProtocolCatalog } from './protocol';
+export {
+  buildCatalog,
+  buildDesignCatalog,
+  ARCHETYPES,
+  DESIGN_ARCHETYPES,
+  SUBSTRATES,
+  PROTOCOL_VERSION,
+  type ProtocolCatalog,
+  type DesignProtocolCatalog,
+} from './protocol';
 export { formatVerdict } from './core/format';
 export { actionEffect, type ActionEffectExpect } from './archetypes/action-effect';
 export { dataHonesty, type DataHonestyExpect } from './archetypes/data-honesty';

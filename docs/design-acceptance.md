@@ -250,12 +250,17 @@ hierarchy discrepancy that motivated the idea.)
      **Design catalog: 15 criteria — jsdom (7) + geometry (7: layout · layer · responsive ·
      reading-order · rtl · tap-target · layout-shift) + model (1), 52/52 mutants killed,
      false-alarm 0.**
-5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
-   serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
-   because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
-   Formalising it — a substrate axis in `CONDITION_AXES`/docs/PROTOCOL.md + design archetypes
-   in the portable catalog — is the high-value structural step for when new grounded criteria
-   run dry, so Assay.NET / a Rails adapter can implement the design tier against the contract.
+5. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
+   portable protocol. A `substrate` axis (`static`/`dom`/`http`/`style`/`geometry`/`model`)
+   lives in `core/types.ts` (the layered-determinism axis) and every design criterion declares
+   it — the 7 jsdom ones `style`, the 7 geometry ones `geometry`, icon `model`. The 15 design
+   archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
+   drift-guarded by `bench/protocol-sync.test.ts` exactly like the behaviour catalog (the
+   behaviour `catalog.json` stays byte-identical — substrate is omitted where absent).
+   `docs/PROTOCOL.md` documents the substrate axis + the design catalog + conformance, so
+   Assay.NET / a Rails adapter can implement the design tier against the contract by binding
+   hooks per substrate. Cleanup along the way: the geometry archetypes had overloaded
+   `requires: 'geometry'` (a non-existent seam) to mean substrate — moved to the proper field.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful
 repro and a 100%-kill mutation family — the same loop that took the behaviour catalog to

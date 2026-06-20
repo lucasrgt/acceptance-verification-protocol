@@ -22,7 +22,7 @@ export const typeHierarchy = archetype('type-hierarchy', '0.1.0', () => {
   criterion(
     'hierarchy-holds',
     'Visual type size matches the semantic heading level: a more-important heading (lower level number) renders strictly larger than any less-important heading present, and two headings of the same level render at the same size. No inversion (a section title bigger than the page title), no two titles competing at the same weight.',
-    { under: 'success', scope: 'invariant', requires: 'headings', seenIn: ['25b16a79', '9b609f8c', '7a2dfc74'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'headings', seenIn: ['25b16a79', '9b609f8c', '7a2dfc74'] },
     mechanical<TypeHierarchyExpect>(async ({ act, expect }) => {
       await act();
       expect.hierarchyHolds();

@@ -27,7 +27,7 @@ export const rtlIntegrity = archetype('rtl-integrity', '0.1.0', () => {
   criterion(
     'directional-icons-mirror',
     'Every direction-dependent icon mirrors correctly with the writing direction: under dir=rtl its computed transform is horizontally flipped (so a back/forward arrow points the right way), and under dir=ltr it is not flipped. A directional icon left unmirrored under RTL — or mirrored unconditionally — is the escape. Scope the horizontal flip to `[dir="rtl"]` and apply it to every directional glyph.',
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['mastodon:51345e51', 'mastodon:af157939d'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['mastodon:51345e51', 'mastodon:af157939d'] },
     mechanical<RtlIntegrityExpect>(async ({ act, expect }) => {
       await act();
       expect.directionalIconsMirror();

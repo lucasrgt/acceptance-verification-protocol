@@ -22,7 +22,7 @@ export const layoutIntegrity = archetype('layout-integrity', '0.1.0', () => {
   criterion(
     'content-fits',
     'No element clips its own content: for every element whose overflow is hidden/clipped, the content fits the box (scrollWidth ≤ clientWidth, scrollHeight ≤ clientHeight). Content cut off at the edge of a fixed-size container is the escape — give it room, wrap, or truncate with an ellipsis intentionally.',
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['calcom:635c1feb', 'calcom:a1124ede', 'calcom:e8e50b70'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['calcom:635c1feb', 'calcom:a1124ede', 'calcom:e8e50b70'] },
     mechanical<LayoutIntegrityExpect>(async ({ act, expect }) => {
       await act();
       expect.contentFits();

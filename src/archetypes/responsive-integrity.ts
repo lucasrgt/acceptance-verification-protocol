@@ -26,7 +26,7 @@ export const responsiveIntegrity = archetype('responsive-integrity', '0.1.0', ()
   criterion(
     'holds-across-breakpoints',
     'The surface holds across breakpoints: rendered at each declared viewport width, the page never overflows horizontally (documentElement.scrollWidth ≤ viewport width). A surface that fits wide but pushes the page past a narrow viewport — a fixed-width row, an oversized block, or nowrap text that never reflows — is the escape. Let it wrap, cap widths, or add the breakpoint that the mobile layout is missing.',
-    { under: 'success', scope: 'invariant', requires: 'geometry', seenIn: ['mastodon:98ec6991', 'mastodon:861625fd', 'gitea:b9f69b4a'] },
+    { under: 'success', scope: 'invariant', substrate: 'geometry', seenIn: ['mastodon:98ec6991', 'mastodon:861625fd', 'gitea:b9f69b4a'] },
     mechanical<ResponsiveIntegrityExpect>(async ({ act, expect }) => {
       await act();
       expect.holdsAcrossBreakpoints();

@@ -22,7 +22,7 @@ export const colorContrast = archetype('color-contrast', '0.1.0', () => {
   criterion(
     'contrast-sufficient',
     'Every text/background pair meets the WCAG AA contrast minimum (4.5:1 normal text, 3:1 large/bold): the computed ratio of the text colour against its effective background is sufficient. An on-scale but low-contrast pairing (muted text on white) or a theme-stranded value (a light colour on a light surface) is the escape — the text is hard or impossible to read.',
-    { under: 'success', scope: 'invariant', requires: 'text', seenIn: ['dd834c98'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'text', seenIn: ['dd834c98'] },
     mechanical<ColorContrastExpect>(async ({ act, expect }) => {
       await act();
       expect.contrastSufficient();

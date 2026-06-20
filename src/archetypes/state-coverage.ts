@@ -24,7 +24,7 @@ export const stateCoverage = archetype('state-coverage', '0.1.0', () => {
   criterion(
     'states-visually-distinct',
     'Each declared interactive state (disabled, loading, …) renders visually distinct from the default state — a disabled control is dimmed/muted, a loading control shows a spinner. A state that is set but renders identically to default is the escape: it is not perceivable.',
-    { under: 'success', scope: 'invariant', requires: 'states', seenIn: ['c86c36b3', 'f842d42c', '876f7734'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'states', seenIn: ['c86c36b3', 'f842d42c', '876f7734'] },
     mechanical<StateCoverageExpect>(async ({ act, expect }) => {
       await act();
       expect.statesVisuallyDistinct();

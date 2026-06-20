@@ -23,7 +23,7 @@ export const tokenAdherence = archetype('token-adherence', '0.1.0', () => {
   criterion(
     'uses-tokens-only',
     'Every colour, spacing, radius and font size the surface renders is a value from the design token scale — no raw hex, no off-scale spacing/radius, no hard-coded font size. A value off the scale has no theme pair and drifts the moment the system changes.',
-    { under: 'success', scope: 'invariant', requires: 'tokens', seenIn: ['dd834c98', '3988ad19'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'tokens', seenIn: ['dd834c98', '3988ad19'] },
     mechanical<TokenAdherenceExpect>(async ({ act, expect }) => {
       await act();
       expect.usesTokensOnly();

@@ -18,7 +18,7 @@ export const iconCorrectness = archetype('icon-correctness', '0.1.0', () => {
   criterion(
     'icon-fits-meaning',
     'Every icon’s meaning fits its control: the glyph a control shows matches the action or label it stands for — a back affordance uses a left chevron/arrow, a fork count a fork, a search a magnifier, a delete a trash. An icon that is semantically wrong or misleading for its label is the escape (a generic glyph where a specific one is expected, a stale icon left after the action changed).',
-    { under: 'success', scope: 'invariant', requires: 'render', seenIn: ['gitea:edf0dfd1', 'gitea:3102c04c', 'mastodon:9576434d'] },
+    { under: 'success', scope: 'invariant', substrate: 'model', requires: 'render', seenIn: ['gitea:edf0dfd1', 'gitea:3102c04c', 'mastodon:9576434d'] },
     model(
       'You are given the icons rendered on a surface, each with the accessible label of the control it belongs to. ' +
         'PASS if every icon’s meaning is a sensible fit for its label/action (e.g. label "Back" → a left chevron or arrow; ' +

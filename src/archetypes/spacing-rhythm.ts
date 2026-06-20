@@ -25,7 +25,7 @@ export const spacingRhythm = archetype('spacing-rhythm', '0.1.0', () => {
   criterion(
     'rhythm-holds',
     'Nested containers follow the spacing rhythm: each container\'s padding is a value from the spacing scale, a deeper container is never roomier than the one enclosing it (outer ≥ inner, strictly decreasing with depth), and two containers at the same depth share the same padding. An inverted, off-scale, or inconsistent rhythm is the escape.',
-    { under: 'success', scope: 'invariant', requires: 'nesting', seenIn: ['b885222b', '25b16a79', 'dc4dd857'] },
+    { under: 'success', scope: 'invariant', substrate: 'style', requires: 'nesting', seenIn: ['b885222b', '25b16a79', 'dc4dd857'] },
     mechanical<SpacingRhythmExpect>(async ({ act, expect }) => {
       await act();
       expect.rhythmHolds();
