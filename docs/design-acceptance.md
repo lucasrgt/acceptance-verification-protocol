@@ -148,10 +148,14 @@ hierarchy discrepancy that motivated the idea.)
 
 ## Recommended build order
 
-1. **Spike `token-adherence` over jsdom** — a component using a raw hex/off-scale value
-   fails; the same component using a semantic token passes; mutation family = colour /
-   spacing / radius / font off the scale. One iteration gives the whole skeleton
-   (design subject + computed-style probe + the design catalog cell).
+1. **Spike `token-adherence` over jsdom** — ✅ **DONE.** A surface with a raw hex /
+   off-scale value fails; the same surface on tokens passes; mutation family (raw
+   palette colour, off-scale bg/space/radius/font) **5/5 killed, false-alarm 0**.
+   Proves the whole skeleton: the design subject (`src/adapter-design/`), the
+   computed-style probe (jsdom resolves inline colours to rgb + px values — the
+   token-membership check works), the archetype (`src/archetypes/token-adherence.ts`)
+   and the token-set ground truth (`src/design/tokens.ts`), all running through the
+   SAME neutral `core/run.ts` as the behaviour adapters. `bench/token-adherence.test.ts`.
 2. Add the rest of the **jsdom tier** (theme-parity, type-hierarchy, contrast,
    state-coverage, composition structure) — highest ROI, no browser needed.
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
