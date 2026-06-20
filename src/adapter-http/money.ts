@@ -62,10 +62,16 @@ export function moneyProbe(subject: HttpMoneySubject): Probe<MoneyExpect> {
           );
         }
       },
+      amountRenderedExact() {
+        throw new AvpFail('amountRenderedExact is a display (FE) criterion; not observable over HTTP — use the React adapter.');
+      },
     },
   };
 }
 
 export function moneyHooks(subject: HttpMoneySubject): VerifyHooks {
-  return { probe: () => moneyProbe(subject) };
+  return {
+    probe: () => moneyProbe(subject),
+    applies: (c) => (c.requires === 'amount-display' ? 'Money split subject — the display criterion runs on the React adapter.' : null),
+  };
 }

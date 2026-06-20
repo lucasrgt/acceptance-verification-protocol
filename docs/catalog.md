@@ -141,6 +141,7 @@ Never fixtures, stock imagery, or fabricated content on a real-content surface. 
 | id | statement | oracle | reach | seen in |
 |---|---|---|---|---|
 | `split-invariant` | A money split sums to the whole; the platform/host split is exact to the cent. | mechanical | BE | the 15/85 split proven over HTTP |
+| `amount-rendered-exact` | A money amount is displayed at the currency's exact precision — no float artifact, no dropped/extra decimals, no wrong rounding. Format from integer minor units. | mechanical | FE | foreign amount rounded on some pages; reconciliation displayed amount; amount display |
 | `money-is-typed` | Money is a value object, not a float; serialization is lossless. | static | STATIC | introduction of a `Money` value object |
 | `money-formatted-once` | One canonical formatter renders currency; no ad-hoc string math. | static | STATIC | duplicated `formatBrlCents` consolidations |
 
@@ -204,7 +205,7 @@ NESTED field. Overwhelmingly grounded: cal.com alone has 44 "crash" fixes —
 
 | reach | archetypes | home |
 |---|---|---|
-| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience | this repo, React adapter |
+| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half) | future backend adapter |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
 
@@ -228,21 +229,23 @@ criterion and a fix passes it, in `bench/`.
 | **authorization** (HTTP adapter) | own-resource-only (IDOR), role-required, server-is-authoritative | `bench/authorization.test.ts` 2/2 + `bench/server-authoritative.test.ts` 1/1 + mutation 5/5 |
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound, callback-resolves-entity | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + `bench/callback-resolves.test.ts` 1/1 + mutation 6/6+4/4 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
-| **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
+| **money-integrity** (HTTP + React) | split-invariant (HTTP), amount-rendered-exact (display) | `bench/money-integrity.test.ts` 1/1 + `bench/money-display.test.ts` 1/1 + mutation 5/5+4/4 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
 | **pagination-integrity** (React) | pages-cover-the-set | `bench/pagination-integrity.test.ts` 1/1 + mutation 4/4 |
 | **render-resilience** (React) | survives-malformed-data | `bench/render-resilience.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **37/37, false-alarm 0**, across **13 archetypes** and 3
+Total executed detection: **38/38, false-alarm 0**, across **13 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
 rest, lifecycle gating) run through the same runner as the DOM archetypes is the
-proof the core is substrate-neutral, not React-shaped. **`lifecycle-gate` is now
-executed across BOTH substrates** — its server half (gate-enforced-server-side) over
-HTTP and its DOM half (blocked-action-is-disabled) in React — one archetype gated at
-both layers, the "determinism is layered" thesis made concrete. `authorization`
+proof the core is substrate-neutral, not React-shaped. **Two archetypes are now
+executed across BOTH substrates** — `lifecycle-gate` (server half
+gate-enforced-server-side over HTTP, DOM half blocked-action-is-disabled in React) and
+`money-integrity` (split-invariant at rest over HTTP, amount-rendered-exact in display
+over React) — the same invariant family gated at both layers, the "determinism is
+layered" thesis made concrete. `authorization`
 (3 criteria), `integration-integrity` (3), `navigation-integrity` (5), `data-honesty`
 (4), `persona-scoped-visibility` (2) and `lifecycle-gate` (2, cross-substrate) now
 seam-gate multiple criteria — a subject declares only the seams it has, and the rest
@@ -257,6 +260,8 @@ it redirects, not ghosts** · a **rendered-count-vs-API-count comparison** · a
 route deep-linked as the wrong actor, judged by redirect** · a **blocked action
 mounted to prove it's disabled with a reason, not a live click into failure** · a
 **guard mounted and its route-load hops counted to prove it settles, not storms** ·
+a **money amount rendered and its string compared to the exact integer-minor-unit
+value, killing float-display defects** ·
 a **sign-out/sign-in switch driven to prove the prior identity's cache is wiped** · a
 **count-readout compared to the server's authoritative value after an optimistic bump** ·
 a **stored UTC instant rendered and its calendar day compared against the viewer's

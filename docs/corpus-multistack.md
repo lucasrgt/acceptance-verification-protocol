@@ -30,11 +30,20 @@ the same archetypes surface in every one.
 | bitwarden/server | password manager | .NET | 7 340 | 846 | 107 |
 | gitea | git forge | Go | 19 948 | 5 345 | 410 |
 | cal.com | scheduling | Node/TS (Next) | 16 015 | 6 275 | 936 |
+| firefly-iii | personal finance | Laravel/PHP | 19 733 | 4 230 | 187 |
 
-≈**2 050 classified escapes** in the slice (a lower bound), on top of the three
-local Lazuli apps from `docs/transfer.md`. cal.com was added (2026-06-20) as a
-**fresh domain** to surface escape classes the marketplace corpus couldn't — see the
-temporal section below.
+≈**2 240 classified escapes** in the slice (a lower bound), on top of the three
+local Lazuli apps from `docs/transfer.md`. cal.com (scheduling) and firefly-iii
+(finance) were added (2026-06-20) as **fresh domains** to surface escape classes the
+marketplace corpus couldn't — see the temporal and money sections below.
+
+**firefly-iii is money-dominated:** money-integrity is its largest class by far (89
+classified, vs navigation 43, validation 21) — the inverse of the backend-heavy repos.
+In a finance app the money invariants *are* the product, which is exactly why it
+grounded the **display** half of money-integrity (`amount-rendered-exact`): "Foreign
+Amount rounded on some pages" (797064a1), "reconciliation displayed amount" (d55cc03e),
+"Fix amount display" (ebc7ea0e). Like temporal-integrity, money-integrity is
+domain-weighted — dominant where money is the domain.
 
 ## The cross-stack archetype matrix
 

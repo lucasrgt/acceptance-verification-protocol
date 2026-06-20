@@ -458,6 +458,20 @@
             "bitwarden:2e0e10307",
             "bitwarden:6d69c9bb9"
           ]
+        },
+        {
+          "id": "amount-rendered-exact",
+          "statement": "A money amount is displayed at the currency's exact precision: the rendered string equals the value formatted to its minor units — no float artifact (0.30000000000000004), no dropped or extra decimals (10.5 / 10.5000 for 10.50), no wrong rounding. Format from integer minor units, never raw float arithmetic.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "firefly:797064a1",
+            "firefly:d55cc03e",
+            "firefly:ebc7ea0e"
+          ]
         }
       ]
     },
