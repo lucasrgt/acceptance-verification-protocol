@@ -19,10 +19,12 @@ export interface ReactTemporalSubject {
   readonly name: string;
   /** Mounts the screen that displays the date/time readout. */
   readonly render: () => ReactElement;
-  /** The stored instant (UTC ISO 8601) the readout represents. */
-  readonly instantIso: string;
-  /** The viewer's IANA timezone the readout must honor (e.g. `America/Sao_Paulo`). */
-  readonly timeZone: string;
+  /** Instant seam (zoned-to-user): the stored instant (UTC ISO 8601) the readout represents. */
+  readonly instantIso?: string;
+  /** Instant seam (zoned-to-user): the viewer's IANA timezone the readout must honor (e.g. `America/Sao_Paulo`). */
+  readonly timeZone?: string;
+  /** Floating-date seam (floating-date-not-shifted): a calendar date (`YYYY-MM-DD`) with no time and no zone, displayed as authored. */
+  readonly dateOnly?: string;
 }
 
 /** The calendar date (`YYYY-MM-DD`) of an instant in a given IANA zone — deterministic on any host. */
@@ -54,6 +56,7 @@ export function temporalProbe(subject: ReactTemporalSubject): Probe<TemporalExpe
     expect: {
       zonedToUser() {
         if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
+        if (!subject.instantIso || !subject.timeZone) throw new AvpFail('zoned-to-user needs the instant seam (instantIso + timeZone).');
         const userDate = localDate(subject.instantIso, subject.timeZone);
         const utcDate = localDate(subject.instantIso, 'UTC');
         const shown = shownDate();
@@ -75,14 +78,34 @@ export function temporalProbe(subject: ReactTemporalSubject): Probe<TemporalExpe
           { shown, expected: userDate, utc: utcDate, timeZone: subject.timeZone },
         );
       },
+      floatingDateNotShifted() {
+        if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
+        if (!subject.dateOnly) throw new AvpFail('floating-date-not-shifted needs the floating-date seam (dateOnly).');
+        const shown = shownDate();
+        if (!shown) {
+          throw new AvpFail(
+            `No ISO calendar date (YYYY-MM-DD) was found in the readout — render the floating date ${subject.dateOnly} as authored so it can be verified.`,
+            { dateOnly: subject.dateOnly },
+          );
+        }
+        if (shown === subject.dateOnly) return;
+        throw new AvpFail(
+          `The date-only value ${subject.dateOnly} is displayed as ${shown} — it was zone-shifted by a Date()/dayjs.tz() round-trip. A floating date has no timezone; render its calendar parts as authored, don't localize it.`,
+          { shown, authored: subject.dateOnly },
+        );
+      },
     },
   };
 }
 
-/** The React adapter's hooks for `temporal-integrity` (DOM half — zoned-to-user). */
+/** The React adapter's hooks for `temporal-integrity` (DOM half — zoned-to-user + floating-date-not-shifted). */
 export function temporalHooks(subject: ReactTemporalSubject): VerifyHooks {
   return {
     probe: () => temporalProbe(subject),
-    applies: (c) => (c.requires === 'instant' && !subject.instantIso ? 'Subject declares no instant — criterion not applicable.' : null),
+    applies: (c) => {
+      if (c.requires === 'instant' && !subject.instantIso) return 'Subject declares no instant seam — criterion not applicable.';
+      if (c.requires === 'floating-date' && !subject.dateOnly) return 'Subject declares no floating-date seam — criterion not applicable.';
+      return null;
+    },
   };
 }

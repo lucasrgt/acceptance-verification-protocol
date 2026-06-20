@@ -4,6 +4,8 @@ import { archetype, criterion, mechanical } from '../core/dsl';
 export interface TemporalExpect {
   /** A displayed instant is rendered in the user's timezone — not UTC, the server's zone, or the host's ambient zone (no day-boundary off-by-one). */
   zonedToUser(): void;
+  /** A date-only value (no time, no zone) is displayed as authored — never zone-shifted by a round-trip through `new Date()` / `dayjs.tz()`. */
+  floatingDateNotShifted(): void;
 }
 
 /**
@@ -19,11 +21,12 @@ export interface TemporalExpect {
  * DateRange in UTC instead of user machine that caused the bug" (c1d0a6bb) and
  * "event startTime is in utc" (d70fa462). See docs/corpus-multistack.md.
  *
- * This is the first executed criterion; it opens the archetype on the ledger. Its
- * frontier (catalogued, not yet executed): `clock-not-frozen` (a relative-time /
- * countdown reflects the live clock, not a value frozen at module load) and
- * `floating-date-not-shifted` (a date-only value is never zone-shifted by a
- * round-trip through `new Date()`).
+ * Two criteria are executed (the two are sharp opposites — the #1 source of date
+ * confusion in JS): `zoned-to-user` says an INSTANT must take the viewer's zone;
+ * `floating-date-not-shifted` says a DATE-ONLY value must take NO zone. Conflating
+ * them is the bug. Frontier (catalogued, not yet executed): `clock-not-frozen` (a
+ * relative-time / countdown reflects the live clock, not a value frozen at module
+ * load).
  */
 export const temporalIntegrity = archetype('temporal-integrity', '0.1.0', () => {
   criterion(
@@ -33,6 +36,16 @@ export const temporalIntegrity = archetype('temporal-integrity', '0.1.0', () => 
     mechanical<TemporalExpect>(async ({ act, expect }) => {
       await act();
       expect.zonedToUser();
+    }),
+  );
+
+  criterion(
+    'floating-date-not-shifted',
+    'A date-only value (an expiry date, a birthday — no time, no zone) is displayed as authored: it is never zone-shifted a day by a round-trip through `new Date()` / `dayjs.tz()`. A floating date has no timezone; render its calendar parts, don\'t localize it.',
+    { under: 'success', scope: 'invariant', requires: 'floating-date', seenIn: ['calcom:26e85823', 'calcom:f7b2f276', 'documenso:22fd1b5b'] },
+    mechanical<TemporalExpect>(async ({ act, expect }) => {
+      await act();
+      expect.floatingDateNotShifted();
     }),
   );
 });
