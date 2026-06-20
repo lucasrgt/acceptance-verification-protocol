@@ -23,4 +23,6 @@ export interface ReactDesignSubject {
   readonly states?: readonly string[];
   /** Mounts the surface in a given state (state-coverage) — the adapter renders `default` + each declared state and compares. */
   readonly renderState?: (state: string) => ReactElement;
+  /** Viewport widths to sweep (responsive-integrity); defaults to mobile/tablet/desktop if omitted. The adapter renders `render()` at each and asserts no horizontal overflow. */
+  readonly breakpoints?: readonly number[];
 }

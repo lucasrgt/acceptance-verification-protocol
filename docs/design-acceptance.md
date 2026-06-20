@@ -202,9 +202,21 @@ hierarchy discrepancy that motivated the idea.)
      should stack don't visually collide (bounding-box intersection) — distinct from
      layout-integrity's self-clip. Mutation 3/3 (absolute, negative-margin, transform),
      false-alarm 0. `bench/layer-integrity.test.ts`.
-     **Design catalog: 9/9 detection, 34/34 mutants killed.**
-   - Remaining: responsive across breakpoints (render narrow+wide, assert no new clip/overlap).
-4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
+   - **responsive-integrity** — ✅ **DONE.** `holds-across-breakpoints`: the SAME surface is
+     swept across viewport widths (default 360/768/1280) and must never push the page past
+     the viewport (`documentElement.scrollWidth` ≤ width) — the cross-viewport escape "fits
+     wide, breaks narrow" that neither single-width criterion can catch. The biggest
+     responsive class. Mutation 3/3 (fixed nowrap row, oversized block, nowrap heading),
+     false-alarm 0. `bench/responsive-integrity.test.ts`.
+     **Design catalog: 10/10 detection, 37/37 mutants killed.**
+4. `icon-correctness` fit and any `visual-balance` via `claudeJudge` (the last non-mechanical
+   criterion — model oracle).
+5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
+   serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
+   because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
+   Formalising it — a substrate axis in `CONDITION_AXES`/docs/PROTOCOL.md + design archetypes
+   in the portable catalog — is the high-value structural step for when new grounded criteria
+   run dry, so Assay.NET / a Rails adapter can implement the design tier against the contract.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful
 repro and a 100%-kill mutation family — the same loop that took the behaviour catalog to

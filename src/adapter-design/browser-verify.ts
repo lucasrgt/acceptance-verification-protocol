@@ -4,6 +4,7 @@ import type { Verdict } from '../core/types';
 import { runVerification, type VerifyHooks } from '../core/run';
 import { layoutHooks } from './layout-integrity';
 import { layerHooks } from './layer-integrity';
+import { responsiveHooks } from './responsive-integrity';
 import type { ReactDesignSubject } from './subject';
 
 /**
@@ -16,6 +17,7 @@ import type { ReactDesignSubject } from './subject';
 const REGISTRY: Record<string, (subject: ReactDesignSubject, page: Page) => VerifyHooks> = {
   'layout-integrity': layoutHooks,
   'layer-integrity': layerHooks,
+  'responsive-integrity': responsiveHooks,
 };
 
 /** Runs a geometry design archetype against a surface in a real browser page. */
