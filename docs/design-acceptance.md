@@ -156,8 +156,14 @@ hierarchy discrepancy that motivated the idea.)
    token-membership check works), the archetype (`src/archetypes/token-adherence.ts`)
    and the token-set ground truth (`src/design/tokens.ts`), all running through the
    SAME neutral `core/run.ts` as the behaviour adapters. `bench/token-adherence.test.ts`.
-2. Add the rest of the **jsdom tier** (theme-parity, type-hierarchy, contrast,
-   state-coverage, composition structure) — highest ROI, no browser needed.
+2. Add the rest of the **jsdom tier** — highest ROI, no browser needed.
+   - **theme-parity** — ✅ **DONE.** Renders the surface under each theme and asserts
+     every colour is on the ACTIVE theme's scale; a light value stranded in dark is the
+     escape. Mutation 4/4 (stuck bg, stuck text, all-light, raw step), false-alarm 0.
+     Ground truth extended with per-theme colour scales (`themes`/`themeColorScale`).
+     `bench/theme-parity.test.ts`. **Design catalog: 2/2 detection, 9/9 mutants killed.**
+   - Remaining: type-hierarchy, color-hierarchy-contrast (axe-core), state-coverage,
+     composition-canonical structure.
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
    layout-integrity), reusing the `proof` plugin's browser harness.
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.

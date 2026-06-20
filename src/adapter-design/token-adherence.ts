@@ -49,6 +49,7 @@ export function tokenAdherenceProbe(subject: ReactDesignSubject): Probe<TokenAdh
   let acted = false;
   return {
     async act() {
+      if (!subject.render) throw new AvpFail('token-adherence needs a render() seam.');
       cleanup();
       render(subject.render());
       await settle();

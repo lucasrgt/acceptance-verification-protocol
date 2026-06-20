@@ -45,3 +45,21 @@ export const tokenScale = {
   radius: new Set<string>(Object.values(tokens.radius)),
   font: new Set<string>(Object.values(tokens.font)),
 } as const;
+
+/**
+ * Theme-aware colours — the ground truth for `theme-parity`. A semantic colour resolves
+ * to a DIFFERENT value per theme; a value off the ACTIVE theme's scale (a raw palette
+ * step, a hard-coded light colour) has no pair there and renders wrong (a light badge in
+ * dark mode). The two scales are disjoint on purpose, so a stuck value is unambiguous.
+ */
+export type DesignTheme = 'light' | 'dark';
+
+export const themes: Record<DesignTheme, { color: Record<string, string> }> = {
+  light: { color: { surface: '#ffffff', text: '#1a1a1a', primary: '#2563eb', secondary: '#6b7280', danger: '#dc2626' } },
+  dark: { color: { surface: '#111827', text: '#f9fafb', primary: '#60a5fa', secondary: '#9ca3af', danger: '#f87171' } },
+};
+
+/** The legal colour set for a given theme (normalised), for theme-parity membership checks. */
+export function themeColorScale(theme: DesignTheme): ReadonlySet<string> {
+  return new Set(Object.values(themes[theme].color).map((c) => normColor(c)!));
+}
