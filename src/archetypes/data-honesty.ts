@@ -8,6 +8,8 @@ export interface DataHonestyExpect {
   noFabricatedMedia(): void;
   /** No raw entity id was shown before the resolved name arrived (no flash-of-id). */
   noRawIdFlash(): void;
+  /** The number of items rendered equals the number the API returned (no dropped/invented rows). */
+  countMatchesSource(): void;
 }
 
 /**
@@ -48,6 +50,16 @@ export const dataHonesty = archetype('data-honesty', '0.1.0', () => {
     mechanical<DataHonestyExpect>(async ({ act, expect }) => {
       await act();
       expect.noRawIdFlash();
+    }),
+  );
+
+  criterion(
+    'count-matches-source',
+    'The number of items rendered equals the number the API returned — a client-side filter or fixture merge never silently drops or invents rows.',
+    { under: 'success', scope: 'invariant', requires: 'count', seenIn: ['documenso:b8e08e88', 'documenso:5f4e0ccf'] },
+    mechanical<DataHonestyExpect>(async ({ act, expect }) => {
+      await act();
+      expect.countMatchesSource();
     }),
   );
 });

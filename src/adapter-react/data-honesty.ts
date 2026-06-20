@@ -28,6 +28,8 @@ export interface DataHonestySubject {
   readonly mediaResponse?: unknown;
   /** Hosts/patterns that betray fabricated media if they surface as an `<img src>`. */
   readonly fabricationMarkers: readonly (string | RegExp)[];
+  /** A populated response with a known row count (drives the `success` condition). Enables `count-matches-source`. */
+  readonly countResponse?: readonly unknown[];
 }
 
 interface DrivenData {
@@ -40,7 +42,12 @@ async function driveData(subject: DataHonestySubject, condition: Condition): Pro
   cleanup();
   const verb = subject.endpoint.method.toLowerCase() as 'get' | 'post';
   const register = http[verb] as typeof http.get;
-  const body = condition.id === 'empty' ? subject.emptyResponse : (subject.mediaResponse ?? subject.emptyResponse);
+  const body =
+    condition.id === 'empty'
+      ? subject.emptyResponse
+      : condition.id === 'partial'
+        ? (subject.mediaResponse ?? subject.emptyResponse)
+        : (subject.countResponse ?? subject.emptyResponse); // success
   server.use(register(subject.endpoint.path, () => HttpResponse.json(body as object)));
 
   render(subject.render());
@@ -99,6 +106,16 @@ export function dataProbe(subject: DataHonestySubject, condition: Condition): Pr
       noRawIdFlash() {
         throw new AvpFail('noRawIdFlash needs a detail subject (declare `rawId`); not applicable to a list subject.');
       },
+      countMatchesSource() {
+        const expected = subject.countResponse?.length ?? 0;
+        const rendered = seen().itemCount();
+        if (rendered !== expected) {
+          throw new AvpFail(
+            `The API returned ${expected} row(s), but ${rendered} rendered — the list ${rendered < expected ? 'silently dropped' : 'invented'} rows (a client-side filter or fixture merge). Render exactly what the source returned; move filtering to the query.`,
+            { apiRows: expected, renderedItems: rendered },
+          );
+        }
+      },
     },
   };
 }
@@ -119,6 +136,9 @@ export function dataHonestyHooks(subject: DataHonestySubject | DetailHonestySubj
       if (c.requires === 'detail') return 'List subject — flash-of-id not applicable.';
       if (c.requires === 'media' && (subject as DataHonestySubject).mediaResponse === undefined) {
         return 'Subject declares no mediaResponse — criterion not applicable.';
+      }
+      if (c.requires === 'count' && (subject as DataHonestySubject).countResponse === undefined) {
+        return 'Subject declares no countResponse — count-matches-source not applicable.';
       }
       return null;
     },

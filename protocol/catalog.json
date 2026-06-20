@@ -153,6 +153,19 @@
             "projp:ce04d0f",
             "projp:33a0d5a"
           ]
+        },
+        {
+          "id": "count-matches-source",
+          "statement": "The number of items rendered equals the number the API returned — a client-side filter or fixture merge never silently drops or invents rows.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:b8e08e88",
+            "documenso:5f4e0ccf"
+          ]
         }
       ]
     },

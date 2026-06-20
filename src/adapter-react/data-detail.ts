@@ -65,6 +65,9 @@ export function detailProbe(subject: DetailHonestySubject): Probe<DataHonestyExp
       noFabricatedMedia() {
         throw new AvpFail('noFabricatedMedia needs a list subject; not applicable to a detail subject.');
       },
+      countMatchesSource() {
+        throw new AvpFail('countMatchesSource needs a list subject; not applicable to a detail subject.');
+      },
       noRawIdFlash() {
         if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
         if (flashed) {
