@@ -9,6 +9,13 @@ import type { DesignTheme } from '../design/tokens';
  */
 export interface ReactDesignSubject {
   readonly name: string;
+  /**
+   * Loads the surface from a LIVE running app (geometry tier): the probe navigates the
+   * browser to this URL instead of rendering a React element, so the app's own CSS/JS
+   * produce the real layout. The real-app pilot path — an alternative to `render` for the
+   * geometry probes (`loadSurface` in adapter-design/surface.ts).
+   */
+  readonly url?: string;
   /** Mounts the surface in a single theme (token-adherence). */
   readonly render?: () => ReactElement;
   /** Mounts the surface for a given theme (theme-parity) — the adapter renders it under each theme. */

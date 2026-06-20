@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadSurface } from './surface';
 import { type TapTargetExpect, MIN_TAP_TARGET_PX } from '../archetypes/tap-target-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -29,10 +29,8 @@ export function tapTargetProbe(subject: ReactDesignSubject, page: Page): Probe<T
   let acted = false;
   return {
     async act() {
-      if (!subject.render) throw new AvpFail('tap-target-integrity needs a render() seam.');
-      const html = renderToStaticMarkup(subject.render());
       await page.setViewport({ width: 480, height: 320 });
-      await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+      await loadSurface(page, subject, 'tap-target-integrity');
       targets = (await page.evaluate(measureTargets, INTERACTIVE)) as Target[];
       acted = true;
     },

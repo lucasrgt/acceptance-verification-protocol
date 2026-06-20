@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadSurface } from './surface';
 import type { ResponsiveIntegrityExpect } from '../archetypes/responsive-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -29,9 +29,7 @@ export function responsiveProbe(subject: ReactDesignSubject, page: Page): Probe<
   let acted = false;
   return {
     async act() {
-      if (!subject.render) throw new AvpFail('responsive-integrity needs a render() seam.');
-      const html = renderToStaticMarkup(subject.render());
-      await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+      await loadSurface(page, subject, 'responsive-integrity');
       const out: BreakpointMeasure[] = [];
       for (const width of breakpoints) {
         await page.setViewport({ width, height: 720 });

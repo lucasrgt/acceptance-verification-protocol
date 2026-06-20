@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadSurface } from './surface';
 import type { RtlIntegrityExpect } from '../archetypes/rtl-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -42,10 +42,8 @@ export function rtlProbe(subject: ReactDesignSubject, page: Page): Probe<RtlInte
     }, dir) as Promise<IconTransform[]>;
   return {
     async act() {
-      if (!subject.render) throw new AvpFail('rtl-integrity needs a render() seam.');
-      const html = renderToStaticMarkup(subject.render());
       await page.setViewport({ width: 480, height: 320 });
-      await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+      await loadSurface(page, subject, 'rtl-integrity');
       ltr = await readUnder('ltr');
       rtl = await readUnder('rtl');
       acted = true;

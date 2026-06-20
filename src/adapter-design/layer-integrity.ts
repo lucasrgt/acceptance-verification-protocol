@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadSurface } from './surface';
 import type { LayerIntegrityExpect } from '../archetypes/layer-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -34,10 +34,8 @@ export function layerProbe(subject: ReactDesignSubject, page: Page): Probe<Layer
   let acted = false;
   return {
     async act() {
-      if (!subject.render) throw new AvpFail('layer-integrity needs a render() seam.');
-      const html = renderToStaticMarkup(subject.render());
       await page.setViewport({ width: 360, height: 480 });
-      await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+      await loadSurface(page, subject, 'layer-integrity');
       rects = (await page.evaluate(measureRegions)) as Rect[];
       acted = true;
     },

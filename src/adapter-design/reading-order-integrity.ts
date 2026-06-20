@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadSurface } from './surface';
 import type { ReadingOrderExpect } from '../archetypes/reading-order-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -40,10 +40,8 @@ export function readingOrderProbe(subject: ReactDesignSubject, page: Page): Prob
   let acted = false;
   return {
     async act() {
-      if (!subject.render) throw new AvpFail('reading-order-integrity needs a render() seam.');
-      const html = renderToStaticMarkup(subject.render());
       await page.setViewport({ width: 640, height: 480 });
-      await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+      await loadSurface(page, subject, 'reading-order-integrity');
       items = (await page.evaluate(measureOrderItems)) as Item[];
       acted = true;
     },

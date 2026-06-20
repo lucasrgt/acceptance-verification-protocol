@@ -1,7 +1,7 @@
 import type { Page } from 'puppeteer-core';
-import { renderToStaticMarkup } from 'react-dom/server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
+import { loadMarkup } from './surface';
 import type { LayoutShiftExpect } from '../archetypes/layout-shift-integrity';
 import type { ReactDesignSubject } from './subject';
 
@@ -16,17 +16,16 @@ export function layoutShiftProbe(subject: ReactDesignSubject, page: Page): Probe
   let loadingTop = Number.NaN;
   let loadedTop = Number.NaN;
   let acted = false;
-  const render = async (state: string): Promise<number> => {
-    const html = renderToStaticMarkup(subject.renderState!(state));
-    await page.setViewport({ width: 480, height: 640 });
-    await page.setContent(`<!doctype html><html><body style="margin:0;font-family:sans-serif">${html}</body></html>`, { waitUntil: 'load' });
+  const measureState = async (state: string): Promise<number> => {
+    await loadMarkup(page, subject.renderState!(state));
     return (await page.evaluate(measureAnchorTop)) as number;
   };
   return {
     async act() {
       if (!subject.renderState) throw new AvpFail('layout-shift-integrity needs a renderState() seam (loading/loaded).');
-      loadingTop = await render('loading');
-      loadedTop = await render('loaded');
+      await page.setViewport({ width: 480, height: 640 });
+      loadingTop = await measureState('loading');
+      loadedTop = await measureState('loaded');
       acted = true;
     },
     expect: {
