@@ -108,6 +108,9 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
           );
         }
       },
+      cacheClearedOnIdentity() {
+        throw new AvpFail('cacheClearedOnIdentity needs an identity subject (declare `responsesByUser`); not applicable to an action subject.');
+      },
       survivesTokenRefresh() {
         const d = seen();
         if (d.refreshCount() === 0) {

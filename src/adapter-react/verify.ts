@@ -4,6 +4,7 @@ import { runVerification, type VerifyHooks } from '../core/run';
 import type { ActionEffectSubject } from './subject';
 import { reactProbe } from './probe';
 import { drive } from './drive';
+import { identityProbe, isIdentitySubject, type IdentitySubject } from './identity';
 import { dataHonestyHooks } from './data-honesty';
 import { personaHooks } from './persona-visibility';
 import { navHooks } from './navigation-integrity';
@@ -18,30 +19,43 @@ export interface VerifyOptions {
 /** Minimal subject contract the registry dispatches on. */
 type NamedSubject = { readonly name: string };
 
-/** The React adapter's hooks for the `action-effect` archetype. */
-function actionEffectHooks(subject: ActionEffectSubject, options: VerifyOptions): VerifyHooks {
+/**
+ * The React adapter's hooks for the `action-effect` archetype. Dispatches by subject
+ * shape: an action subject drives a control (the seven action criteria); an identity
+ * subject drives a sign-out/sign-in switch (cache-cleared-on-identity). Each criterion
+ * is gated to the subject that can observe it.
+ */
+function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, options: VerifyOptions): VerifyHooks {
+  if (isIdentitySubject(subject)) {
+    return {
+      probe: () => identityProbe(subject),
+      applies: (c) => (c.id === 'cache-cleared-on-identity' ? null : 'Identity subject — action criterion not applicable.'),
+    };
+  }
+  const s = subject;
   return {
-    probe: (condition) => reactProbe(subject, condition),
+    probe: (condition) => reactProbe(s, condition),
     applies: (c) => {
-      if (c.requires === 'input' && !subject.input) {
+      if (c.id === 'cache-cleared-on-identity') return 'Action subject — identity criterion not applicable.';
+      if (c.requires === 'input' && !s.input) {
         return 'Subject has no input — criterion not applicable.';
       }
-      if (c.requires === 'projection' && !subject.projection) {
+      if (c.requires === 'projection' && !s.projection) {
         return 'Subject declares no projection — criterion not applicable.';
       }
-      if (c.requires === 'contract' && !subject.accepts) {
+      if (c.requires === 'contract' && !s.accepts) {
         return 'Subject declares no accepts() contract — criterion not applicable.';
       }
-      if (c.requires === 'retryable' && !subject.retryable) {
+      if (c.requires === 'retryable' && !s.retryable) {
         return 'Subject is not marked retryable — criterion not applicable.';
       }
-      if (c.requires === 'refresh' && !subject.refreshEndpoint) {
+      if (c.requires === 'refresh' && !s.refreshEndpoint) {
         return 'Subject declares no refreshEndpoint — criterion not applicable.';
       }
       return null;
     },
     gatherEvidence: async (condition) => {
-      const driven = await drive(subject, condition);
+      const driven = await drive(s, condition);
       const text = (document.body.textContent ?? '').replace(/\s+/g, ' ').trim();
       return { text, draft: driven.inputValue(), requests: driven.requests };
     },

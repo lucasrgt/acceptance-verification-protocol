@@ -109,6 +109,19 @@
           "seenIn": [
             "b4b0fc07"
           ]
+        },
+        {
+          "id": "cache-cleared-on-identity",
+          "statement": "Signing in/out wipes the prior identity's cached rows: after an identity switch, the previous account's data never feeds the new session — the UI shows the new identity's data, not the old.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:8fca029d",
+            "documenso:d2976cb1"
+          ]
         }
       ]
     },

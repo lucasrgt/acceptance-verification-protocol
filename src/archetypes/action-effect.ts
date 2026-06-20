@@ -18,6 +18,8 @@ export interface ActionEffectExpect {
   survivesTokenRefresh(): void;
   /** No success affirmation was shown after a failed action (no phantom success). */
   noFalseSuccess(): void;
+  /** After an identity switch, the prior identity's cached rows are gone and the new identity's data loads. */
+  cacheClearedOnIdentity(): void;
 }
 
 /**
@@ -99,6 +101,16 @@ export const actionEffect = archetype('action-effect', '0.1.0', () => {
     mechanical<ActionEffectExpect>(async ({ act, expect }) => {
       await act();
       expect.survivesTokenRefresh();
+    }),
+  );
+
+  criterion(
+    'cache-cleared-on-identity',
+    'Signing in/out wipes the prior identity\'s cached rows: after an identity switch, the previous account\'s data never feeds the new session — the UI shows the new identity\'s data, not the old.',
+    { under: 'success', scope: 'invariant', requires: 'identity', seenIn: ['documenso:8fca029d', 'documenso:d2976cb1'] },
+    mechanical<ActionEffectExpect>(async ({ act, expect }) => {
+      await act();
+      expect.cacheClearedOnIdentity();
     }),
   );
 });
