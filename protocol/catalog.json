@@ -477,6 +477,26 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "temporal-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "zoned-to-user",
+          "statement": "A displayed instant is rendered in the user's timezone: a stored UTC timestamp near a day boundary shows the user's local calendar date, not the UTC/server/ambient date — no off-by-one day.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:22fd1b5b",
+            "calcom:c1d0a6bb",
+            "calcom:d70fa462"
+          ]
+        }
+      ]
     }
   ]
 }

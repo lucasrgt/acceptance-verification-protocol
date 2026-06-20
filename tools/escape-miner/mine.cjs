@@ -42,6 +42,7 @@ function inferStack(repo) {
 const ARCHETYPES = [
   ["navigation-integrity", /\b(404|not[-\s]?found|route|router|redirect|nav(igation)?|outlet|deep[-\s]?link|back[-\s]?button|voltar|breadcrumb|dead[-\s]?link)\b/i],
   ["authorization/persona", /\b(idor|authoriz|authz|permission|role[-\s]|tenant|persona|forbidden|403|unauthor|cross[-\s]?account|leak|scope to|own(ed|s)?[-\s]|visib)\b/i],
+  ["temporal-integrity", /\b(time[-\s]?zone|tz|utc|off[-\s]?by[-\s]?one|midnight|day[-\s]?light|dst|date[-\s]?only|local time|wrong (date|day|time)|day boundary|start[Oo]f|end[Oo]f|dayjs|moment\.)\b/i],
   ["action-effect", /\b(no[-\s]?op|not connected|never connected|wire|wiring|silent(ly)?|phantom|does nothing|dead button|swallow|idempoten|retry|refresh token|401 interceptor|drop(ped)? (the )?(request|message|action))\b/i],
   ["projection/cache", /\b(stale|invalidate|invalidation|cache|refetch|out[-\s]?of[-\s]?sync|not updat|re-?sync|reconcile)\b/i],
   ["mount-stability", /\b(storm|infinite (loop|redirect|refetch)|render loop|freeze|frozen|hang|too many requests|re-?render loop|flicker)\b/i],

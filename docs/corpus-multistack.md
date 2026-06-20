@@ -29,9 +29,12 @@ the same archetypes surface in every one.
 | monica | personal CRM | Laravel/PHP | 966 | 131 | 8 |
 | bitwarden/server | password manager | .NET | 7 340 | 846 | 107 |
 | gitea | git forge | Go | 19 948 | 5 345 | 410 |
+| cal.com | scheduling | Node/TS (Next) | 16 015 | 6 275 | 936 |
 
-≈**1 120 classified escapes** in the slice (a lower bound), on top of the three
-local Lazuli apps from `docs/transfer.md`.
+≈**2 050 classified escapes** in the slice (a lower bound), on top of the three
+local Lazuli apps from `docs/transfer.md`. cal.com was added (2026-06-20) as a
+**fresh domain** to surface escape classes the marketplace corpus couldn't — see the
+temporal section below.
 
 ## The cross-stack archetype matrix
 
@@ -57,6 +60,32 @@ Counts of classified escapes per archetype per repo (tier-1, lower bound).
 authorization/persona, integration-integrity); navigation, projection,
 action-effect and validation in five of six. The catalog is a property of *web
 software*, not of one team or one framework.
+
+## A new escape class: `temporal-integrity` (mined 2026-06-20)
+
+The marketplace corpus that built the catalog had no temporal archetype — its time
+handling was simple. Mining a **fresh domain where time IS the product** surfaced a
+large, distinct class the original error-analysis never reached. We added a temporal
+classifier to the miner (`time-zone|utc|off-by-one|dst|date-only|dayjs|…`) and
+re-mined the repos we hold locally:
+
+| repo | domain | stack | temporal-integrity escapes |
+|---|---|---|--:|
+| cal.com | scheduling | Node/TS | **114** (4th-largest archetype in the repo) |
+| documenso | e-signature | Node/TS | 1 (*"default to user timezone"* 22fd1b5b) |
+| bitwarden/server | password manager | .NET | 0 |
+
+The shape is the finding: temporal-integrity is **domain-weighted**, not universal —
+it dominates where scheduling/booking/expiry is the core (cal.com: 114, behind only
+navigation 188, second-order 187, integration 164) and all but vanishes in a vault
+(bitwarden: 0). That's the opposite profile from the universal archetypes
+(authorization, second-order, integration appear in *every* repo) and exactly why it
+escaped a marketplace-only mine. Representative cal.com fixes: *"Stores the DateRange
+in UTC instead of user machine that caused the bug"* (c1d0a6bb), *"event startTime is
+in utc"* (d70fa462), *"use UTC parsing for recurring booking dates to prevent timezone
+conversion issues"* (26e85823). The first executed criterion — `zoned-to-user` (an
+instant must be shown in the viewer's zone, no day-boundary off-by-one) — is in
+`bench/temporal-integrity.test.ts`.
 
 ## Exact-match confirmations (the gold)
 

@@ -10,6 +10,7 @@ import { personaHooks } from './persona-visibility';
 import { navHooks } from './navigation-integrity';
 import { mountStabilityHooks } from './mount-stability';
 import { lifecycleFeHooks } from './lifecycle-gate';
+import { temporalHooks } from './temporal-integrity';
 
 export interface VerifyOptions {
   /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
@@ -78,6 +79,7 @@ const REGISTRY: Record<string, (subject: never, options: VerifyOptions) => Verif
   'navigation-integrity': navHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'mount-stability': mountStabilityHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'lifecycle-gate': lifecycleFeHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
+  'temporal-integrity': temporalHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
 };
 
 /**

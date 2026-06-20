@@ -10,6 +10,7 @@ import { integrationIntegrity } from './archetypes/integration-integrity';
 import { secondOrderEffects } from './archetypes/second-order-effects';
 import { moneyIntegrity } from './archetypes/money-integrity';
 import { lifecycleGate } from './archetypes/lifecycle-gate';
+import { temporalIntegrity } from './archetypes/temporal-integrity';
 
 /**
  * The PROTOCOL surface — the language-neutral truth, emitted FROM the archetypes so
@@ -33,6 +34,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   secondOrderEffects,
   moneyIntegrity,
   lifecycleGate,
+  temporalIntegrity,
 ];
 
 /** The condition vocabulary, by axis — the preconditions an adapter must be able to force. */

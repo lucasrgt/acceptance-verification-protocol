@@ -152,13 +152,30 @@ completeness; **not** an Assay runtime criterion — caught cheaper before runti
 
 `LZFE011` (locale parity) + `LZFE014` (no hardcoded copy). Static-doctor territory.
 
+### 12. `temporal-integrity` — time is correct: an instant is shown in the user's zone *(FE + BE)*
+
+A **cross-stack addition** (mined 2026-06-20), not from the marketplace — its time
+handling was too simple to surface this. Mined from fresh domains where time *is* the
+product: cal.com (scheduling — **114** classified temporal escapes, the 4th-largest
+archetype there) and documenso (e-signature). The canonical LLM/test escape: a stored
+UTC instant is formatted in UTC / the server's zone / the lazy
+`new Date(iso).toISOString().slice(0,10)` instead of the viewer's zone, so a value
+near a day boundary renders a day off — the test ran at a fixed instant in a fixed
+zone and never saw it. Domain-weighted, not universal (see `docs/corpus-multistack.md`).
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `zoned-to-user` | A displayed instant is rendered in the user's timezone; a UTC timestamp near a day boundary shows the user's local date, not the UTC/server date — no off-by-one. | mechanical | FE | DateRange stored in UTC not user machine; event startTime in UTC; default-to-user-timezone |
+| `clock-not-frozen` | A relative-time / countdown readout reflects the live clock at render, not a value frozen at module-load / build time. | mechanical | FE | *(frontier — catalogued, not yet executed)* |
+| `floating-date-not-shifted` | A date-only value (an expiry date, a birthday) is never zone-shifted by a round-trip through `new Date()`. | mechanical | FE | *(frontier — catalogued, not yet executed)* |
+
 ---
 
 ## The coverage ledger (where each criterion lives)
 
 | reach | archetypes | home |
 |---|---|---|
-| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half) | this repo, React adapter |
+| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user) | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half) | future backend adapter |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
 
@@ -184,8 +201,9 @@ criterion and a fix passes it, in `bench/`.
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
+| **temporal-integrity** (React) | zoned-to-user | `bench/temporal-integrity.test.ts` 1/1 + mutation 5/5 |
 
-Total executed detection: **32/32, false-alarm 0**, across **10 archetypes** and 3
+Total executed detection: **33/33, false-alarm 0**, across **11 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -209,16 +227,21 @@ route deep-linked as the wrong actor, judged by redirect** · a **blocked action
 mounted to prove it's disabled with a reason, not a live click into failure** · a
 **guard mounted and its route-load hops counted to prove it settles, not storms** ·
 a **sign-out/sign-in switch driven to prove the prior identity's cache is wiped** · a
-**count-readout compared to the server's authoritative value after an optimistic bump**.
+**count-readout compared to the server's authoritative value after an optimistic bump** ·
+a **stored UTC instant rendered and its calendar day compared against the viewer's
+zone, deterministic on any CI host**.
 
-**Every catalogued RUNTIME criterion is now executed** — the FE/DOM and BE/HTTP
-reach is complete. What remains catalogued-but-not-executed is exclusively **STATIC**
-(host-doctor territory, by design — cheaper before runtime, not Assay's job):
-`contract-mints-no-routes`, `state-completeness`, `i18n-honesty`, `money-is-typed`,
-`money-formatted-once`. money-integrity's `split-invariant` runs over HTTP; its other
-two criteria are STATIC. The catalog converges by accumulation of escapes, never
-proven complete — the next executed criteria grow from new mined escape classes, not
-from this list.
+The original **marketplace** runtime catalog (FE/DOM + BE/HTTP) is fully executed;
+what remains from it is exclusively **STATIC** (host-doctor territory, by design —
+cheaper before runtime, not Assay's job): `contract-mints-no-routes`,
+`state-completeness`, `i18n-honesty`, `money-is-typed`, `money-formatted-once`.
+money-integrity's `split-invariant` runs over HTTP; its other two criteria are STATIC.
+**The catalog converges by accumulation of escapes, never proven complete** — and
+`temporal-integrity` is the proof: a whole archetype the marketplace mine couldn't
+see, surfaced only by mining a fresh domain (cal.com, scheduling). Its first criterion
+(`zoned-to-user`) is executed; its frontier (`clock-not-frozen`,
+`floating-date-not-shifted`) is the next runtime growth — from new mined escape
+classes, not from a fixed list.
 
 The neutral core (`src/core/run.ts`) runs every archetype through one runner; each
 new archetype/probe is one hooks entry in `src/adapter-react/verify.ts`, and
