@@ -229,7 +229,14 @@ hierarchy discrepancy that motivated the idea.)
      every interactive element. Mutation 3/3 (tiny-icon, thin-link, narrow-btn), false-alarm 0.
      `bench/tap-target-integrity.test.ts`. Grounded in the "clickable area" cluster
      (mastodon:2b93a221, gitea:8703b6c9).
-     **Design catalog: 13/13 detection, 46/46 mutants killed (geometry tier = 6).**
+   - **layout-shift-integrity** — ✅ **DONE.** `reserved-space-stable`: async content (image,
+     widget, banner) reserves its space so a downstream `[data-anchor]` keeps its position
+     between the loading and loaded states — no cumulative layout shift. The TEMPORAL geometry
+     criterion: compares the layout BEFORE and AFTER load (via the `renderState` seam), unlike
+     every other geometry criterion (single static layout). Mutation 3/3 (unsized-image,
+     late-widget, expanding-banner), false-alarm 0. `bench/layout-shift-integrity.test.ts`.
+     Grounded in the layout-shift cluster (mastodon:511e10df, gitea:32fdfb0b, documenso:1a23744d).
+     **Design catalog: 14/14 detection, 49/49 mutants killed (geometry tier = 7).**
 4. **Model-oracle tier** — the one criterion no mechanical check can decide.
    - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
@@ -240,8 +247,9 @@ hierarchy discrepancy that motivated the idea.)
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
      `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
-     **Design catalog: 14 criteria — jsdom (7) + geometry (6: layout · layer · responsive ·
-     reading-order · rtl · tap-target) + model (1), 49/49 mutants killed, false-alarm 0.**
+     **Design catalog: 15 criteria — jsdom (7) + geometry (7: layout · layer · responsive ·
+     reading-order · rtl · tap-target · layout-shift) + model (1), 52/52 mutants killed,
+     false-alarm 0.**
 5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
    serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
    because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
