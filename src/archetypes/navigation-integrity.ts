@@ -8,6 +8,8 @@ export interface NavigationExpect {
   nestedRenders(): void;
   /** Back is never a dead no-op: with no history it lands on a real fallback. */
   backHasFallback(): void;
+  /** A route that needs a param redirects to a real parent when the param is absent/empty (not a ghost). */
+  requiredParamsGuarded(): void;
 }
 
 /**
@@ -47,6 +49,16 @@ export const navigationIntegrity = archetype('navigation-integrity', '0.1.0', ()
     mechanical<NavigationExpect>(async ({ act, expect }) => {
       await act();
       expect.backHasFallback();
+    }),
+  );
+
+  criterion(
+    'required-params-guarded',
+    'A route that needs a param redirects to a real parent when the param is absent or empty — it never renders the detail with an undefined/empty param (a ghost screen).',
+    { under: 'success', scope: 'invariant', requires: 'router', seenIn: ['documenso:184cbd67', 'documenso:04b1ce1a'] },
+    mechanical<NavigationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.requiredParamsGuarded();
     }),
   );
 });

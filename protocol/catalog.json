@@ -218,6 +218,19 @@
           "seenIn": [
             "3aa1c80a"
           ]
+        },
+        {
+          "id": "required-params-guarded",
+          "statement": "A route that needs a param redirects to a real parent when the param is absent or empty — it never renders the detail with an undefined/empty param (a ghost screen).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:184cbd67",
+            "documenso:04b1ce1a"
+          ]
         }
       ]
     },

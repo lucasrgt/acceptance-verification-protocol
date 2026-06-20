@@ -24,6 +24,15 @@ export interface RouterNavSubject {
     readonly trigger: { readonly role: string; readonly name: string | RegExp };
     readonly fallbackMarker: string | RegExp;
   };
+  /**
+   * Mounted at a param-less route, the guard must redirect to a real parent
+   * (`fallbackMarker` present) and must NOT render the detail with a missing param
+   * (`ghostMarker` absent, when given). (required-params-guarded)
+   */
+  readonly paramGuard?: {
+    readonly fallbackMarker: string | RegExp;
+    readonly ghostMarker?: string | RegExp;
+  };
 }
 
 const present = (marker: string | RegExp): boolean => {
@@ -72,6 +81,23 @@ export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> 
         if (!present(subject.back.fallbackMarker)) {
           throw new AvpFail(
             `Back was a dead no-op: opened deep with no history, pressing back did not land on the fallback ("${String(subject.back.fallbackMarker)}"). Fall back to a real route when there is nothing to pop (canGoBack ? back() : navigate(fallback)).`,
+            {},
+          );
+        }
+      },
+      requiredParamsGuarded() {
+        if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
+        if (!subject.paramGuard) throw new AvpFail('requiredParamsGuarded needs a `paramGuard` seam on the subject.');
+        const { fallbackMarker, ghostMarker } = subject.paramGuard;
+        if (!present(fallbackMarker)) {
+          throw new AvpFail(
+            `A param-less route did not redirect to its real parent ("${String(fallbackMarker)}") — it rendered the detail with a missing param (a ghost screen). Guard the route: when the required param is absent or empty, redirect to the parent instead of rendering.`,
+            {},
+          );
+        }
+        if (ghostMarker && present(ghostMarker)) {
+          throw new AvpFail(
+            `A param-less route rendered the detail ("${String(ghostMarker)}") instead of (or alongside) redirecting — the missing-param ghost is still visible. The guard must redirect before the detail mounts.`,
             {},
           );
         }

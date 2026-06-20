@@ -1,1 +1,4 @@
 index.db*
+# Local-only: the anonymization map necessarily contains the private names it maps —
+# it must NEVER reach the public remote. Keep it on disk, out of git.
+items/geral/fc2e2566-public-repo-anonymization-map-no-private-project.md

@@ -177,31 +177,33 @@ criterion and a fix passes it, in `bench/`.
 | action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, survives-token-refresh | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 |
 | data-honesty | no-fixture-fallback, no-fabricated-media, no-raw-id-flash | `bench/data-honesty.test.ts` 2/2 + `bench/data-detail.test.ts` 1/1 |
 | persona-scoped-visibility | no-cross-persona-affordance | `bench/persona-visibility.test.ts` 2/2 **cross-project** |
-| navigation-integrity | target-resolves, nested-renders, back-has-fallback | `bench/navigation.test.ts` 2/2 **cross-project** + `bench/navigation-nested.test.ts` 1/1 + `bench/navigation-back.test.ts` 1/1 |
+| navigation-integrity | target-resolves, nested-renders, back-has-fallback, required-params-guarded | `bench/navigation.test.ts` 2/2 **cross-project** + `bench/navigation-nested.test.ts` 1/1 + `bench/navigation-back.test.ts` 1/1 + `bench/navigation-params.test.ts` 1/1 + mutation 4/4 |
 | mount-stability | settles-without-storm | `bench/mount-stability.test.ts` 1/1 |
 | **authorization** (HTTP adapter) | own-resource-only (IDOR), role-required, server-is-authoritative | `bench/authorization.test.ts` 2/2 + `bench/server-authoritative.test.ts` 1/1 + mutation 5/5 |
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + mutation 6/6 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
 
-Total executed detection: **23/23, false-alarm 0**, across 9 archetypes and 3
+Total executed detection: **24/24, false-alarm 0**, across 9 archetypes and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
 rest) run through the same runner as the DOM archetypes is the proof the core is
-substrate-neutral, not React-shaped. `authorization` (3 criteria) and
-`integration-integrity` (2) now seam-gate multiple criteria over HTTP — a subject
-declares only the seams it has, and the rest are honestly skipped, never failed.
-Probe substrates so far: RTL+MSW drive · render-vs-API · render-as-actor ·
-navigate-spy · mount-and-count · a real mounted TanStack router · a paint-timing
-harness · a **real HTTP request** · an **integer-cent split swept across totals** · a
-**checkout return-URL binding check** · a **client-tamper sweep on a recorded value**.
+substrate-neutral, not React-shaped. `authorization` (3 criteria),
+`integration-integrity` (2) and `navigation-integrity` (4) now seam-gate multiple
+criteria — a subject declares only the seams it has, and the rest are honestly
+skipped, never failed. Probe substrates so far: RTL+MSW drive · render-vs-API ·
+render-as-actor · navigate-spy · mount-and-count · a real mounted TanStack router · a
+paint-timing harness · a **real HTTP request** · an **integer-cent split swept across
+totals** · a **checkout return-URL binding check** · a **client-tamper sweep on a
+recorded value** · a **param-less route mounted to prove it redirects, not ghosts**.
 
 Catalogued but not yet executed: action-effect's `optimistic-reconcile` /
-`cache-cleared-on-identity`; navigation's `no-redirect-loop` /
-`required-params-guarded`; data-honesty's `count-matches-source`; the HTTP-reachable
-BE criteria still open (integration's `callback-resolves-entity`, lifecycle's
-`gate-enforced-server-side`); all STATIC archetypes (host doctor). money-integrity's
+`cache-cleared-on-identity`; navigation's `no-redirect-loop`; data-honesty's
+`count-matches-source`; persona's `no-cross-persona-route`; lifecycle's
+`blocked-action-is-disabled` (FE); the HTTP-reachable BE criteria still open
+(integration's `callback-resolves-entity`, lifecycle's `gate-enforced-server-side`);
+all STATIC archetypes (host doctor). money-integrity's
 `split-invariant` is now executed over the HTTP adapter (the others — `money-is-typed`,
 `money-formatted-once` — are STATIC, host-doctor territory).
 
