@@ -189,11 +189,17 @@ hierarchy discrepancy that motivated the idea.)
      rhythm needs no layout engine. Mutation 4/4 (inverted, off-scale, flat,
      inconsistent), false-alarm 0. `bench/spacing-rhythm.test.ts`.
      **Design catalog: 7/7 detection, 28/28 mutants killed.**
-3. **Playwright tier** — the criteria that genuinely need a layout engine (offsetWidth = 0):
-   `layout-integrity` (overflow/clip/overlap), `layer-integrity` (z-index stacking that
-   actually overlaps), responsive across breakpoints. Reuse the `proof` plugin's browser
-   harness. Spacing *ratios* did NOT need this (declared padding is jsdom-readable); only
-   measured geometry does. The next architectural step.
+3. **Browser geometry tier** — the criteria that genuinely need a layout engine
+   (offsetWidth = 0). Substrate: **puppeteer-core driving the installed Chrome/Edge** (no
+   ~150MB download) — `src/adapter-design/browser.ts` + `browser-verify.ts`
+   (`verifyDesignBrowser`, reuses `core/run.ts`); the probe renders the React surface to
+   static markup, loads it in headless Chrome, and measures real `scrollWidth`/
+   `clientWidth`. The bench skips honestly if no Chrome/Edge is installed.
+   - **layout-integrity** — ✅ **DONE.** `content-fits`: no element clips its own content
+     (cut off by a too-small box with hidden overflow). Mutation 3/3 (horizontal clip,
+     vertical clip, button-label clip), false-alarm 0. `bench/layout-integrity.test.ts`.
+     **Design catalog: 8/8 detection, 31/31 mutants killed.**
+   - Remaining: `layer-integrity` (sibling z-index overlap), responsive across breakpoints.
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful
