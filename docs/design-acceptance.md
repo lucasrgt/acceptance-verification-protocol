@@ -222,7 +222,14 @@ hierarchy discrepancy that motivated the idea.)
      directional icon's computed transform under both writing directions. Mutation 3/3
      (no-flip, partial-flip, flip-always), false-alarm 0. `bench/rtl-integrity.test.ts`.
      Grounded in mastodon:51345e51 (back arrow wrong way in RTL).
-     **Design catalog: 12/12 detection, 43/43 mutants killed (geometry tier = 5).**
+   - **tap-target-integrity** — ✅ **DONE.** `targets-meet-minimum-size`: every interactive
+     control is ≥ 44×44 CSS px (WCAG 2.5.5) — a bare icon button, a thin link, or a control
+     shrunk to its glyph is too small to reliably tap. The control's OWN size against a
+     threshold, distinct from overflow/collision/order/mirror. Reads getBoundingClientRect of
+     every interactive element. Mutation 3/3 (tiny-icon, thin-link, narrow-btn), false-alarm 0.
+     `bench/tap-target-integrity.test.ts`. Grounded in the "clickable area" cluster
+     (mastodon:2b93a221, gitea:8703b6c9).
+     **Design catalog: 13/13 detection, 46/46 mutants killed (geometry tier = 6).**
 4. **Model-oracle tier** — the one criterion no mechanical check can decide.
    - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
@@ -233,8 +240,8 @@ hierarchy discrepancy that motivated the idea.)
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
      `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
-     **Design catalog: 13 criteria — jsdom (7) + geometry (5: layout · layer · responsive ·
-     reading-order · rtl) + model (1), 46/46 mutants killed, false-alarm 0.**
+     **Design catalog: 14 criteria — jsdom (7) + geometry (6: layout · layer · responsive ·
+     reading-order · rtl · tap-target) + model (1), 49/49 mutants killed, false-alarm 0.**
 5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
    serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
    because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
