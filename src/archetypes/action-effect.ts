@@ -20,6 +20,8 @@ export interface ActionEffectExpect {
   noFalseSuccess(): void;
   /** After an identity switch, the prior identity's cached rows are gone and the new identity's data loads. */
   cacheClearedOnIdentity(): void;
+  /** An optimistic update reconciled to the server's authoritative value (no permanent drift). */
+  optimisticReconcile(): void;
 }
 
 /**
@@ -111,6 +113,16 @@ export const actionEffect = archetype('action-effect', '0.1.0', () => {
     mechanical<ActionEffectExpect>(async ({ act, expect }) => {
       await act();
       expect.cacheClearedOnIdentity();
+    }),
+  );
+
+  criterion(
+    'optimistic-reconcile',
+    'An optimistic update reconciles to the server\'s authoritative value: when the response differs from the optimistic guess, the UI settles on the server\'s truth — a count-based optimistic state never drifts permanently.',
+    { under: 'success', scope: 'invariant', requires: 'reconcile', seenIn: ['documenso:eb45d1e5', 'documenso:ed7a0011'] },
+    mechanical<ActionEffectExpect>(async ({ act, expect }) => {
+      await act();
+      expect.optimisticReconcile();
     }),
   );
 });

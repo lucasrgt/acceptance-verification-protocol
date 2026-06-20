@@ -122,6 +122,19 @@
             "documenso:8fca029d",
             "documenso:d2976cb1"
           ]
+        },
+        {
+          "id": "optimistic-reconcile",
+          "statement": "An optimistic update reconciles to the server's authoritative value: when the response differs from the optimistic guess, the UI settles on the server's truth — a count-based optimistic state never drifts permanently.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:eb45d1e5",
+            "documenso:ed7a0011"
+          ]
         }
       ]
     },

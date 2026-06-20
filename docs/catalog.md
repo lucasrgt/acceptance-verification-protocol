@@ -174,7 +174,7 @@ criterion and a fix passes it, in `bench/`.
 
 | archetype | criteria executed (green) | benchmark |
 |---|---|---|
-| action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, survives-token-refresh, cache-cleared-on-identity | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 + `bench/cache-identity.test.ts` 1/1 + mutation 3/3 |
+| action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, survives-token-refresh, cache-cleared-on-identity, optimistic-reconcile | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 + `bench/cache-identity.test.ts` 1/1 + `bench/optimistic-reconcile.test.ts` 1/1 + mutation 3/3+3/3 |
 | data-honesty | no-fixture-fallback, no-fabricated-media, no-raw-id-flash, count-matches-source | `bench/data-honesty.test.ts` 2/2 + `bench/data-detail.test.ts` 1/1 + `bench/count-source.test.ts` 1/1 + mutation 4/4 |
 | persona-scoped-visibility | no-cross-persona-affordance, no-cross-persona-route | `bench/persona-visibility.test.ts` 2/2 **cross-project** + `bench/persona-route.test.ts` 1/1 + mutation 4/4 |
 | navigation-integrity | target-resolves, nested-renders, back-has-fallback, required-params-guarded, no-redirect-loop | `bench/navigation.test.ts` 2/2 **cross-project** + `bench/navigation-nested.test.ts` 1/1 + `bench/navigation-back.test.ts` 1/1 + `bench/navigation-params.test.ts` 1/1 + `bench/redirect-loop.test.ts` 1/1 + mutation 4/4+3/3 |
@@ -185,7 +185,7 @@ criterion and a fix passes it, in `bench/`.
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 
-Total executed detection: **31/31, false-alarm 0**, across **10 archetypes** and 3
+Total executed detection: **32/32, false-alarm 0**, across **10 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -208,12 +208,17 @@ it redirects, not ghosts** · a **rendered-count-vs-API-count comparison** · a
 route deep-linked as the wrong actor, judged by redirect** · a **blocked action
 mounted to prove it's disabled with a reason, not a live click into failure** · a
 **guard mounted and its route-load hops counted to prove it settles, not storms** ·
-a **sign-out/sign-in switch driven to prove the prior identity's cache is wiped**.
+a **sign-out/sign-in switch driven to prove the prior identity's cache is wiped** · a
+**count-readout compared to the server's authoritative value after an optimistic bump**.
 
-Catalogued but not yet executed: action-effect's `optimistic-reconcile`; all STATIC
-archetypes (host doctor). money-integrity's
-`split-invariant` is now executed over the HTTP adapter (the others — `money-is-typed`,
-`money-formatted-once` — are STATIC, host-doctor territory).
+**Every catalogued RUNTIME criterion is now executed** — the FE/DOM and BE/HTTP
+reach is complete. What remains catalogued-but-not-executed is exclusively **STATIC**
+(host-doctor territory, by design — cheaper before runtime, not Assay's job):
+`contract-mints-no-routes`, `state-completeness`, `i18n-honesty`, `money-is-typed`,
+`money-formatted-once`. money-integrity's `split-invariant` runs over HTTP; its other
+two criteria are STATIC. The catalog converges by accumulation of escapes, never
+proven complete — the next executed criteria grow from new mined escape classes, not
+from this list.
 
 The neutral core (`src/core/run.ts`) runs every archetype through one runner; each
 new archetype/probe is one hooks entry in `src/adapter-react/verify.ts`, and

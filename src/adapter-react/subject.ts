@@ -30,4 +30,14 @@ export interface ActionEffectSubject {
   readonly refreshEndpoint?: { readonly method: string; readonly path: string };
   /** A success affirmation (text the UI shows only on real success). On failure it must NOT appear (no phantom success). */
   readonly successMarker?: { readonly text: string | RegExp };
+  /**
+   * Optimistic-reconcile seam: a count readout that, after the action, must equal the
+   * server's authoritative value (`successResponse` carries it). Enables
+   * `optimistic-reconcile`.
+   */
+  readonly reconcile?: {
+    readonly readout: { readonly role: string; readonly name?: string | RegExp };
+    /** The server's authoritative count the readout must settle on (no optimistic drift). */
+    readonly serverCount: number;
+  };
 }

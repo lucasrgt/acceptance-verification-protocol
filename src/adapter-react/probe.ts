@@ -1,3 +1,4 @@
+import { screen } from '@testing-library/react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { Condition } from '../core/types';
 import type { ActionEffectExpect } from '../archetypes/action-effect';
@@ -110,6 +111,22 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
       },
       cacheClearedOnIdentity() {
         throw new AvpFail('cacheClearedOnIdentity needs an identity subject (declare `responsesByUser`); not applicable to an action subject.');
+      },
+      optimisticReconcile() {
+        seen();
+        const r = subject.reconcile;
+        if (!r) throw new AvpFail('No reconcile seam declared on the subject.');
+        const el = screen.queryByRole(r.readout.role, r.readout.name ? { name: r.readout.name } : undefined);
+        const n = parseInt((el?.textContent ?? '').replace(/[^\d-]/g, ''), 10);
+        if (Number.isNaN(n)) {
+          throw new AvpFail(`Could not read a number from the count readout ("${el?.textContent ?? ''}").`);
+        }
+        if (n !== r.serverCount) {
+          throw new AvpFail(
+            `After the action the count is ${n}, but the server's authoritative value is ${r.serverCount} — an optimistic update never reconciled to server truth (permanent drift). On the response, set the count to the server's value; don't keep the optimistic guess.`,
+            { rendered: n, serverCount: r.serverCount },
+          );
+        }
       },
       survivesTokenRefresh() {
         const d = seen();

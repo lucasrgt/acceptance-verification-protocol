@@ -88,6 +88,7 @@ export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpec
       idempotentRetry: stub('idempotentRetry'),
       noFalseSuccess: stub('noFalseSuccess'),
       survivesTokenRefresh: stub('survivesTokenRefresh'),
+      optimisticReconcile: stub('optimisticReconcile'),
     },
   };
 }

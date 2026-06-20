@@ -52,6 +52,9 @@ function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, optio
       if (c.requires === 'refresh' && !s.refreshEndpoint) {
         return 'Subject declares no refreshEndpoint — criterion not applicable.';
       }
+      if (c.requires === 'reconcile' && !s.reconcile) {
+        return 'Subject declares no reconcile seam — criterion not applicable.';
+      }
       return null;
     },
     gatherEvidence: async (condition) => {
