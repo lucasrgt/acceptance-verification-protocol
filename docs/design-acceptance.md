@@ -215,7 +215,14 @@ hierarchy discrepancy that motivated the idea.)
      DECLARED spec) — here the measured VISUAL order is the ground truth. Mutation 3/3
      (flex-order, column-reverse, absolute-bump), false-alarm 0.
      `bench/reading-order-integrity.test.ts`. Grounded in mastodon:d20d0492.
-     **Design catalog: 11/11 detection, 40/40 mutants killed (geometry tier = 4).**
+   - **rtl-integrity** — ✅ **DONE.** `directional-icons-mirror`: a direction-dependent icon
+     (back/next chevron, marked `data-dir-icon`) mirrors under `dir=rtl` and only under rtl —
+     so it points the right way in RTL locales. Distinct from icon-correctness (the glyph's
+     MEANING): here the glyph is right but its ORIENTATION under RTL is wrong. Reads each
+     directional icon's computed transform under both writing directions. Mutation 3/3
+     (no-flip, partial-flip, flip-always), false-alarm 0. `bench/rtl-integrity.test.ts`.
+     Grounded in mastodon:51345e51 (back arrow wrong way in RTL).
+     **Design catalog: 12/12 detection, 43/43 mutants killed (geometry tier = 5).**
 4. **Model-oracle tier** — the one criterion no mechanical check can decide.
    - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
@@ -226,8 +233,8 @@ hierarchy discrepancy that motivated the idea.)
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
      `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
-     **Design catalog: 12 criteria — jsdom (7) + geometry (4: layout · layer · responsive ·
-     reading-order) + model (1), 43/43 mutants killed, false-alarm 0.**
+     **Design catalog: 13 criteria — jsdom (7) + geometry (5: layout · layer · responsive ·
+     reading-order · rtl) + model (1), 46/46 mutants killed, false-alarm 0.**
 5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
    serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
    because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.

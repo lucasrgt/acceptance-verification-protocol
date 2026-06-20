@@ -6,6 +6,7 @@ import { layoutHooks } from './layout-integrity';
 import { layerHooks } from './layer-integrity';
 import { responsiveHooks } from './responsive-integrity';
 import { readingOrderHooks } from './reading-order-integrity';
+import { rtlHooks } from './rtl-integrity';
 import type { ReactDesignSubject } from './subject';
 
 /**
@@ -20,6 +21,7 @@ const REGISTRY: Record<string, (subject: ReactDesignSubject, page: Page) => Veri
   'layer-integrity': layerHooks,
   'responsive-integrity': responsiveHooks,
   'reading-order-integrity': readingOrderHooks,
+  'rtl-integrity': rtlHooks,
 };
 
 /** Runs a geometry design archetype against a surface in a real browser page. */
