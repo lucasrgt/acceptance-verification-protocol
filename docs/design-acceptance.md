@@ -198,8 +198,12 @@ hierarchy discrepancy that motivated the idea.)
    - **layout-integrity** — ✅ **DONE.** `content-fits`: no element clips its own content
      (cut off by a too-small box with hidden overflow). Mutation 3/3 (horizontal clip,
      vertical clip, button-label clip), false-alarm 0. `bench/layout-integrity.test.ts`.
-     **Design catalog: 8/8 detection, 31/31 mutants killed.**
-   - Remaining: `layer-integrity` (sibling z-index overlap), responsive across breakpoints.
+   - **layer-integrity** — ✅ **DONE.** `no-unintended-overlap`: two in-flow regions that
+     should stack don't visually collide (bounding-box intersection) — distinct from
+     layout-integrity's self-clip. Mutation 3/3 (absolute, negative-margin, transform),
+     false-alarm 0. `bench/layer-integrity.test.ts`.
+     **Design catalog: 9/9 detection, 34/34 mutants killed.**
+   - Remaining: responsive across breakpoints (render narrow+wide, assert no new clip/overlap).
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful
