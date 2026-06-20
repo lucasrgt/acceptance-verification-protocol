@@ -26,6 +26,8 @@ export interface ActionEffectSubject {
   readonly accepts?: (body: unknown) => boolean;
   /** Opt-in: the action is a single logical operation that a retry must not duplicate. Enables `idempotent-retry`. */
   readonly retryable?: boolean;
+  /** Opt-in: the action must be single-flight — a fast double-activation fires the effect once, not twice. Enables `single-flight`. */
+  readonly singleFlight?: boolean;
   /** The token-refresh endpoint a 401 interceptor should call before retrying. Enables `survives-token-refresh`. */
   readonly refreshEndpoint?: { readonly method: string; readonly path: string };
   /** A success affirmation (text the UI shows only on real success). On failure it must NOT appear (no phantom success). */

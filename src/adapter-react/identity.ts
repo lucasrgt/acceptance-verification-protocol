@@ -86,6 +86,7 @@ export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpec
       projectionConverged: stub('projectionConverged'),
       requestAccepted: stub('requestAccepted'),
       idempotentRetry: stub('idempotentRetry'),
+      firesOnce: stub('firesOnce'),
       noFalseSuccess: stub('noFalseSuccess'),
       survivesTokenRefresh: stub('survivesTokenRefresh'),
       optimisticReconcile: stub('optimisticReconcile'),

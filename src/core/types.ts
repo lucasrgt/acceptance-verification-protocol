@@ -30,6 +30,7 @@ export type ConditionId =
   | 'empty'
   | 'partial'
   | 'retry'
+  | 'double-activate'
   | 'token-expired';
 
 export interface Condition {

@@ -86,6 +86,7 @@ failure must tell the truth.
 | `error-is-specific` | On failure, the error names the real problem and a next step — not "something went wrong". | model | FE | generic checkout error swallowing the backend reason |
 | `request-accepted` | The request the FE sends is well-formed enough for the backend to accept it. | mechanical | FE | birthDate sent as datetime to a date-only field → 400 |
 | `idempotent-retry` | A retry after a partial failure does not duplicate the effect. | mechanical | FE | service-create retry leaking a duplicate draft per attempt |
+| `single-flight` | A fast double-activation fires the effect once, not twice — a primary action guards itself in flight (disables on submit). No failure involved, only click concurrency. | mechanical | FE | double bookings on a seated event; submit fired twice with no loading guard |
 | `survives-token-refresh` | An expired token mid-action recovers via refresh instead of erroring the user. | mechanical | FE | idle tab 401s instead of refreshing |
 | `projections-converge` | After a successful mutation, sibling projections (lists, badges, counts) reflect it without a reload. | mechanical | FE | stale badges/lists across screens |
 | `optimistic-reconcile` | An optimistic update reconciles to the server truth (no permanent drift on count-based UIs). | mechanical | FE | count-based optimistic state never reconciled |
@@ -191,7 +192,7 @@ criterion and a fix passes it, in `bench/`.
 
 | archetype | criteria executed (green) | benchmark |
 |---|---|---|
-| action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, survives-token-refresh, cache-cleared-on-identity, optimistic-reconcile | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 + `bench/cache-identity.test.ts` 1/1 + `bench/optimistic-reconcile.test.ts` 1/1 + mutation 3/3+3/3 |
+| action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, single-flight, survives-token-refresh, cache-cleared-on-identity, optimistic-reconcile | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 + `bench/cache-identity.test.ts` 1/1 + `bench/optimistic-reconcile.test.ts` 1/1 + `bench/double-submit.test.ts` 1/1 + mutation 3/3+3/3+4/4 |
 | data-honesty | no-fixture-fallback, no-fabricated-media, no-raw-id-flash, count-matches-source | `bench/data-honesty.test.ts` 2/2 + `bench/data-detail.test.ts` 1/1 + `bench/count-source.test.ts` 1/1 + mutation 4/4 |
 | persona-scoped-visibility | no-cross-persona-affordance, no-cross-persona-route | `bench/persona-visibility.test.ts` 2/2 **cross-project** + `bench/persona-route.test.ts` 1/1 + mutation 4/4 |
 | navigation-integrity | target-resolves, nested-renders, back-has-fallback, required-params-guarded, no-redirect-loop | `bench/navigation.test.ts` 2/2 **cross-project** + `bench/navigation-nested.test.ts` 1/1 + `bench/navigation-back.test.ts` 1/1 + `bench/navigation-params.test.ts` 1/1 + `bench/redirect-loop.test.ts` 1/1 + mutation 4/4+3/3 |
@@ -203,7 +204,7 @@ criterion and a fix passes it, in `bench/`.
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
 
-Total executed detection: **34/34, false-alarm 0**, across **11 archetypes** and 3
+Total executed detection: **35/35, false-alarm 0**, across **11 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -230,7 +231,9 @@ a **sign-out/sign-in switch driven to prove the prior identity's cache is wiped*
 **count-readout compared to the server's authoritative value after an optimistic bump** ·
 a **stored UTC instant rendered and its calendar day compared against the viewer's
 zone, deterministic on any CI host** · a **date-only value rendered and checked for a
-spurious zone-shift back a day across distinct `Date()`/`dayjs.tz()` round-trips**.
+spurious zone-shift back a day across distinct `Date()`/`dayjs.tz()` round-trips** · a
+**control activated twice in quick succession against a slow endpoint, counting
+requests to prove it's single-flight**.
 
 The original **marketplace** runtime catalog (FE/DOM + BE/HTTP) is fully executed;
 what remains from it is exclusively **STATIC** (host-doctor territory, by design —

@@ -41,7 +41,7 @@ export const ARCHETYPES: readonly Archetype[] = [
 export const CONDITION_AXES = {
   fault: ['success', 'api-error', 'slow', 'offline'],
   data: ['empty', 'partial'],
-  interaction: ['retry', 'token-expired'],
+  interaction: ['retry', 'double-activate', 'token-expired'],
 } as const;
 
 /** What can decide a criterion. */

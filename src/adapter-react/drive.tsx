@@ -66,7 +66,9 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
         requests.push({ ...base, status: 401 });
         return new HttpResponse(null, { status: 401 });
       }
-      if (condition.id === 'slow') await delay(50);
+      // double-activate: keep the first request in flight so a guarded control has time
+      // to disable before the second activation lands.
+      if (condition.id === 'slow' || condition.id === 'double-activate') await delay(50);
       if (condition.id === 'offline') {
         requests.push({ ...base, status: 0 });
         return HttpResponse.error();
@@ -113,12 +115,21 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
   const projectionBefore = projectionText();
   const trigger = () => user.click(screen.getByRole(subject.action.role, { name: subject.action.name }));
 
-  await trigger();
-  await settle();
-  // interaction axis: a retry activates the SAME action again on the same mount.
-  if (condition.id === 'retry') {
+  if (condition.id === 'double-activate') {
+    // Two activations in quick succession. The first awaits long enough for a guarded
+    // control to commit its disabled state (React re-render); the slow endpoint keeps
+    // the first request in flight so a correct guard makes the second a no-op.
+    await trigger();
     await trigger();
     await settle();
+  } else {
+    await trigger();
+    await settle();
+    // interaction axis: a retry activates the SAME action again on the same mount.
+    if (condition.id === 'retry') {
+      await trigger();
+      await settle();
+    }
   }
 
   return {

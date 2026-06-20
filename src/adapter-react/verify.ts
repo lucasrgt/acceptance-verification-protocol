@@ -50,6 +50,9 @@ function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, optio
       if (c.requires === 'retryable' && !s.retryable) {
         return 'Subject is not marked retryable — criterion not applicable.';
       }
+      if (c.requires === 'singleFlight' && !s.singleFlight) {
+        return 'Subject is not marked singleFlight — criterion not applicable.';
+      }
       if (c.requires === 'refresh' && !s.refreshEndpoint) {
         return 'Subject declares no refreshEndpoint — criterion not applicable.';
       }

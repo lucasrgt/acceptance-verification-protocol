@@ -14,6 +14,8 @@ export interface ActionEffectExpect {
   requestAccepted(): void;
   /** A retry of the same action did not duplicate the effect. */
   idempotentRetry(): void;
+  /** A fast double-activation (no failure) fired the effect once, not twice. */
+  firesOnce(): void;
   /** An expired token mid-action recovered via refresh and the effect still happened. */
   survivesTokenRefresh(): void;
   /** No success affirmation was shown after a failed action (no phantom success). */
@@ -93,6 +95,16 @@ export const actionEffect = archetype('action-effect', '0.1.0', () => {
     mechanical<ActionEffectExpect>(async ({ act, expect }) => {
       await act();
       expect.idempotentRetry();
+    }),
+  );
+
+  criterion(
+    'single-flight',
+    'A fast double-activation fires the effect once, not twice: a primary action guards itself while in flight (disables/locks on submit) so a double-click does not create a duplicate. Distinct from idempotent-retry — no failure is involved, only concurrency of clicks.',
+    { under: 'double-activate', scope: 'invariant', requires: 'singleFlight', seenIn: ['calcom:d7226fc3', 'calcom:5b50a469', 'documenso:56683aa9'] },
+    mechanical<ActionEffectExpect>(async ({ act, expect }) => {
+      await act();
+      expect.firesOnce();
     }),
   );
 

@@ -14,6 +14,7 @@
     ],
     "interaction": [
       "retry",
+      "double-activate",
       "token-expired"
     ]
   },
@@ -96,6 +97,20 @@
           },
           "seenIn": [
             "0188869f"
+          ]
+        },
+        {
+          "id": "single-flight",
+          "statement": "A fast double-activation fires the effect once, not twice: a primary action guards itself while in flight (disables/locks on submit) so a double-click does not create a duplicate. Distinct from idempotent-retry — no failure is involved, only concurrency of clicks.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "seenIn": [
+            "calcom:d7226fc3",
+            "calcom:5b50a469",
+            "documenso:56683aa9"
           ]
         },
         {

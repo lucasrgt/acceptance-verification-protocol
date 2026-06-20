@@ -96,6 +96,22 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
           );
         }
       },
+      firesOnce() {
+        const d = seen();
+        const hits = endpointHits(d, subject);
+        if (hits.length === 0) {
+          throw new AvpFail(
+            `No request reached ${subject.endpoint.path} after activating the action.`,
+            { observed: d.requests },
+          );
+        }
+        if (hits.length > 1) {
+          throw new AvpFail(
+            `A fast double-activation fired the effect ${hits.length} times (${hits.length} requests to ${subject.endpoint.path} for one click-pair) — a double-submit. Guard the action while it's in flight: disable/lock it on submit so the second activation is a no-op.`,
+            { count: hits.length },
+          );
+        }
+      },
       noFalseSuccess() {
         seen();
         const m = subject.successMarker;
