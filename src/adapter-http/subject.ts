@@ -7,8 +7,13 @@ export interface HttpRequestSpec {
 }
 
 /**
- * `authorization` subject: a single cross-account request — AS one caller,
- * targeting ANOTHER account's resource — plus what counts as a correct refusal.
+ * `authorization` subject — three independent seams, each gating its own criterion
+ * (skipped when absent):
+ *  - ownership (`own-resource-only`): a cross-account request that must be refused.
+ *  - role (`role-required`): a privileged op called as a lesser role, must be refused.
+ *  - authority (`server-is-authoritative`): several writes to the SAME resource that
+ *    each send a different client-tampered value; the server must record its own
+ *    truth, identical regardless of what the client sent.
  */
 export interface HttpAuthSubject {
   readonly name: string;
@@ -18,6 +23,12 @@ export interface HttpAuthSubject {
   readonly privileged?: HttpRequestSpec;
   /** Statuses that count as a correct refusal (default: any non-2xx; 401/403/404 are canonical). */
   readonly rejectWith?: readonly number[];
+  /** Authority seam: writes to one resource, each carrying a different client-tampered value. */
+  readonly writes?: readonly HttpRequestSpec[];
+  /** Authority seam: reads the value the server actually recorded out of a write response. */
+  readonly readRecorded?: (body: unknown) => unknown;
+  /** Authority seam: the value the server MUST record, regardless of the client-sent value. */
+  readonly serverTruth?: unknown;
 }
 
 /** A return-URL transition a checkout/OAuth flow must bind. */

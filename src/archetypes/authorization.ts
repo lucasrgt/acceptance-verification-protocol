@@ -6,6 +6,8 @@ export interface AuthorizationExpect {
   ownResourceOnly(): void;
   /** A privileged operation was refused when called as a role that should not have it. */
   roleRequired(): void;
+  /** The server recorded its own truth, not a client-tampered value (price/version/quantity). */
+  serverIsAuthoritative(): void;
 }
 
 /**
@@ -14,8 +16,8 @@ export interface AuthorizationExpect {
  * the FIRST backend archetype, observed over HTTP (not the DOM) — so it runs
  * through the HTTP adapter against ANY backend, language-neutral. Mined as the
  * marketplace's `UpdateHost`-by-id-alone (1db3c2fd) and confirmed cross-stack in
- * .NET (bitwarden: cross-organization IDOR in bulk user revoke). See
- * docs/catalog.md #7 and docs/corpus-multistack.md.
+ * .NET (bitwarden: cross-organization IDOR in bulk user revoke). Three seams, each
+ * gating its own criterion. See docs/catalog.md #7 and docs/corpus-multistack.md.
  */
 export const authorization = archetype('authorization', '0.1.0', () => {
   criterion(
@@ -35,6 +37,16 @@ export const authorization = archetype('authorization', '0.1.0', () => {
     mechanical<AuthorizationExpect>(async ({ act, expect }) => {
       await act();
       expect.roleRequired();
+    }),
+  );
+
+  criterion(
+    'server-is-authoritative',
+    'The server records its own truth (price, version, quantity), never the client\'s word for it: writes that send a tampered value are recorded identically, as the server-resolved value.',
+    { under: 'success', scope: 'invariant', requires: 'authority', seenIn: ['bitwarden:ae5508d14', 'bitwarden:3b5bb7680'] },
+    mechanical<AuthorizationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.serverIsAuthoritative();
     }),
   );
 });

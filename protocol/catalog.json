@@ -269,6 +269,19 @@
             "d36af822",
             "gitea:171df0c9"
           ]
+        },
+        {
+          "id": "server-is-authoritative",
+          "statement": "The server records its own truth (price, version, quantity), never the client's word for it: writes that send a tampered value are recorded identically, as the server-resolved value.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "bitwarden:ae5508d14",
+            "bitwarden:3b5bb7680"
+          ]
         }
       ]
     },

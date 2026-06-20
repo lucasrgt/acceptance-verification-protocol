@@ -12,6 +12,15 @@ async function sendStatus(r: HttpRequestSpec): Promise<number> {
   return res.status;
 }
 
+async function sendJson(r: HttpRequestSpec): Promise<unknown> {
+  const res = await fetch(r.url, {
+    method: r.method,
+    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
+    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
+  });
+  return res.json().catch(() => ({}));
+}
+
 const ok = (s: number | null) => s !== null && s >= 200 && s < 300;
 
 /**
@@ -23,11 +32,17 @@ const ok = (s: number | null) => s !== null && s >= 200 && s < 300;
 export function httpProbe(subject: HttpAuthSubject): Probe<AuthorizationExpect> {
   let ownerStatus: number | null = null;
   let privStatus: number | null = null;
+  let recorded: unknown[] | null = null;
 
   return {
     async act() {
       if (subject.request) ownerStatus = await sendStatus(subject.request);
       if (subject.privileged) privStatus = await sendStatus(subject.privileged);
+      if (subject.writes) {
+        const read = subject.readRecorded ?? ((b) => b);
+        recorded = [];
+        for (const w of subject.writes) recorded.push(read(await sendJson(w)));
+      }
     },
     expect: {
       ownResourceOnly() {
@@ -49,6 +64,20 @@ export function httpProbe(subject: HttpAuthSubject): Probe<AuthorizationExpect> 
           );
         }
       },
+      serverIsAuthoritative() {
+        if (recorded === null) throw new AvpFail('probe used before act() — no authority writes declared.');
+        const truth = JSON.stringify(subject.serverTruth);
+        const trusted = recorded
+          .map((r, i) => ({ i, r }))
+          .filter(({ r }) => JSON.stringify(r) !== truth);
+        if (trusted.length > 0) {
+          const { i, r } = trusted[0];
+          throw new AvpFail(
+            `The server recorded a client-sent value (write #${i} → ${JSON.stringify(r)}) instead of its own truth (${truth}) — a client can dictate price/version/quantity. Resolve the authoritative value server-side and ignore the client's word for it.`,
+            { recorded, serverTruth: subject.serverTruth },
+          );
+        }
+      },
     },
   };
 }
@@ -60,6 +89,7 @@ export function authHooks(subject: HttpAuthSubject): VerifyHooks {
     applies: (c) => {
       if (c.requires === 'ownership' && !subject.request) return 'Subject declares no cross-account request — not applicable.';
       if (c.requires === 'role' && !subject.privileged) return 'Subject declares no privileged request — not applicable.';
+      if (c.requires === 'authority' && !subject.writes) return 'Subject declares no authority writes — not applicable.';
       return null;
     },
   };
