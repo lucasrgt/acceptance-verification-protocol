@@ -90,6 +90,20 @@ export interface HttpNotifySubject {
 }
 
 /**
+ * `request-idempotency` subject: a mutation endpoint that must apply a request
+ * carrying an idempotency key at most once. The probe fires the create twice with the
+ * SAME key (must yield one resource — the original, replayed) and once with a
+ * DIFFERENT key (must yield a distinct resource — the key scopes the dedup).
+ */
+export interface HttpIdempotencySubject {
+  readonly name: string;
+  /** Builds a create (mutation) request carrying the given idempotency key. */
+  readonly createWithKey: (key: string) => HttpRequestSpec;
+  /** Reads the created resource id out of a create response (null if absent). */
+  readonly readId: (body: unknown) => string | number | null;
+}
+
+/**
  * `money-integrity` subject: an endpoint that splits a total (in cents) into a
  * platform share and a host share, plus the policy fraction in basis points. The
  * probe fires the endpoint over a range of totals and checks the split is exact to

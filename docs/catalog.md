@@ -199,6 +199,19 @@ NESTED field. Overwhelmingly grounded: cal.com alone has 44 "crash" fixes —
 |---|---|---|---|---|
 | `survives-malformed-data` | Rendering with the empty/null/malformed data the surface can receive does not throw — it degrades to a fallback/empty state, not a white screen. | mechanical | FE | `a.trim is not a function`; crash removing last option; null/empty nested fields |
 
+### 15. `request-idempotency` — a mutation with an idempotency key applies at most once *(BE)*
+
+The backend counterpart of `single-flight` (which guards the client button): the server
+must persist the idempotency key and replay the original result on a repeat, so a
+retried / duplicated request (flaky network, double POST, webhook redelivery) does not
+create a second resource. Grounded in cal.com "Prevent duplicate bookings with
+idempotency key" (d85e0b51) and documenso "rework stripe webhooks into idempotent
+subscription sync" (3887aa67).
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `idempotency-key-honored` | Two requests with the same key yield one resource (the original, replayed); a different key yields a distinct one. Persist the key; never re-create, never dedup regardless of the key. | mechanical | BE | duplicate bookings without an idempotency key; non-idempotent stripe webhook sync |
+
 ---
 
 ## The coverage ledger (where each criterion lives)
@@ -206,7 +219,7 @@ NESTED field. Overwhelmingly grounded: cal.com alone has 44 "crash" fixes —
 | reach | archetypes | home |
 |---|---|---|
 | **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
-| **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half) | future backend adapter |
+| **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency | future backend adapter |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
 
 This three-way split is the thesis in one table: **determinism is layered.** Some
@@ -229,13 +242,14 @@ criterion and a fix passes it, in `bench/`.
 | **authorization** (HTTP adapter) | own-resource-only (IDOR), role-required, server-is-authoritative | `bench/authorization.test.ts` 2/2 + `bench/server-authoritative.test.ts` 1/1 + mutation 5/5 |
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound, callback-resolves-entity | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + `bench/callback-resolves.test.ts` 1/1 + mutation 6/6+4/4 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
+| **request-idempotency** (HTTP adapter) | idempotency-key-honored | `bench/idempotency.test.ts` 1/1 + mutation 4/4 |
 | **money-integrity** (HTTP + React) | split-invariant (HTTP), amount-rendered-exact (display) | `bench/money-integrity.test.ts` 1/1 + `bench/money-display.test.ts` 1/1 + mutation 5/5+4/4 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
 | **pagination-integrity** (React) | pages-cover-the-set | `bench/pagination-integrity.test.ts` 1/1 + mutation 4/4 |
 | **render-resilience** (React) | survives-malformed-data | `bench/render-resilience.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **38/38, false-alarm 0**, across **13 archetypes** and 3
+Total executed detection: **39/39, false-alarm 0**, across **14 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -270,7 +284,9 @@ spurious zone-shift back a day across distinct `Date()`/`dayjs.tz()` round-trips
 **control activated twice in quick succession against a slow endpoint, counting
 requests to prove it's single-flight** · a **paginated list driven "next" to the end,
 its collected ids checked to be the full set, each exactly once** · a **surface mounted
-against null/empty/malformed data to prove it degrades instead of throwing**.
+against null/empty/malformed data to prove it degrades instead of throwing** · a
+**create fired twice with one idempotency key and once with another, proving the same
+key replays and a new key mints**.
 
 The original **marketplace** runtime catalog (FE/DOM + BE/HTTP) is fully executed;
 what remains from it is exclusively **STATIC** (host-doctor territory, by design —

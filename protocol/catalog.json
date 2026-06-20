@@ -580,6 +580,26 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "request-idempotency",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "idempotency-key-honored",
+          "statement": "A mutation carrying an idempotency key is applied at most once: two requests with the SAME key yield one resource (the original, replayed), and a request with a DIFFERENT key yields a distinct resource. Persist the key and replay on a repeat — never re-create, never dedup regardless of the key.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "calcom:d85e0b51",
+            "documenso:3887aa67",
+            "documenso:31be5489"
+          ]
+        }
+      ]
     }
   ]
 }
