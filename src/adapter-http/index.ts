@@ -3,7 +3,14 @@
 // into the same neutral core runner (src/core/run.ts).
 export { verifyHttp } from './verify';
 export { httpProbe } from './probe';
-export { webhookProbe } from './integration';
+export { integrationProbe } from './integration';
 export { notifyProbe } from './second-order';
 export { moneyProbe } from './money';
-export type { HttpAuthSubject, HttpWebhookSubject, HttpNotifySubject, HttpMoneySubject, HttpRequestSpec } from './subject';
+export type {
+  HttpAuthSubject,
+  HttpIntegrationSubject,
+  HttpNotifySubject,
+  HttpMoneySubject,
+  HttpRequestSpec,
+  ReturnTransition,
+} from './subject';

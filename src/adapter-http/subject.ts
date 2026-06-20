@@ -20,15 +20,32 @@ export interface HttpAuthSubject {
   readonly rejectWith?: readonly number[];
 }
 
+/** A return-URL transition a checkout/OAuth flow must bind. */
+export type ReturnTransition = 'success' | 'failure' | 'pending';
+
 /**
- * `integration-integrity` subject: a forged/absent-signature webhook (must be
- * refused) and a correctly-signed one (must be accepted) — so the criterion checks
- * the server verifies signatures, not that it rejects everything.
+ * `integration-integrity` subject — two independent seams, each gating its own
+ * criterion (skipped when absent):
+ *  - webhook seam (`webhook-signature-verified`): a forged/absent-signature webhook
+ *    (must be refused) + a correctly-signed one (must be accepted).
+ *  - checkout seam (`redirect-urls-bound`): a checkout/OAuth-create request whose
+ *    response carries the return URLs, which must be present for the required
+ *    transitions, absolute http(s), and not a placeholder/dev host.
  */
-export interface HttpWebhookSubject {
+export interface HttpIntegrationSubject {
   readonly name: string;
-  readonly forged: HttpRequestSpec;
-  readonly valid: HttpRequestSpec;
+  /** Webhook seam: a forged/absent-signature callback that must be refused. */
+  readonly forged?: HttpRequestSpec;
+  /** Webhook seam: a correctly-signed callback that must be accepted. */
+  readonly valid?: HttpRequestSpec;
+  /** Checkout seam: the checkout/OAuth-create request whose response binds the return URLs. */
+  readonly checkout?: HttpRequestSpec;
+  /** Checkout seam: reads the return URLs (by transition) out of the checkout response. */
+  readonly readReturnUrls?: (body: unknown) => Partial<Record<ReturnTransition, string | null | undefined>>;
+  /** Checkout seam: which transitions must be bound (default: success + failure). */
+  readonly requiredTransitions?: readonly ReturnTransition[];
+  /** Checkout seam (optional, stricter): the app origin every return URL must belong to. */
+  readonly expectedOrigin?: string;
 }
 
 /**

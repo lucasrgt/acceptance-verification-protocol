@@ -288,6 +288,19 @@
             "692d85af",
             "documenso:3887aa67"
           ]
+        },
+        {
+          "id": "redirect-urls-bound",
+          "statement": "A checkout/OAuth flow binds its return URLs to the real environment: every required transition (success, failure) is present, an absolute http(s) URL, and never a placeholder, relative path, or dev host.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "bitwarden:aa1665065",
+            "bitwarden:004e3c58e"
+          ]
         }
       ]
     },

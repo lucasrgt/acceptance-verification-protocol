@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { verifyHttp } from '../src/adapter-http/verify';
 import { integrationIntegrity } from '../src/archetypes/integration-integrity';
-import type { HttpWebhookSubject } from '../src/adapter-http/subject';
+import type { HttpIntegrationSubject } from '../src/adapter-http/subject';
 import { startWebhookServer, sign } from './dataset/webhook-server';
 
 /**
@@ -23,7 +23,7 @@ afterAll(async () => {
 const payload = { chargeId: 'ch_1', status: 'paid' };
 const body = JSON.stringify(payload);
 
-const webhook = (baseUrl: string): HttpWebhookSubject => ({
+const webhook = (baseUrl: string): HttpIntegrationSubject => ({
   name: 'payment-webhook',
   forged: { method: 'POST', url: `${baseUrl}/webhooks/payment`, headers: { 'x-signature': 'forged-deadbeef' }, body: payload },
   valid: { method: 'POST', url: `${baseUrl}/webhooks/payment`, headers: { 'x-signature': sign(body) }, body: payload },

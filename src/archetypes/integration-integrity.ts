@@ -4,6 +4,8 @@ import { archetype, criterion, mechanical } from '../core/dsl';
 export interface IntegrationExpect {
   /** A forged/absent-signature webhook was refused, and a correctly-signed one accepted. */
   webhookSignatureVerified(): void;
+  /** A checkout/OAuth flow's return URLs are present, absolute, and bound to a real environment. */
+  redirectUrlsBound(): void;
 }
 
 /**
@@ -11,16 +13,28 @@ export interface IntegrationExpect {
  * they mutate state". A backend archetype, HTTP-observable. The webhook-signature
  * shape recurs in every backend-heavy app in the corpus (gitea, documenso,
  * mastodon, bitwarden). Mined as the marketplace's unverified payment-provider
- * webhook (692d85af). See docs/catalog.md #5 and docs/corpus-multistack.md.
+ * webhook (692d85af) and missing-back_urls checkout. Confirmed cross-stack in .NET
+ * by bitwarden's missing-RedirectUris fixes (aa1665065, 004e3c58e). Two seams, each
+ * gating its own criterion. See docs/catalog.md #5 and docs/corpus-multistack.md.
  */
 export const integrationIntegrity = archetype('integration-integrity', '0.1.0', () => {
   criterion(
     'webhook-signature-verified',
     'An inbound webhook with a forged or absent signature is rejected; only an authentically-signed callback is accepted and allowed to mutate state.',
-    { under: 'success', scope: 'invariant', seenIn: ['692d85af', 'documenso:3887aa67'] },
+    { under: 'success', scope: 'invariant', requires: 'webhook', seenIn: ['692d85af', 'documenso:3887aa67'] },
     mechanical<IntegrationExpect>(async ({ act, expect }) => {
       await act();
       expect.webhookSignatureVerified();
+    }),
+  );
+
+  criterion(
+    'redirect-urls-bound',
+    'A checkout/OAuth flow binds its return URLs to the real environment: every required transition (success, failure) is present, an absolute http(s) URL, and never a placeholder, relative path, or dev host.',
+    { under: 'success', scope: 'invariant', requires: 'checkout', seenIn: ['bitwarden:aa1665065', 'bitwarden:004e3c58e'] },
+    mechanical<IntegrationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.redirectUrlsBound();
     }),
   );
 });
