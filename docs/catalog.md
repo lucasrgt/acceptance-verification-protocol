@@ -307,6 +307,33 @@ new archetype/probe is one hooks entry in `src/adapter-react/verify.ts`, and
 behind one archetype — the evidence the core is genuinely substrate-neutral, not
 action-effect-shaped.
 
+## Frontier status (new-domain mining, 2026-06-20)
+
+A focused mining sweep across **four fresh domains and stacks** — cal.com (scheduling,
+Node), documenso (e-signature, Node), firefly-iii (finance, Laravel/PHP), bitwarden
+(.NET) — harvested every NEW escape class that cleared the bar: a genuine acceptance
+invariant, recurring, neutral across domains, with an available FE/HTTP adapter, and a
+**faithfully-grounded** repro (a real fix commit, never a moulded one). It added:
+
+- **temporal-integrity** (`zoned-to-user`, `floating-date-not-shifted`) — from cal.com's
+  189 timezone fixes;
+- **action-effect · single-flight** + its server twin **request-idempotency** — the
+  exactly-once pair, from the duplicate-booking / double-submit clusters;
+- **pagination-integrity** (`pages-cover-the-set`) — from the paging-discrepancy cluster;
+- **render-resilience** (`survives-malformed-data`) — from cal.com's 44 crash fixes;
+- **money-integrity · amount-rendered-exact** — from firefly-iii's 89 money fixes, making
+  money-integrity (like lifecycle-gate) executed across BOTH substrates.
+
+The sweep then came up **dry**: the remaining candidates are either **gold-rule blocked**
+(no faithful repro in the mined corpora — `clock-not-frozen`, lost-update /
+optimistic-concurrency, optimistic-rollback-on-error), **below the acceptance bar**
+(rate-limiting, CSRF/XSS — abuse/security, not "does the feature work"), or **marginal**
+(upload-validation, sort-order, dirty-form guards). None clears the bar today. The
+catalog never proves itself complete — these grow back the moment a new domain or a
+clean repro surfaces one — but the high-value, well-grounded, FE/HTTP-reachable frontier
+is, for now, harvested. **The next bulk of value is backend depth — Assay.NET** (the
+~40% below), reachable only by the .NET reference adapter, not by mining more FE escapes.
+
 ## What the distribution says
 
 - **~45% of the escapes are FE-observable** and are Assay's domain — navigation,
