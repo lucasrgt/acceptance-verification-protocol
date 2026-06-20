@@ -380,6 +380,25 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "lifecycle-gate",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "gate-enforced-server-side",
+          "statement": "The server enforces the transition's precondition: a transition requested on a resource whose precondition is unmet is refused (4xx), and a ready resource's transition still succeeds — the FE gate is a courtesy, not the guard.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:6e09a470",
+            "bitwarden:43d14971f"
+          ]
+        }
+      ]
     }
   ]
 }

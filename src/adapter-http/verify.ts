@@ -5,6 +5,7 @@ import { authHooks } from './probe';
 import { webhookHooks } from './integration';
 import { notifyHooks } from './second-order';
 import { moneyHooks } from './money';
+import { lifecycleHooks } from './lifecycle';
 
 type NamedSubject = { readonly name: string };
 
@@ -18,6 +19,7 @@ const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
   'integration-integrity': webhookHooks as (subject: never) => VerifyHooks,
   'second-order-effects': notifyHooks as (subject: never) => VerifyHooks,
   'money-integrity': moneyHooks as (subject: never) => VerifyHooks,
+  'lifecycle-gate': lifecycleHooks as (subject: never) => VerifyHooks,
 };
 
 /**

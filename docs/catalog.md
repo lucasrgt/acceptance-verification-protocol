@@ -183,13 +183,14 @@ criterion and a fix passes it, in `bench/`.
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + mutation 6/6 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
+| **lifecycle-gate** (HTTP adapter) | gate-enforced-server-side | `bench/lifecycle-gate.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **25/25, false-alarm 0**, across 9 archetypes and 3
+Total executed detection: **26/26, false-alarm 0**, across **10 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
-rest) run through the same runner as the DOM archetypes is the proof the core is
-substrate-neutral, not React-shaped. `authorization` (3 criteria),
+rest, lifecycle gating) run through the same runner as the DOM archetypes is the
+proof the core is substrate-neutral, not React-shaped. `authorization` (3 criteria),
 `integration-integrity` (2), `navigation-integrity` (4) and `data-honesty` (4) now
 seam-gate multiple criteria — a subject declares only the seams it has, and the rest
 are honestly skipped, never failed. Probe substrates so far: RTL+MSW drive ·
@@ -197,13 +198,13 @@ render-vs-API · render-as-actor · navigate-spy · mount-and-count · a real mo
 TanStack router · a paint-timing harness · a **real HTTP request** · an
 **integer-cent split swept across totals** · a **checkout return-URL binding check** ·
 a **client-tamper sweep on a recorded value** · a **param-less route mounted to prove
-it redirects, not ghosts** · a **rendered-count-vs-API-count comparison**.
+it redirects, not ghosts** · a **rendered-count-vs-API-count comparison** · a
+**direct transition on an unready resource to prove the gate is server-side**.
 
 Catalogued but not yet executed: action-effect's `optimistic-reconcile` /
 `cache-cleared-on-identity`; navigation's `no-redirect-loop`; persona's
 `no-cross-persona-route`; lifecycle's `blocked-action-is-disabled` (FE); the
-HTTP-reachable BE criteria still open (integration's `callback-resolves-entity`,
-lifecycle's `gate-enforced-server-side`);
+HTTP-reachable BE criteria still open (integration's `callback-resolves-entity`);
 all STATIC archetypes (host doctor). money-integrity's
 `split-invariant` is now executed over the HTTP adapter (the others — `money-is-typed`,
 `money-formatted-once` — are STATIC, host-doctor territory).

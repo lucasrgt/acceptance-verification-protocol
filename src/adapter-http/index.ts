@@ -6,11 +6,13 @@ export { httpProbe } from './probe';
 export { integrationProbe } from './integration';
 export { notifyProbe } from './second-order';
 export { moneyProbe } from './money';
+export { lifecycleProbe } from './lifecycle';
 export type {
   HttpAuthSubject,
   HttpIntegrationSubject,
   HttpNotifySubject,
   HttpMoneySubject,
+  HttpLifecycleSubject,
   HttpRequestSpec,
   ReturnTransition,
 } from './subject';

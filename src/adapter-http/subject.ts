@@ -31,6 +31,22 @@ export interface HttpAuthSubject {
   readonly serverTruth?: unknown;
 }
 
+/**
+ * `lifecycle-gate` subject: a state transition requested on a resource whose
+ * precondition is UNMET (must be refused), and the same transition on a READY
+ * resource (must succeed) — so the criterion checks the server enforces the gate,
+ * not that it rejects everything.
+ */
+export interface HttpLifecycleSubject {
+  readonly name: string;
+  /** The transition on a resource whose precondition is unmet — must be refused. */
+  readonly transition: HttpRequestSpec;
+  /** The same transition on a ready resource — must succeed. */
+  readonly whenReady?: HttpRequestSpec;
+  /** Statuses that count as a correct refusal (default: any non-2xx; 409/422/403 canonical). */
+  readonly rejectWith?: readonly number[];
+}
+
 /** A return-URL transition a checkout/OAuth flow must bind. */
 export type ReturnTransition = 'success' | 'failure' | 'pending';
 

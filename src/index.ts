@@ -14,3 +14,4 @@ export { authorization, type AuthorizationExpect } from './archetypes/authorizat
 export { integrationIntegrity, type IntegrationExpect } from './archetypes/integration-integrity';
 export { secondOrderEffects, type SecondOrderExpect } from './archetypes/second-order-effects';
 export { moneyIntegrity, type MoneyExpect } from './archetypes/money-integrity';
+export { lifecycleGate, type LifecycleGateExpect } from './archetypes/lifecycle-gate';
