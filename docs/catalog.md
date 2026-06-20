@@ -183,13 +183,28 @@ pagination on documents list API" (7d257236 — only the first page is ever retu
 |---|---|---|---|---|
 | `pages-cover-the-set` | Paging the entire list yields every item exactly once: the union of pages equals the full set — no off-by-one drop at a boundary, no overlap that repeats a row, no unstable sort that strands one. | mechanical | FE | default pagination missing (first page only); pagination discrepancy; standard pagination not applied |
 
+### 14. `render-resilience` — a surface degrades on bad data, it doesn't white-screen *(FE)*
+
+The canonical happy-path-fixture escape, and AVP's thesis in its purest form: a
+component assumes a data shape, the test ran on the happy fixture and passed, and
+production hit a null/empty/malformed value and **crashed**. Only running the surface
+with the data it can *receive* finds it. Distinct from state-completeness (STATIC: does
+it DECLARE an empty branch) — a component with an empty state still crashes on a null
+NESTED field. Overwhelmingly grounded: cal.com alone has 44 "crash" fixes —
+"a.trim is not a function" (000324c0), "handle empty location" (013e6143); documenso
+"prevent crash when removing last dropdown option" (43fe5584).
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `survives-malformed-data` | Rendering with the empty/null/malformed data the surface can receive does not throw — it degrades to a fallback/empty state, not a white screen. | mechanical | FE | `a.trim is not a function`; crash removing last option; null/empty nested fields |
+
 ---
 
 ## The coverage ledger (where each criterion lives)
 
 | reach | archetypes | home |
 |---|---|---|
-| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity | this repo, React adapter |
+| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half) | future backend adapter |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
 
@@ -217,8 +232,9 @@ criterion and a fix passes it, in `bench/`.
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
 | **pagination-integrity** (React) | pages-cover-the-set | `bench/pagination-integrity.test.ts` 1/1 + mutation 4/4 |
+| **render-resilience** (React) | survives-malformed-data | `bench/render-resilience.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **36/36, false-alarm 0**, across **12 archetypes** and 3
+Total executed detection: **37/37, false-alarm 0**, across **13 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -248,7 +264,8 @@ zone, deterministic on any CI host** · a **date-only value rendered and checked
 spurious zone-shift back a day across distinct `Date()`/`dayjs.tz()` round-trips** · a
 **control activated twice in quick succession against a slow endpoint, counting
 requests to prove it's single-flight** · a **paginated list driven "next" to the end,
-its collected ids checked to be the full set, each exactly once**.
+its collected ids checked to be the full set, each exactly once** · a **surface mounted
+against null/empty/malformed data to prove it degrades instead of throwing**.
 
 The original **marketplace** runtime catalog (FE/DOM + BE/HTTP) is fully executed;
 what remains from it is exclusively **STATIC** (host-doctor territory, by design —

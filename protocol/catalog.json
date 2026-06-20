@@ -546,6 +546,26 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "render-resilience",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "survives-malformed-data",
+          "statement": "Rendering the surface with the empty/null/malformed data it can actually receive does not throw: it degrades to a fallback or empty state instead of crashing the screen. A guard for a happy-path shape is not optional — the real data is not always the fixture.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "calcom:000324c0",
+            "calcom:013e6143",
+            "documenso:43fe5584"
+          ]
+        }
+      ]
     }
   ]
 }

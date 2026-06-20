@@ -12,6 +12,7 @@ import { moneyIntegrity } from './archetypes/money-integrity';
 import { lifecycleGate } from './archetypes/lifecycle-gate';
 import { temporalIntegrity } from './archetypes/temporal-integrity';
 import { paginationIntegrity } from './archetypes/pagination-integrity';
+import { renderResilience } from './archetypes/render-resilience';
 
 /**
  * The PROTOCOL surface — the language-neutral truth, emitted FROM the archetypes so
@@ -37,6 +38,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   lifecycleGate,
   temporalIntegrity,
   paginationIntegrity,
+  renderResilience,
 ];
 
 /** The condition vocabulary, by axis — the preconditions an adapter must be able to force. */

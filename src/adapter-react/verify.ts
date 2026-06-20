@@ -12,6 +12,7 @@ import { mountStabilityHooks } from './mount-stability';
 import { lifecycleFeHooks } from './lifecycle-gate';
 import { temporalHooks } from './temporal-integrity';
 import { paginationHooks } from './pagination-integrity';
+import { resilienceHooks } from './render-resilience';
 
 export interface VerifyOptions {
   /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
@@ -85,6 +86,7 @@ const REGISTRY: Record<string, (subject: never, options: VerifyOptions) => Verif
   'lifecycle-gate': lifecycleFeHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'temporal-integrity': temporalHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'pagination-integrity': paginationHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
+  'render-resilience': resilienceHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
 };
 
 /**
