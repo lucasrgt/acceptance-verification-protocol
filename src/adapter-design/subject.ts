@@ -13,4 +13,10 @@ export interface ReactDesignSubject {
   readonly render?: () => ReactElement;
   /** Mounts the surface for a given theme (theme-parity) — the adapter renders it under each theme. */
   readonly renderTheme?: (theme: DesignTheme) => ReactElement;
+  /**
+   * Expected composition (composition-canonical): the ordered landmark slots and the
+   * canonical DS component each must be. The adapter reads `[data-slot]` elements and
+   * their `data-ds` marker from the rendered surface.
+   */
+  readonly composition?: ReadonlyArray<{ readonly slot: string; readonly component: string }>;
 }

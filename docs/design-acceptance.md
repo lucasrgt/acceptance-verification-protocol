@@ -166,9 +166,14 @@ hierarchy discrepancy that motivated the idea.)
      size matches semantic level (h1 > h2 > h3; same level, same size) — distinct from
      token-adherence's membership check. Mutation 4/4 (inverted title, equal-weight,
      subtitle-beats-title, inconsistent same-level), false-alarm 0.
-     `bench/type-hierarchy.test.ts`. **Design catalog: 3/3 detection, 13/13 mutants killed.**
-   - Remaining: color-hierarchy-contrast (axe-core), state-coverage,
-     composition-canonical structure.
+     `bench/type-hierarchy.test.ts`.
+   - **composition-canonical** — ✅ **DONE.** Reads the rendered `[data-slot]` landmarks
+     and asserts they are present, in the declared order, and each the canonical DS
+     component (via `data-ds`) — atoms/molecules/organisms: the back affordance above
+     the title, the screen icon present, no bespoke fork. Mutation 4/4 (wrong order,
+     missing icon, bespoke back, missing back), false-alarm 0.
+     `bench/composition-canonical.test.ts`. **Design catalog: 4/4 detection, 17/17 mutants killed.**
+   - Remaining: color-hierarchy-contrast, state-coverage.
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
    layout-integrity), reusing the `proof` plugin's browser harness.
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
