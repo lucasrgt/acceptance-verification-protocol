@@ -172,10 +172,16 @@ hierarchy discrepancy that motivated the idea.)
      component (via `data-ds`) — atoms/molecules/organisms: the back affordance above
      the title, the screen icon present, no bespoke fork. Mutation 4/4 (wrong order,
      missing icon, bespoke back, missing back), false-alarm 0.
-     `bench/composition-canonical.test.ts`. **Design catalog: 4/4 detection, 17/17 mutants killed.**
-   - Remaining: color-hierarchy-contrast, state-coverage.
+     `bench/composition-canonical.test.ts`.
+   - **state-coverage** — ✅ **DONE.** Renders default + each declared state and asserts
+     each is visually distinct (the runtime sibling of LZFE010): a `disabled` button
+     that isn't dimmed or a loading button with no spinner is the escape. Mutation 3/3
+     (disabled-not-dimmed, loading-no-spinner, all-flat), false-alarm 0.
+     `bench/state-coverage.test.ts`. **Design catalog: 5/5 detection, 20/20 mutants killed.**
+   - Remaining jsdom: color-hierarchy-contrast (compute the WCAG ratio directly).
 3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
-   layout-integrity), reusing the `proof` plugin's browser harness.
+   layout-integrity) — the only criteria with no jsdom path (offsetWidth = 0), reusing
+   the `proof` plugin's browser harness. The next architectural step.
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful

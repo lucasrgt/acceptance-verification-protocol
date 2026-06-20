@@ -19,4 +19,8 @@ export interface ReactDesignSubject {
    * their `data-ds` marker from the rendered surface.
    */
   readonly composition?: ReadonlyArray<{ readonly slot: string; readonly component: string }>;
+  /** Interactive states to check (state-coverage), e.g. `['disabled', 'loading']` — `default` is always the baseline. */
+  readonly states?: readonly string[];
+  /** Mounts the surface in a given state (state-coverage) — the adapter renders `default` + each declared state and compares. */
+  readonly renderState?: (state: string) => ReactElement;
 }
