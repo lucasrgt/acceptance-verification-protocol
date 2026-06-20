@@ -8,6 +8,7 @@ import { dataHonestyHooks } from './data-honesty';
 import { personaHooks } from './persona-visibility';
 import { navHooks } from './navigation-integrity';
 import { mountStabilityHooks } from './mount-stability';
+import { lifecycleFeHooks } from './lifecycle-gate';
 
 export interface VerifyOptions {
   /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
@@ -59,6 +60,7 @@ const REGISTRY: Record<string, (subject: never, options: VerifyOptions) => Verif
   'persona-scoped-visibility': personaHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'navigation-integrity': navHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
   'mount-stability': mountStabilityHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
+  'lifecycle-gate': lifecycleFeHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
 };
 
 /**

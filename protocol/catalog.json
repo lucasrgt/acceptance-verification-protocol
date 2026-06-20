@@ -423,6 +423,19 @@
             "documenso:6e09a470",
             "bitwarden:43d14971f"
           ]
+        },
+        {
+          "id": "blocked-action-is-disabled",
+          "statement": "When a precondition is unmet, the FE disables the action and says why — it does not offer a live control that will fail (e.g. publishing offered on an incomplete listing).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:41ed6c9a",
+            "documenso:6d754acf"
+          ]
         }
       ]
     }

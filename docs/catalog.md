@@ -183,17 +183,21 @@ criterion and a fix passes it, in `bench/`.
 | **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound, callback-resolves-entity | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + `bench/callback-resolves.test.ts` 1/1 + mutation 6/6+4/4 |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
-| **lifecycle-gate** (HTTP adapter) | gate-enforced-server-side | `bench/lifecycle-gate.test.ts` 1/1 + mutation 4/4 |
+| **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 
-Total executed detection: **28/28, false-alarm 0**, across **10 archetypes** and 3
+Total executed detection: **29/29, false-alarm 0**, across **10 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
 rest, lifecycle gating) run through the same runner as the DOM archetypes is the
-proof the core is substrate-neutral, not React-shaped. `authorization` (3 criteria),
-`integration-integrity` (3), `navigation-integrity` (4), `data-honesty` (4) and
-`persona-scoped-visibility` (2) now seam-gate multiple criteria — a subject declares
-only the seams it has, and the rest are honestly skipped, never failed. Probe substrates so far: RTL+MSW drive ·
+proof the core is substrate-neutral, not React-shaped. **`lifecycle-gate` is now
+executed across BOTH substrates** — its server half (gate-enforced-server-side) over
+HTTP and its DOM half (blocked-action-is-disabled) in React — one archetype gated at
+both layers, the "determinism is layered" thesis made concrete. `authorization`
+(3 criteria), `integration-integrity` (3), `navigation-integrity` (4), `data-honesty`
+(4), `persona-scoped-visibility` (2) and `lifecycle-gate` (2, cross-substrate) now
+seam-gate multiple criteria — a subject declares only the seams it has, and the rest
+are honestly skipped, never failed. Probe substrates so far: RTL+MSW drive ·
 render-vs-API · render-as-actor · navigate-spy · mount-and-count · a real mounted
 TanStack router · a paint-timing harness · a **real HTTP request** · an
 **integer-cent split swept across totals** · a **checkout return-URL binding check** ·
@@ -201,12 +205,12 @@ a **client-tamper sweep on a recorded value** · a **param-less route mounted to
 it redirects, not ghosts** · a **rendered-count-vs-API-count comparison** · a
 **direct transition on an unready resource to prove the gate is server-side** · a
 **callback with an unresolvable reference, judged by refusal** · a **foreign-actor
-route deep-linked as the wrong actor, judged by redirect**.
+route deep-linked as the wrong actor, judged by redirect** · a **blocked action
+mounted to prove it's disabled with a reason, not a live click into failure**.
 
 Catalogued but not yet executed: action-effect's `optimistic-reconcile` /
-`cache-cleared-on-identity`; navigation's `no-redirect-loop`; lifecycle's
-`blocked-action-is-disabled` (FE); all STATIC archetypes (host doctor).
-money-integrity's
+`cache-cleared-on-identity`; navigation's `no-redirect-loop`; all STATIC archetypes
+(host doctor). money-integrity's
 `split-invariant` is now executed over the HTTP adapter (the others — `money-is-typed`,
 `money-formatted-once` — are STATIC, host-doctor territory).
 

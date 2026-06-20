@@ -45,10 +45,16 @@ export function lifecycleProbe(subject: HttpLifecycleSubject): Probe<LifecycleGa
           );
         }
       },
+      blockedActionIsDisabled() {
+        throw new AvpFail('blockedActionIsDisabled is a DOM criterion; not observable over HTTP — use the React adapter.');
+      },
     },
   };
 }
 
 export function lifecycleHooks(subject: HttpLifecycleSubject): VerifyHooks {
-  return { probe: () => lifecycleProbe(subject) };
+  return {
+    probe: () => lifecycleProbe(subject),
+    applies: (c) => (c.requires === 'blocked' ? 'HTTP subject — DOM-only criterion not applicable.' : null),
+  };
 }
