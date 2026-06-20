@@ -209,8 +209,17 @@ hierarchy discrepancy that motivated the idea.)
      responsive class. Mutation 3/3 (fixed nowrap row, oversized block, nowrap heading),
      false-alarm 0. `bench/responsive-integrity.test.ts`.
      **Design catalog: 10/10 detection, 37/37 mutants killed.**
-4. `icon-correctness` fit and any `visual-balance` via `claudeJudge` (the last non-mechanical
-   criterion — model oracle).
+4. **Model-oracle tier** — the one criterion no mechanical check can decide.
+   - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
+     control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
+     composition-canonical's presence check. Oracle is `model(rubric)`: the adapter gathers
+     each `[data-icon]` + its control's accessible label as evidence and an injected judge
+     (`claudeJudge` in prod; deterministic stub in the bench) decides fit; `skipped` honestly
+     without a judge. `verifyDesign(archetype, subject, { judge })` threads the judge. The
+     bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
+     mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
+     `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
+     **Design catalog: 11 criteria — jsdom (7) + browser (3) + model (1), 40/40 mutants killed.**
 5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
    serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
    because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
