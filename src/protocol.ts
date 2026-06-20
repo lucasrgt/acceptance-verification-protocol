@@ -11,6 +11,7 @@ import { secondOrderEffects } from './archetypes/second-order-effects';
 import { moneyIntegrity } from './archetypes/money-integrity';
 import { lifecycleGate } from './archetypes/lifecycle-gate';
 import { temporalIntegrity } from './archetypes/temporal-integrity';
+import { paginationIntegrity } from './archetypes/pagination-integrity';
 
 /**
  * The PROTOCOL surface — the language-neutral truth, emitted FROM the archetypes so
@@ -35,6 +36,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   moneyIntegrity,
   lifecycleGate,
   temporalIntegrity,
+  paginationIntegrity,
 ];
 
 /** The condition vocabulary, by axis — the preconditions an adapter must be able to force. */

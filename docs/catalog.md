@@ -170,13 +170,26 @@ zone and never saw it. Domain-weighted, not universal (see `docs/corpus-multista
 | `floating-date-not-shifted` | A date-only value (an expiry date, a birthday — no time, no zone) is displayed as authored, never zone-shifted a day by a `new Date()` / `dayjs.tz()` round-trip. | mechanical | FE | `dayjs.tz(dateStr, tz)`→`dayjs.utc(dateStr)` for booking dates; ISO offset parse on reschedule |
 | `clock-not-frozen` | A relative-time / countdown readout reflects the live clock at render, not a value frozen at module-load / build time. | mechanical | FE | *(frontier — catalogued, not yet executed)* |
 
+### 13. `pagination-integrity` — paging yields the whole set, each item once *(FE + BE)*
+
+A **cross-stack addition** (every list app paginates). Distinct from data-honesty's
+`count-matches-source` (which checks ONE response): this is the multi-page union
+invariant. Mined from cal.com (16 pagination fixes) and documenso (10): "default
+pagination on documents list API" (7d257236 — only the first page is ever returned),
+"pagination discrepancy" (0488442), cal.com "apply standard pagination to /bookings"
+(367e2666).
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `pages-cover-the-set` | Paging the entire list yields every item exactly once: the union of pages equals the full set — no off-by-one drop at a boundary, no overlap that repeats a row, no unstable sort that strands one. | mechanical | FE | default pagination missing (first page only); pagination discrepancy; standard pagination not applied |
+
 ---
 
 ## The coverage ledger (where each criterion lives)
 
 | reach | archetypes | home |
 |---|---|---|
-| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user) | this repo, React adapter |
+| **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half) | future backend adapter |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
 
@@ -203,8 +216,9 @@ criterion and a fix passes it, in `bench/`.
 | **money-integrity** (HTTP adapter) | split-invariant | `bench/money-integrity.test.ts` 1/1 + mutation 5/5 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
+| **pagination-integrity** (React) | pages-cover-the-set | `bench/pagination-integrity.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **35/35, false-alarm 0**, across **11 archetypes** and 3
+Total executed detection: **36/36, false-alarm 0**, across **12 archetypes** and 3
 independent projects (see `docs/transfer.md`), now over **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
@@ -233,7 +247,8 @@ a **stored UTC instant rendered and its calendar day compared against the viewer
 zone, deterministic on any CI host** · a **date-only value rendered and checked for a
 spurious zone-shift back a day across distinct `Date()`/`dayjs.tz()` round-trips** · a
 **control activated twice in quick succession against a slow endpoint, counting
-requests to prove it's single-flight**.
+requests to prove it's single-flight** · a **paginated list driven "next" to the end,
+its collected ids checked to be the full set, each exactly once**.
 
 The original **marketplace** runtime catalog (FE/DOM + BE/HTTP) is fully executed;
 what remains from it is exclusively **STATIC** (host-doctor territory, by design —

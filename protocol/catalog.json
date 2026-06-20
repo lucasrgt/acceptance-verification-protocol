@@ -526,6 +526,26 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "pagination-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "pages-cover-the-set",
+          "statement": "Paging through the entire list yields every item exactly once: the union of all pages equals the full set — nothing dropped at a page boundary, nothing duplicated across pages, nothing stranded by an unstable sort.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:7d257236",
+            "documenso:0488442",
+            "calcom:367e2666"
+          ]
+        }
+      ]
     }
   ]
 }
