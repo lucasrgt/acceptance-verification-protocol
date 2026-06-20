@@ -15,3 +15,6 @@ export { integrationIntegrity, type IntegrationExpect } from './archetypes/integ
 export { secondOrderEffects, type SecondOrderExpect } from './archetypes/second-order-effects';
 export { moneyIntegrity, type MoneyExpect } from './archetypes/money-integrity';
 export { lifecycleGate, type LifecycleGateExpect } from './archetypes/lifecycle-gate';
+// The reference model-oracle judge (Claude-backed). Lazy-loads @anthropic-ai/sdk — an
+// optional peer dependency — so importing the factory never pulls the SDK into core.
+export { claudeJudge, type ClaudeJudgeOptions, type AnthropicLike } from './judge/claude';
