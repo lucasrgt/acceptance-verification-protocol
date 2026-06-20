@@ -182,10 +182,18 @@ hierarchy discrepancy that motivated the idea.)
      pair directly (`src/design/contrast.ts`, no axe dep) — distinct from token/theme
      checks since an on-scale pair (muted text on white) can still fail. Mutation 4/4
      (muted-on-white, light-on-white, dark-on-dark, light-danger), false-alarm 0.
-     `bench/color-contrast.test.ts`. **jsdom tier COMPLETE — design catalog: 6/6 detection, 24/24 mutants killed.**
-3. Stand up the **Playwright tier** for geometry (spacing-rhythm, layer-integrity,
-   layout-integrity) — the only criteria with no jsdom path (offsetWidth = 0), reusing
-   the `proof` plugin's browser harness. The next architectural step.
+     `bench/color-contrast.test.ts`.
+   - **spacing-rhythm** — ✅ **DONE (jsdom).** The user's 4×/2×/1× nested padding example:
+     nested containers' DECLARED padding is on-scale, decreases with depth (outer roomier
+     than inner), and is consistent at a depth. Checks inline padding — the *authored*
+     rhythm needs no layout engine. Mutation 4/4 (inverted, off-scale, flat,
+     inconsistent), false-alarm 0. `bench/spacing-rhythm.test.ts`.
+     **Design catalog: 7/7 detection, 28/28 mutants killed.**
+3. **Playwright tier** — the criteria that genuinely need a layout engine (offsetWidth = 0):
+   `layout-integrity` (overflow/clip/overlap), `layer-integrity` (z-index stacking that
+   actually overlaps), responsive across breakpoints. Reuse the `proof` plugin's browser
+   harness. Spacing *ratios* did NOT need this (declared padding is jsdom-readable); only
+   measured geometry does. The next architectural step.
 4. `icon-correctness` fit and any `visual-balance` via `claudeJudge`.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful

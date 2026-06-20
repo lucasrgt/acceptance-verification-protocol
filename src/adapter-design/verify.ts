@@ -7,6 +7,7 @@ import { typeHierarchyHooks } from './type-hierarchy';
 import { compositionHooks } from './composition-canonical';
 import { stateCoverageHooks } from './state-coverage';
 import { colorContrastHooks } from './color-contrast';
+import { spacingRhythmHooks } from './spacing-rhythm';
 
 type NamedSubject = { readonly name: string };
 
@@ -24,6 +25,7 @@ const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
   'composition-canonical': compositionHooks as (subject: never) => VerifyHooks,
   'state-coverage': stateCoverageHooks as (subject: never) => VerifyHooks,
   'color-contrast': colorContrastHooks as (subject: never) => VerifyHooks,
+  'spacing-rhythm': spacingRhythmHooks as (subject: never) => VerifyHooks,
 };
 
 /** Runs a design archetype against a surface (jsdom + computed style) and returns a Verdict. */
