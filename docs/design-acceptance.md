@@ -208,7 +208,14 @@ hierarchy discrepancy that motivated the idea.)
      wide, breaks narrow" that neither single-width criterion can catch. The biggest
      responsive class. Mutation 3/3 (fixed nowrap row, oversized block, nowrap heading),
      false-alarm 0. `bench/responsive-integrity.test.ts`.
-     **Design catalog: 10/10 detection, 37/37 mutants killed.**
+   - **reading-order-integrity** — ✅ **DONE.** `dom-order-matches-visual`: the DOM/focus order
+     matches the visual reading order (top→bottom, left→right) — CSS reordering (flex `order`,
+     column-reverse, absolute) that desyncs keyboard/screen-reader order from what is seen is
+     the escape. An a11y criterion; distinct from composition-canonical (DOM order vs a
+     DECLARED spec) — here the measured VISUAL order is the ground truth. Mutation 3/3
+     (flex-order, column-reverse, absolute-bump), false-alarm 0.
+     `bench/reading-order-integrity.test.ts`. Grounded in mastodon:d20d0492.
+     **Design catalog: 11/11 detection, 40/40 mutants killed (geometry tier = 4).**
 4. **Model-oracle tier** — the one criterion no mechanical check can decide.
    - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
@@ -219,7 +226,8 @@ hierarchy discrepancy that motivated the idea.)
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
      `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
-     **Design catalog: 11 criteria — jsdom (7) + browser (3) + model (1), 40/40 mutants killed.**
+     **Design catalog: 12 criteria — jsdom (7) + geometry (4: layout · layer · responsive ·
+     reading-order) + model (1), 43/43 mutants killed, false-alarm 0.**
 5. **Design protocol surface (structural, pending).** `protocol/catalog.json` currently
    serialises only the *behaviour* archetypes; the 10 design archetypes sit outside it
    because the protocol vocabulary has no substrate/`requires` axis (`jsdom`/`geometry`) yet.
