@@ -10,6 +10,8 @@ export interface NavigationExpect {
   backHasFallback(): void;
   /** A route that needs a param redirects to a real parent when the param is absent/empty (not a ghost). */
   requiredParamsGuarded(): void;
+  /** A guard/redirect resolves in finitely many hops — no redirect storm / replace-in-effect loop. */
+  noRedirectLoop(): void;
 }
 
 /**
@@ -59,6 +61,16 @@ export const navigationIntegrity = archetype('navigation-integrity', '0.1.0', ()
     mechanical<NavigationExpect>(async ({ act, expect }) => {
       await act();
       expect.requiredParamsGuarded();
+    }),
+  );
+
+  criterion(
+    'no-redirect-loop',
+    'A guard/redirect resolves in finitely many hops: opened where a guard fires, the router settles on a real screen — it never bounces between routes forever (a replace-in-effect storm).',
+    { under: 'success', scope: 'invariant', requires: 'router', seenIn: ['documenso:849885b5', 'documenso:ef79eb3c'] },
+    mechanical<NavigationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.noRedirectLoop();
     }),
   );
 });

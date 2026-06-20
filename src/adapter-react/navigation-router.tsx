@@ -33,6 +33,12 @@ export interface RouterNavSubject {
     readonly fallbackMarker: string | RegExp;
     readonly ghostMarker?: string | RegExp;
   };
+  /**
+   * Mounted where a guard fires, the router must settle in finitely many hops — not
+   * bounce between routes forever. `maxHops` is the load-count past which it's a
+   * storm (default 8). (no-redirect-loop)
+   */
+  readonly redirectLoop?: { readonly maxHops?: number };
 }
 
 const present = (marker: string | RegExp): boolean => {
@@ -48,12 +54,35 @@ const settle = () =>
 /** The React adapter's router-mounted `navigation-integrity` probe. */
 export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> {
   let acted = false;
+  let hops = 0;
+  let mountError: Error | null = null;
   return {
     async act() {
       cleanup();
       const user = userEvent.setup();
-      render(<RouterProvider router={subject.router()} />);
-      await settle();
+      const router = subject.router();
+      let unsub: (() => void) | undefined;
+      if (subject.redirectLoop) {
+        // Count each route-load attempt; a redirect storm fires it until the router
+        // bails (or far past a healthy guard's one or two hops).
+        try {
+          unsub = (router as { subscribe?: (e: string, cb: () => void) => () => void }).subscribe?.(
+            'onBeforeLoad',
+            () => {
+              hops++;
+            },
+          );
+        } catch {
+          /* subscribe shape differs — fall back to the mount-error signal */
+        }
+      }
+      try {
+        render(<RouterProvider router={router} />);
+        await settle();
+      } catch (e) {
+        mountError = e as Error;
+      }
+      unsub?.();
       if (subject.back) {
         const el = screen.queryByRole(subject.back.trigger.role, { name: subject.back.trigger.name });
         if (el) await user.click(el);
@@ -99,6 +128,18 @@ export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> 
           throw new AvpFail(
             `A param-less route rendered the detail ("${String(ghostMarker)}") instead of (or alongside) redirecting — the missing-param ghost is still visible. The guard must redirect before the detail mounts.`,
             {},
+          );
+        }
+      },
+      noRedirectLoop() {
+        if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
+        if (!subject.redirectLoop) throw new AvpFail('noRedirectLoop needs a `redirectLoop` seam on the subject.');
+        const max = subject.redirectLoop.maxHops ?? 8;
+        const stormy = mountError !== null && /redirect|loop|maximum|infinite|invariant/i.test(mountError.message);
+        if (hops > max || stormy) {
+          throw new AvpFail(
+            `A guard/redirect did not resolve in finitely many hops (${hops} route load(s)${mountError ? `; ${mountError.message}` : ''}) — a redirect storm. Make the guard a fixed point: redirect only when it changes the destination, and let the target route render.`,
+            { hops, error: mountError?.message },
           );
         }
       },

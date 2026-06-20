@@ -75,6 +75,9 @@ export function navProbe(subject: NavigationSubject): Probe<NavigationExpect> {
       requiredParamsGuarded() {
         throw new AvpFail('requiredParamsGuarded needs a router-mounted subject (declare `router`); not applicable to a navigate-spy subject.');
       },
+      noRedirectLoop() {
+        throw new AvpFail('noRedirectLoop needs a router-mounted subject (declare `router`); not applicable to a navigate-spy subject.');
+      },
     },
   };
 }
@@ -96,6 +99,7 @@ export function navHooks(subject: NavigationSubject | RouterNavSubject): VerifyH
         if (c.id === 'nested-renders' && !s.childMarker) return 'Subject declares no childMarker — nested-renders not applicable.';
         if (c.id === 'back-has-fallback' && !s.back) return 'Subject declares no back seam — back-has-fallback not applicable.';
         if (c.id === 'required-params-guarded' && !s.paramGuard) return 'Subject declares no paramGuard seam — required-params-guarded not applicable.';
+        if (c.id === 'no-redirect-loop' && !s.redirectLoop) return 'Subject declares no redirectLoop seam — no-redirect-loop not applicable.';
       }
       return null;
     },

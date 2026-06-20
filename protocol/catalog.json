@@ -257,6 +257,19 @@
             "documenso:184cbd67",
             "documenso:04b1ce1a"
           ]
+        },
+        {
+          "id": "no-redirect-loop",
+          "statement": "A guard/redirect resolves in finitely many hops: opened where a guard fires, the router settles on a real screen — it never bounces between routes forever (a replace-in-effect storm).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "documenso:849885b5",
+            "documenso:ef79eb3c"
+          ]
         }
       ]
     },
