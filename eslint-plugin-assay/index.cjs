@@ -9,7 +9,7 @@ const path = require("path");
  * Assay verifies behaviour at runtime, but only for features that HAVE a
  * verification. The gap "you never wrote one" is a static problem, so it belongs
  * in a static doctor (ADR 0001 keeps Assay runtime-only). This generic ESLint
- * plugin plugs the coverage check into any project's lint step; a lazuli-net app
+ * plugin plugs the coverage check into any project's lint step; an AeroFortress Framework app
  * enables + configures it (mapping its slice/view types to archetypes).
  *
  * The rule keys off Assay's stable, statically-matchable convention:

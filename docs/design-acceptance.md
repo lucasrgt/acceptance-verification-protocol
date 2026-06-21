@@ -24,7 +24,7 @@ the **design system** and confirms the screen is faithful to it.
 Same discipline as `docs/catalog.md`: every archetype comes from a real fix commit.
 We mined the design-discrepancy fixes of three independently-built products (the
 marketplace + project P + project F from `docs/transfer.md`) and one unrelated
-non-Lazuli app (cal.com) for breadth.
+non-AeroFortress app (cal.com) for breadth.
 
 | design escape class | marketplace | project P | cal.com (transfer) |
 |---|--:|--:|--:|
@@ -45,7 +45,7 @@ Two findings shape everything:
    system) has the same shapes at scale — theme 84, responsive 88, spacing 82, overflow
    78, icon 50. Design fidelity is a property of *UI software*, not of one team.
 
-2. **The distribution shifts with how codified the design system is.** The Lazuli apps
+2. **The distribution shifts with how codified the design system is.** The AeroFortress apps
    already run a **static design-token doctor** (`LZFE012` design-tokens, `LZFE010`
    state-completeness) — so their *residual* runtime escapes skew to token/theme/
    composition (jsdom-reachable). cal.com, less codified, is dominated by **geometry**
@@ -110,7 +110,7 @@ same three-way split as `docs/catalog.md`:
   composition structure, theme matrix, state matrix.** jsdom *can* do these — they are
   computed-style + tree-shape, not geometry. Covers token-adherence, theme-parity,
   type-hierarchy, color-hierarchy-contrast (axe-core runs in jsdom), state-coverage,
-  and the structural half of composition-canonical. This is where the Lazuli residual
+  and the structural half of composition-canonical. This is where the AeroFortress residual
   lives, so it's the **highest-ROI substrate to build first**.
 - **RUNTIME · real browser (Playwright — the `proof` plugin already wires it).** Pure
   **layout geometry**: spacing ratios, overflow/clip, overlap, z-index stacking,
@@ -139,7 +139,7 @@ Same protocol, new adapter. Concretely:
 ## Prerequisite: the design system *as data*
 
 The verifier is only as good as its ground truth. Assay Design needs the system
-codified: a **token set** (the legal colours/spaces/radii/type — the Lazuli apps
+codified: a **token set** (the legal colours/spaces/radii/type — the AeroFortress apps
 already have this), a **component manifest** (which DS component each role maps to), and
 **composition rules** (a screen header = back · icon · title, in order). Where this is
 missing, codifying it is the highest-value first step — and the verifier then *is* the

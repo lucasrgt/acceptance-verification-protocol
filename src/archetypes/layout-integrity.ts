@@ -10,7 +10,7 @@ export interface LayoutIntegrityExpect {
  * The `layout-integrity` archetype — the first GEOMETRY criterion, measured in a real
  * browser (no jsdom path): content fits its box and isn't cut off. The escape is text
  * or a control clipped by a too-small container with hidden overflow — a label cut off,
- * a button overflowing its row. This is the largest non-Lazuli design class (cal.com:
+ * a button overflowing its row. This is the largest non-AeroFortress design class (cal.com:
  * 78 overflow/overlap fixes).
  *
  * Faithfully grounded in cal.com's overflow cluster: "Booking Drawer — text overlap in

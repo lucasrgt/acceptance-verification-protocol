@@ -24,7 +24,7 @@ agent-generated; if the oracle is stable, the pass/fail is stable.
 
 ## Where it fits
 
-Assay is the **behavior doctor** — the runtime sibling of the static doctor (a convention linter
+Assay is the **behavior doctor** — the runtime sibling of the AeroFortress Framework static doctor (a convention linter
 enforces *shape*; Assay enforces *observable runtime effect*). It is not a framework that wraps
 your app: it's a thin layer **on top of mature substrate** (Vitest · Testing Library · MSW ·
 axe-core · an LLM judge). You rewrite nothing — you declare the seams that already exist and Assay

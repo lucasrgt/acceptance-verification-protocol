@@ -33,7 +33,7 @@ the same archetypes surface in every one.
 | firefly-iii | personal finance | Laravel/PHP | 19 733 | 4 230 | 187 |
 
 ≈**2 240 classified escapes** in the slice (a lower bound), on top of the three
-local Lazuli apps from `docs/transfer.md`. cal.com (scheduling) and firefly-iii
+local AeroFortress apps from `docs/transfer.md`. cal.com (scheduling) and firefly-iii
 (finance) were added (2026-06-20) as **fresh domains** to surface escape classes the
 marketplace corpus couldn't — see the temporal and money sections below.
 

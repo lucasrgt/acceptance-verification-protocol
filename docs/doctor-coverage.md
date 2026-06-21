@@ -3,7 +3,7 @@
 Assay verifies behavior at **runtime**, but only for features that *have* a verification. The
 static gap — "you never wrote a verification" or "you didn't run the archetype this feature
 needs" — must be caught upstream, by a **static doctor**. Assay stays runtime-only (ADR 0001);
-this rule plugs the coverage check into an existing static doctor (in a lazuli-net project, its
+this rule plugs the coverage check into an existing static doctor (in an AeroFortress Framework project, its
 ESLint/LZFE layer).
 
 ## The honest boundary
@@ -51,24 +51,24 @@ with each listed archetype. Missing → report on the feature file.
 
 ## Implementation options
 
-1. **Assay ships a generic `eslint-plugin-assay`** with `require-verification`; the lazuli-net
-   doctor *enables + configures* it (maps lazuli slice/view types → archetypes). Reusable by any
+1. **Assay ships a generic `eslint-plugin-assay`** with `require-verification`; the AeroFortress Framework
+   doctor *enables + configures* it (maps AeroFortress slice/view types → archetypes). Reusable by any
    ecosystem — matches "AVP is for everyone". **← recommended.**
-2. lazuli authors a bespoke LZFE rule (e.g. `LZFE0NN`) with the same semantics. Tighter lazuli
-   idiom, but not reusable outside lazuli.
+2. AeroFortress authors a bespoke LZFE rule (e.g. `LZFE0NN`) with the same semantics. Tighter AeroFortress
+   idiom, but not reusable outside AeroFortress.
 
 ## Where it runs
 
-The lazuli `doctor` already runs ESLint (LZFE) in dev + CI. This rule rides that — no new runner,
+The AeroFortress `doctor` already runs ESLint (LZFE) in dev + CI. This rule rides that — no new runner,
 no new doctor. The static coverage check (doctor) + runtime correctness (Assay `verify`) +
-existing shape rules (LZFE loading/error/empty) together give a lazuli app its full completeness
+existing shape rules (LZFE loading/error/empty) together give an AeroFortress app its full completeness
 story: *present → covered → correct*.
 
 ## Status — built (option 1) + dogfooded read-only
 
 `eslint-plugin-assay` exists (`eslint-plugin-assay/`, option 1): the generic
 `require-verification` rule + a no-framework self-test (green) + a read-only
-`scan.cjs`. The scan, run against three real Lazuli apps WITHOUT touching them,
+`scan.cjs`. The scan, run against three real AeroFortress apps WITHOUT touching them,
 measured the coverage gap they'd have the day they adopt the rule:
 
 | app | `*.view.tsx` features | covered today | gap |
@@ -78,7 +78,7 @@ measured the coverage gap they'd have the day they adopt the rule:
 | project F | 23 | 0 | 23 |
 
 189 real view-features, 0 currently carrying an Assay verification — the exact
-surface the rule would light up. Enabling it inside the lazuli doctor (the
-`assay/require-verification` config keyed to lazuli's `*.view.tsx` slice type) is
+surface the rule would light up. Enabling it inside the AeroFortress doctor (the
+`assay/require-verification` config keyed to AeroFortress's `*.view.tsx` slice type) is
 the remaining one-line wiring; it lives in the shared framework repo, so it ships
 deliberately, not as an overnight push.

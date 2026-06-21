@@ -1,7 +1,7 @@
 # Conventions — keep the protocol from snowballing
 
 Discipline adopted at the *start* of the protocol, so it can't rot later. Borrowed
-from lazuli-lang's working rules (a mature AI-first framework) and adapted to
+from the AeroFortress Framework's working rules (a mature AI-first framework) and adapted to
 AVP/Assay (TS). Where possible each rule is **enforced by a guard test**, not left
 to memory — the same philosophy as the protocol drift guard: make it red, don't
 make it a hope.
@@ -15,7 +15,7 @@ file is `arrange + observe`, not a framework.
 
 Self-test before committing an adapter file: if it's >100 LOC with zero substrate
 imports and it's re-doing something a mature library already does, it's wrong —
-rewrite as wire or delete. (lazuli-lang's founding principle; our ponytail rung.)
+rewrite as wire or delete. (the AeroFortress Framework's founding principle; our ponytail rung.)
 
 ## 2. Every source file ≤ 500 LOC — production AND test, no exceptions
 

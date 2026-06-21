@@ -4,7 +4,7 @@ import type { ReactElement } from 'react';
  * Descriptor of an `action-effect` subject: the SEAMS AVP needs to observe
  * behavior. It is not invasive — it declares what already exists (how to mount,
  * which domain endpoint, which control the user activates, which input holds the
- * draft). On a Lazuli app those seams come for free (data door, generated client).
+ * draft). On an AeroFortress app those seams come for free (data door, generated client).
  */
 export interface ActionEffectSubject {
   readonly name: string;

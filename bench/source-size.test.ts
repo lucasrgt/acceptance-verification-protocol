@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve, extname } from 'node:path';
 
 /**
- * The snowball guard — structural discipline borrowed from lazuli-lang's
+ * The snowball guard — structural discipline borrowed from the AeroFortress Framework's
  * "every source file ≤ 500 LOC" rule (production AND test, no exceptions). A file
  * past the ceiling is the signal to SPLIT by concern, not to keep packing. Enforced
  * here so the discipline can't erode as the protocol grows — the same philosophy as

@@ -32,7 +32,7 @@ real effect" is the invariant the example is one instance of.
   signatures, money math at rest). The frontend adapter *cannot see it*; it is
   bound to a backend adapter (**Assay.NET**, future) or an HTTP adapter.
 - **STATIC** — best caught before runtime, by static analysis. These belong in the
-  host project's linter/doctor (in this codebase's case, the Lazuli `LZ*`/`LZFE*`
+  host project's linter/doctor (in this codebase's case, the AeroFortress `LZ*`/`LZFE*`
   doctor), **not** in Assay. Listed here for completeness of the dictionary.
 
 ## Oracle — what decides it
@@ -220,7 +220,7 @@ subscription sync" (3887aa67).
 |---|---|---|
 | **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency | future backend adapter |
-| **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (Lazuli `LZ*`/`LZFE*`) |
+| **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (AeroFortress `LZ*`/`LZFE*`) |
 
 This three-way split is the thesis in one table: **determinism is layered.** Some
 acceptance invariants are cheapest as static rules (the doctor), some need a running
