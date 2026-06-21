@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Assay.Net.Archetypes;
 
@@ -15,7 +16,8 @@ public sealed record WebhookSubject(
     string Secret,
     string CallbackPath = "",
     string KnownRef = "",
-    string UnknownRef = "");
+    string UnknownRef = "",
+    string CheckoutPath = "");
 
 /// <summary>integration-integrity — only an authentically-signed inbound callback may mutate state.</summary>
 public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
@@ -56,7 +58,43 @@ public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
                     body: new StringContent($$"""{"ref":"{{s.UnknownRef}}","status":"completed"}"""));
                 Http.Refused(await http.SendAsync(unknown), "callback with an unknown reference");
             },
+
+            ["redirect-urls-bound"] = async s =>
+            {
+                if (string.IsNullOrEmpty(s.CheckoutPath))
+                    throw new AvpSkipException("redirect-urls-bound: this subject provides no checkout seam.");
+                using var http = Http.Client(s.BaseUrl);
+
+                // A checkout/OAuth flow must bind its return URLs to the real environment: each required
+                // transition is present, an absolute http(s) URL, and never a placeholder, relative path,
+                // or dev host that leaks back into production.
+                var res = await http.SendAsync(Http.Request(HttpMethod.Get, s.CheckoutPath));
+                Http.Accepted(res, "checkout flow");
+                using var doc = JsonDocument.Parse(await res.Content.ReadAsStringAsync());
+
+                BindsReturnUrl(doc.RootElement, "successUrl", "success");
+                BindsReturnUrl(doc.RootElement, "failureUrl", "failure");
+            },
         };
+
+    /// <summary>A required return URL must be present, an absolute http(s) URL, and never a placeholder,
+    /// relative path, or dev host. Throws <see cref="AvpFailException"/> otherwise.</summary>
+    private static void BindsReturnUrl(JsonElement root, string field, string transition)
+    {
+        var url = root.TryGetProperty(field, out var v) ? v.GetString() : null;
+        if (string.IsNullOrEmpty(url))
+            throw new AvpFailException($"{transition} return URL ({field}): missing or empty.");
+
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            throw new AvpFailException(
+                $"{transition} return URL ({field}): '{url}' is not an absolute http(s) URL.");
+
+        string[] taints = ["localhost", "127.0.0.1", "example.com", "TODO"];
+        if (url.StartsWith('/') || taints.Any(t => url.Contains(t, StringComparison.OrdinalIgnoreCase)))
+            throw new AvpFailException(
+                $"{transition} return URL ({field}): '{url}' is a placeholder, relative path, or dev host.");
+    }
 
     /// <summary>HMAC-SHA256 over the raw body, hex lowercase. Public so a repro server can sign identically.</summary>
     public static string Hmac(string body, string secret)
