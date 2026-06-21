@@ -45,6 +45,10 @@ public static class Runner
                 await oracle(subject);
                 results.Add(new CriterionVerdict(c.Id, VerdictStatus.Pass, c.Statement));
             }
+            catch (AvpSkipException ex)
+            {
+                results.Add(new CriterionVerdict(c.Id, VerdictStatus.Skipped, ex.Message));
+            }
             catch (AvpFailException ex)
             {
                 results.Add(new CriterionVerdict(c.Id, VerdictStatus.Fail, ex.Message));

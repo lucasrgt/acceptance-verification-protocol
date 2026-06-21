@@ -46,3 +46,7 @@ public sealed record Verdict(string Subject, string Archetype, IReadOnlyList<Cri
 
 /// <summary>Thrown by a mechanical oracle to FAIL a criterion with an actionable reason.</summary>
 public sealed class AvpFailException(string reason) : Exception(reason);
+
+/// <summary>Thrown by a mechanical oracle to SKIP a criterion whose seam/precondition this subject does not
+/// provide — honest non-applicability, never a false pass.</summary>
+public sealed class AvpSkipException(string reason) : Exception(reason);
