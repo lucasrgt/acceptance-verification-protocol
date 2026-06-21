@@ -1,0 +1,96 @@
+# Assay.NET — the backend adapter (Phase 1 plan)
+
+> **Status:** planned (2026-06-21). Assay.NET is the documented next frontier — the
+> `assay-cycle` loop stopped with "FE/design frontier dry; remaining value is
+> BACKEND depth, reachable only by a .NET adapter" (~40% of mined escapes are
+> backend). This is the recorte for that adapter.
+
+## What it is
+
+**Assay.NET is a .NET implementation of AVP** — a sibling to `assay` (the JS/React
+reference), not a fork. It implements the **adapter contract** for the substrates a
+backend can observe (`http` first, an in-process **native** substrate next),
+consuming the language-neutral catalog and emitting portable `Verdict`s.
+
+It is **not** a port of the 34 archetypes. The archetype/criteria *definitions* are
+the neutral catalog (`protocol/catalog.json` + `protocol/design-catalog.json`,
+generated + drift-guarded). An adapter *binds hooks to a substrate*; `core/run.ts`
+already proved the core is substrate-neutral by running `dom` and `http` through one
+runner. Assay.NET is the `http`/native sibling of that.
+
+## Invariants (inherited, non-negotiable — see the constitution + ADR 0001)
+
+- **Thin layer, not a framework.** Ride mature substrate: **xUnit** + a real HTTP
+  host (e.g. `WebApplicationFactory`/Kestrel or `HttpClient` against a repro server),
+  the way `assay` rides Vitest/MSW. No bespoke runner, no IR, **no `assay.config`**.
+- **Not a runner addon.** `Verify(...)` returns a portable `Verdict` and runs inside
+  any host (xUnit, a console, CI). The adapter binds to the *platform substrate*
+  (HTTP / in-process), never to the runner.
+- **Honest skips.** A criterion whose seam/oracle is unavailable is `skipped`, never
+  silently passed (a false green is the catastrophic error).
+- **Standalone.** Assay.NET knows nothing about `aerofortress-framework` or the
+  Harness. The dependency is one-way: the Framework → AVP, never the reverse (the
+  `[Verify]`/`LZ*` enforcement lives in the Framework, Phase 2).
+- Repo language: **English**, neutral (no client names).
+
+## Conformance target (`docs/PROTOCOL.md` §Conformance)
+
+Assay.NET is AVP-conformant for a substrate iff it:
+1. consumes the `Specification`s in `protocol/catalog.json` for that substrate;
+2. provides `hooks` (`probe` / `applies?` / `gatherEvidence?` / `judge?`) binding
+   each catalog archetype's criteria to the substrate;
+3. emits `Verdict`s in the protocol shape (`status` + `reason` + `acceptanceScore`);
+4. is honest (skip, never false-green).
+
+## Slice 1 — mirror `src/adapter-http/` in .NET
+
+The JS HTTP adapter is the blueprint (see network item `9cec644b`): a registry
+`verify.ts` keyed by `archetype.name` → `core/run.ts`, driving backend archetypes
+over real `node:http` repro servers. Assay.NET mirrors this pattern:
+
+| Archetype (catalog) | Criterion | Seam |
+|---|---|---|
+| `authorization` | `own-resource-only` (IDOR), `role-required` | HTTP request as owner/role |
+| `integration-integrity` | `webhook-signature-verified` | forged vs valid HMAC |
+| `second-order-effects` | `notifies-all-parties` | trigger → assert each party inbox |
+
+Next backend criteria (already named as the frontier): `idempotent-write`
+(double-POST same key → one effect), `server-is-authoritative` (client-claimed
+privileged value ignored), `callback-resolves-entity`.
+
+## Monorepo layout (polyglot)
+
+Restructure this repo into a polyglot monorepo (do it now — the FE frontier is dry,
+no active iteration to break):
+
+```
+/  (acceptance-verification-protocol)
+├─ protocol/        # catalog.json + design-catalog.json — the neutral source of truth
+├─ docs/            # PROTOCOL.md, catalog.md, this plan — shared
+├─ assay/           # the JS/React reference (today's repo root moves here)
+└─ assay.net/       # the .NET sibling (new)
+   conformance/     # asserts assay & assay.net agree on the catalog
+```
+
+The root conformance suite is the cross-language drift-guard: both implementations
+consume the same `protocol/` catalog; neither may diverge silently.
+
+## The leadership trajectory (.NET leads, without breaking lockstep)
+
+- **Now (Phase 1):** Assay.NET *conforms* to the current catalog (emitted from the JS
+  archetypes + drift-guarded). Ships the ~40% backend value fast.
+- **Phase 2:** the .NET extraction **refines the protocol** — `PROTOCOL.md`
+  §Versioning already anticipates "the Assay.NET extraction is expected to refine the
+  Subject-descriptor and adapter contract into their final cross-language form." Then
+  catalog generation migrates to .NET; JS conforms. That is how ".NET leads" lands
+  without throwing away the lockstep machinery already running.
+
+## Open Phase-1 questions
+
+1. **.NET HTTP substrate:** `WebApplicationFactory` (in-process ASP.NET) vs raw
+   Kestrel repro servers vs `HttpClient` + `TestServer`. *(lean: `WebApplicationFactory`
+   — closest to the framework's real runtime; raw repro servers for protocol-level tests.)*
+2. **Catalog consumption:** generate C# types from `catalog.json` at build, or read it
+   at runtime. *(lean: build-time codegen — fail-fast, matches the static-doctor ethos.)*
+3. **Naming/namespace:** keep neutral (`Assay.Net`, namespace `Assay`) to preserve the
+   standalone, reusable-by-anyone stance (xUnit-like), not under the AeroFortress brand.
