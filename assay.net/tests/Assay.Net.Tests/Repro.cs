@@ -20,7 +20,7 @@ internal static class Repro
 {
     public const string WebhookSecret = "whsec_test";
 
-    private static async Task<WebApplication> Start(Action<WebApplication> routes)
+    internal static async Task<WebApplication> Start(Action<WebApplication> routes)
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.WebHost.UseUrls("http://127.0.0.1:0");
@@ -37,13 +37,13 @@ internal static class Repro
         return feature!.Addresses.First();
     }
 
-    private static string? Bearer(HttpRequest req)
+    internal static string? Bearer(HttpRequest req)
     {
         var h = req.Headers.Authorization.ToString();
         return h.StartsWith("Bearer ") ? h["Bearer ".Length..] : null;
     }
 
-    private static async Task<string> Body(HttpRequest req)
+    internal static async Task<string> Body(HttpRequest req)
     {
         using var r = new StreamReader(req.Body);
         return await r.ReadToEndAsync();
