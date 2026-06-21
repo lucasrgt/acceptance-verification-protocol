@@ -11,8 +11,10 @@ import { buildCatalog, buildDesignCatalog } from '../src/protocol';
  *   ASSAY_WRITE_PROTOCOL=1 npx vitest run protocol-sync
  */
 const CATALOGS = [
-  { file: resolve(process.cwd(), 'protocol/catalog.json'), build: buildCatalog },
-  { file: resolve(process.cwd(), 'protocol/design-catalog.json'), build: buildDesignCatalog },
+  // protocol/ lives at the monorepo ROOT (the neutral, shared contract); the JS
+  // package runs from assay/, so the catalogs are one level up.
+  { file: resolve(process.cwd(), '../protocol/catalog.json'), build: buildCatalog },
+  { file: resolve(process.cwd(), '../protocol/design-catalog.json'), build: buildDesignCatalog },
 ] as const;
 
 describe('AVP protocol — drift guard', () => {
