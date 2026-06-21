@@ -1,9 +1,12 @@
 # Assay.NET — the backend adapter (Phase 1 plan)
 
-> **Status:** planned (2026-06-21). Assay.NET is the documented next frontier — the
-> `assay-cycle` loop stopped with "FE/design frontier dry; remaining value is
-> BACKEND depth, reachable only by a .NET adapter" (~40% of mined escapes are
-> backend). This is the recorte for that adapter.
+> **Status:** Slice 1 SHIPPED (2026-06-21) — `assay.net/` builds green, **12 tests
+> passing**. The adapter consumes the neutral catalog, runs 3 backend archetypes
+> (authz, webhook, notify) over real Kestrel HTTP, passes the secure repro servers and
+> FAILS the vulnerable ones (the ruler is calibrated), and honestly skips unbound
+> criteria. Assay.NET was the documented next frontier — the `assay-cycle` loop stopped
+> with "FE/design frontier dry; remaining value is BACKEND depth, reachable only by a
+> .NET adapter" (~40% of mined escapes are backend).
 
 ## What it is
 
