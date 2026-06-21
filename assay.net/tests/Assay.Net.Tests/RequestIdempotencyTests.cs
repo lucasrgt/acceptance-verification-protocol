@@ -66,4 +66,52 @@ public class RequestIdempotencyTests
 
         Assert.Equal(VerdictStatus.Fail, Of(v, "idempotency-key-honored")); // same key minted two resources
     }
+
+    // GOOD mutation (in-place, not a create): a debit endpoint whose observable is the resulting balance.
+    // A custom RequestBody + IdField="balance" lets the same verifier prove an idempotent withdraw-style slice.
+    private static Task<WebApplication> DebitGood() => Repro.Start(app =>
+    {
+        var byKey = new Dictionary<string, decimal>();
+        var balance = 1000m;
+        app.MapPost("/withdraw", (HttpRequest req, WithdrawBody body) =>
+        {
+            var key = req.Headers["Idempotency-Key"].ToString();
+            if (!string.IsNullOrEmpty(key) && byKey.TryGetValue(key, out var prior))
+                return Results.Ok(new { balance = prior }); // replay the stored outcome
+            balance -= body.Amount;
+            if (!string.IsNullOrEmpty(key)) byKey[key] = balance;
+            return Results.Ok(new { balance });
+        });
+    });
+
+    // BAD mutation: ignores the key, debits every time — the double-withdraw escape a retry triggers.
+    private static Task<WebApplication> DebitBad() => Repro.Start(app =>
+    {
+        var balance = 1000m;
+        app.MapPost("/withdraw", (WithdrawBody body) => { balance -= body.Amount; return Results.Ok(new { balance }); });
+    });
+
+    [Fact]
+    public async Task idempotency_passes_an_idempotent_in_place_mutation_by_balance()
+    {
+        await using var app = await DebitGood();
+        var subject = new RequestIdempotencySubject(app.BaseUrl(), "/withdraw", new { amount = 10m }, IdField: "balance");
+
+        var v = await Runner.Run(Catalog, new RequestIdempotency(), "debit-good", subject);
+
+        Assert.Equal(VerdictStatus.Pass, Of(v, "idempotency-key-honored"));
+    }
+
+    [Fact]
+    public async Task idempotency_fails_a_non_idempotent_in_place_mutation_by_balance()
+    {
+        await using var app = await DebitBad();
+        var subject = new RequestIdempotencySubject(app.BaseUrl(), "/withdraw", new { amount = 10m }, IdField: "balance");
+
+        var v = await Runner.Run(Catalog, new RequestIdempotency(), "debit-bad", subject);
+
+        Assert.Equal(VerdictStatus.Fail, Of(v, "idempotency-key-honored")); // same key debited twice
+    }
+
+    private sealed record WithdrawBody(decimal Amount);
 }
