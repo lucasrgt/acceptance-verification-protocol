@@ -161,6 +161,28 @@
       ]
     },
     {
+      "archetype": "accessible-name",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "controls-have-accessible-name",
+          "statement": "Every interactive control (button, link, input, select, textarea, or ARIA-roled widget) that reaches the accessibility tree exposes a non-empty accessible name — from aria-labelledby, aria-label, an associated <label>, its visible text (excluding aria-hidden subtrees), or title. An icon-only control whose only content is an aria-hidden glyph, or an input with only a placeholder, is the escape: a screen reader announces the role and nothing more.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "substrate": "dom",
+          "seenIn": [
+            "8cace7f7",
+            "a0e4580f",
+            "bf9be591",
+            "02a86f1d"
+          ]
+        }
+      ]
+    },
+    {
       "archetype": "layout-integrity",
       "version": "0.1.0",
       "criteria": [
@@ -301,6 +323,27 @@
             "mastodon:511e10df",
             "gitea:32fdfb0b",
             "documenso:1a23744d"
+          ]
+        }
+      ]
+    },
+    {
+      "archetype": "focus-visible-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "focus-is-visible",
+          "statement": "Every interactive control paints a visible focus indicator when focused (WCAG 2.4.7): focusing it must change its outline, box-shadow, border, or background to something a sighted keyboard user can actually see. The escape is removing the UA outline (`outline: none` / `focus:outline-none`) without adding a replacement — or adding one that paints nothing (a transparent ring, a zero-width outline) or that only triggers on `:hover`, not `:focus`. Add a visible focus ring.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "substrate": "geometry",
+          "seenIn": [
+            "calcom:7393ba1d1",
+            "calcom:689150d78",
+            "calcom:c1b41d825"
           ]
         }
       ]

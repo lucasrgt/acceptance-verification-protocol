@@ -247,14 +247,36 @@ hierarchy discrepancy that motivated the idea.)
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
      `bench/icon-correctness.test.ts`. Grounded in gitea:edf0dfd1 (wrong forks icon).
-     **Design catalog: 15 criteria — jsdom (7) + geometry (7: layout · layer · responsive ·
-     reading-order · rtl · tap-target · layout-shift) + model (1), 52/52 mutants killed,
-     false-alarm 0.**
-5. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
+5. **A11y tier** — the two highest-frequency real-world accessibility escapes, one per
+   substrate boundary they live on.
+   - **accessible-name** — ✅ **DONE.** `controls-have-accessible-name`: every interactive
+     control (button/link/input/role-widget) that reaches the accessibility tree exposes a
+     non-empty accessible name — resolved from aria-labelledby / aria-label / an associated
+     `<label>` / name-from-content (excluding aria-hidden subtrees) / title; a placeholder is
+     NOT a name. The single most common axe-core finding: an icon-only button or an unlabelled
+     input announces only its role. The **first design criterion on the `dom` substrate** — it
+     needs only the accessibility tree, no computed style and no layout engine (cheaper than the
+     `style` jsdom tier). Distinct from icon-correctness (the glyph's MEANING, a model oracle):
+     this is purely mechanical presence. Mutation 4/4 (bare icon button, placeholder-only input,
+     icon-only link, text hidden in an aria-hidden span), false-alarm 0.
+     `bench/accessible-name.test.ts`. Grounded in cal.com's aria-label cluster (8cace7f7,
+     a0e4580f, bf9be591, 02a86f1d).
+   - **focus-visible-integrity** — ✅ **DONE.** `focus-is-visible`: every interactive control
+     paints a visible focus indicator when focused (WCAG 2.4.7); `focus:outline-none` with no
+     replacement (or a transparent/zero-width ring, or a ring bound to `:hover` not `:focus`) is
+     the escape. Browser-measured (`geometry`) — a `:focus` style change only a real browser
+     resolves. Distinct from tap-target (SIZE) and state-coverage (jsdom declared states).
+     Mutation 4/4 (no-indicator, transparent-ring, hover-only, zero-outline), false-alarm 0.
+     `bench/focus-visible-integrity.test.ts`. Grounded in cal.com's focus-ring cluster
+     (7393ba1d1, 689150d78, c1b41d825).
+     **Design catalog: 17 criteria — jsdom·style (7) + dom (1: accessible-name) + geometry
+     (8: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
+     focus-visible) + model (1), 60/60 mutants killed, false-alarm 0.**
+6. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
    portable protocol. A `substrate` axis (`static`/`dom`/`http`/`style`/`geometry`/`model`)
    lives in `core/types.ts` (the layered-determinism axis) and every design criterion declares
-   it — the 7 jsdom ones `style`, the 7 geometry ones `geometry`, icon `model`. The 15 design
-   archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
+   it — the 7 jsdom ones `style`, accessible-name `dom`, the 8 geometry ones `geometry`, icon
+   `model`. The 17 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
    drift-guarded by `bench/protocol-sync.test.ts` exactly like the behaviour catalog (the
    behaviour `catalog.json` stays byte-identical — substrate is omitted where absent).
    `docs/PROTOCOL.md` documents the substrate axis + the design catalog + conformance, so

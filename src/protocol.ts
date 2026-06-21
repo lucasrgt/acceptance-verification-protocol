@@ -21,6 +21,7 @@ import { compositionCanonical } from './archetypes/composition-canonical';
 import { stateCoverage } from './archetypes/state-coverage';
 import { colorContrast } from './archetypes/color-contrast';
 import { spacingRhythm } from './archetypes/spacing-rhythm';
+import { accessibleName } from './archetypes/accessible-name';
 import { layoutIntegrity } from './archetypes/layout-integrity';
 import { layerIntegrity } from './archetypes/layer-integrity';
 import { responsiveIntegrity } from './archetypes/responsive-integrity';
@@ -28,6 +29,7 @@ import { readingOrderIntegrity } from './archetypes/reading-order-integrity';
 import { rtlIntegrity } from './archetypes/rtl-integrity';
 import { tapTargetIntegrity } from './archetypes/tap-target-integrity';
 import { layoutShiftIntegrity } from './archetypes/layout-shift-integrity';
+import { focusVisibleIntegrity } from './archetypes/focus-visible-integrity';
 import { iconCorrectness } from './archetypes/icon-correctness';
 
 /**
@@ -72,6 +74,7 @@ export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   stateCoverage,
   colorContrast,
   spacingRhythm,
+  accessibleName,
   layoutIntegrity,
   layerIntegrity,
   responsiveIntegrity,
@@ -79,6 +82,7 @@ export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   rtlIntegrity,
   tapTargetIntegrity,
   layoutShiftIntegrity,
+  focusVisibleIntegrity,
   iconCorrectness,
 ];
 
