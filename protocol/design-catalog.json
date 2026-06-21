@@ -370,6 +370,27 @@
       ]
     },
     {
+      "archetype": "truncation-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "overflowing-text-is-truncated",
+          "statement": "When text overflows its width- or height-constrained container, it must be handled gracefully: truncated with an ellipsis (`text-overflow: ellipsis`), clamped to N lines (`-webkit-line-clamp`), or made scrollable (`overflow: auto/scroll`). The escape is text that SPILLS out of its box (`overflow: visible`) over neighbouring content, or that is HARD-CLIPPED (`overflow: hidden`) with no ellipsis or clamp so the cut is invisible to the user. Add an ellipsis, a line-clamp, or a scroll affordance.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "substrate": "geometry",
+          "seenIn": [
+            "calcom:f63d70552",
+            "calcom:22201cbc7",
+            "calcom:3af6fee05"
+          ]
+        }
+      ]
+    },
+    {
       "archetype": "icon-correctness",
       "version": "0.1.0",
       "criteria": [

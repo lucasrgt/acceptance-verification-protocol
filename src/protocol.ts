@@ -31,6 +31,7 @@ import { rtlIntegrity } from './archetypes/rtl-integrity';
 import { tapTargetIntegrity } from './archetypes/tap-target-integrity';
 import { layoutShiftIntegrity } from './archetypes/layout-shift-integrity';
 import { focusVisibleIntegrity } from './archetypes/focus-visible-integrity';
+import { truncationIntegrity } from './archetypes/truncation-integrity';
 import { iconCorrectness } from './archetypes/icon-correctness';
 
 /**
@@ -85,6 +86,7 @@ export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   tapTargetIntegrity,
   layoutShiftIntegrity,
   focusVisibleIntegrity,
+  truncationIntegrity,
   iconCorrectness,
 ];
 

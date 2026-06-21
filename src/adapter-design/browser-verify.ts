@@ -10,6 +10,7 @@ import { rtlHooks } from './rtl-integrity';
 import { tapTargetHooks } from './tap-target-integrity';
 import { layoutShiftHooks } from './layout-shift-integrity';
 import { focusVisibleHooks } from './focus-visible-integrity';
+import { truncationHooks } from './truncation-integrity';
 import type { ReactDesignSubject } from './subject';
 
 /**
@@ -28,6 +29,7 @@ const REGISTRY: Record<string, (subject: ReactDesignSubject, page: Page) => Veri
   'tap-target-integrity': tapTargetHooks,
   'layout-shift-integrity': layoutShiftHooks,
   'focus-visible-integrity': focusVisibleHooks,
+  'truncation-integrity': truncationHooks,
 };
 
 /** Runs a geometry design archetype against a surface in a real browser page. */

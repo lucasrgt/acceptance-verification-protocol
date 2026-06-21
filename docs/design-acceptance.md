@@ -237,6 +237,18 @@ hierarchy discrepancy that motivated the idea.)
      late-widget, expanding-banner), false-alarm 0. `bench/layout-shift-integrity.test.ts`.
      Grounded in the layout-shift cluster (mastodon:511e10df, gitea:32fdfb0b, documenso:1a23744d).
      **Design catalog: 14/14 detection, 49/49 mutants killed (geometry tier = 7).**
+   - **truncation-integrity** — ✅ **DONE.** `overflowing-text-is-truncated`: when text overflows its
+     width/height-constrained box it must be handled gracefully — an ellipsis (`text-overflow`), a
+     `-webkit-line-clamp`, or a scroll (`overflow:auto`); the escape is text that SPILLS out
+     (`overflow:visible`) over neighbours or is HARD-CLIPPED (`overflow:hidden`) with no ellipsis/
+     clamp, so the cut is invisible. **Affordance-aware**, which is what makes it distinct from
+     layout-integrity's `content-fits` — that flags ANY clip unconditionally (blind to the ellipsis),
+     this faults only the MISSING affordance and passes legitimate ellipsis/clamp/scroll. Measured in
+     real Chrome (scrollWidth/scrollHeight + computed overflow). Mutation 4/4 (spill-x, hard-clip-x,
+     clip-y, spill-y), and the three graceful affordances all pass without false alarm.
+     `bench/truncation-integrity.test.ts`. Grounded in cal.com's truncation cluster
+     (calcom:f63d70552 url-spill→ellipsis, calcom:22201cbc7 clip→line-clamp, calcom:3af6fee05
+     overflow→scroll).
 4. **Model-oracle tier** — the one criterion no mechanical check can decide.
    - **icon-correctness** — ✅ **DONE.** `icon-fits-meaning`: each icon's MEANING fits its
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
@@ -279,14 +291,14 @@ hierarchy discrepancy that motivated the idea.)
      no-name, empty aria-label), false-alarm 0 — including the decorative divider left unflagged.
      `bench/image-alt.test.ts`. Grounded in cal.com alt-text fixes (fa20f19e, 55113f20) +
      documenso (df9c603a).
-     **Design catalog: 18 criteria — jsdom·style (7) + dom (2: accessible-name, image-alt) +
-     geometry (8: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
-     focus-visible) + model (1), 64/64 mutants killed, false-alarm 0.**
+     **Design catalog: 19 criteria — jsdom·style (7) + dom (2: accessible-name, image-alt) +
+     geometry (9: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
+     focus-visible · truncation) + model (1), 68/68 mutants killed, false-alarm 0.**
 6. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
    portable protocol. A `substrate` axis (`static`/`dom`/`http`/`style`/`geometry`/`model`)
    lives in `core/types.ts` (the layered-determinism axis) and every design criterion declares
-   it — the 7 jsdom ones `style`, accessible-name + image-alt `dom`, the 8 geometry ones `geometry`,
-   icon `model`. The 18 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
+   it — the 7 jsdom ones `style`, accessible-name + image-alt `dom`, the 9 geometry ones `geometry`,
+   icon `model`. The 19 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
    drift-guarded by `bench/protocol-sync.test.ts` exactly like the behaviour catalog (the
    behaviour `catalog.json` stays byte-identical — substrate is omitted where absent).
    `docs/PROTOCOL.md` documents the substrate axis + the design catalog + conformance, so
