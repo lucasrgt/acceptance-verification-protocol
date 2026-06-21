@@ -10,6 +10,7 @@ import { colorContrastHooks } from './color-contrast';
 import { spacingRhythmHooks } from './spacing-rhythm';
 import { accessibleNameHooks } from './accessible-name';
 import { imageAltHooks } from './image-alt';
+import { inputPurposeHooks } from './input-purpose';
 import { iconHooks } from './icon-correctness';
 
 type NamedSubject = { readonly name: string };
@@ -37,6 +38,7 @@ const REGISTRY: Record<string, (subject: never, opts: DesignOptions) => VerifyHo
   'spacing-rhythm': spacingRhythmHooks as (subject: never) => VerifyHooks,
   'accessible-name': accessibleNameHooks as (subject: never) => VerifyHooks,
   'image-alt': imageAltHooks as (subject: never) => VerifyHooks,
+  'input-purpose': inputPurposeHooks as (subject: never) => VerifyHooks,
   'icon-correctness': iconHooks as (subject: never, opts: DesignOptions) => VerifyHooks,
 };
 

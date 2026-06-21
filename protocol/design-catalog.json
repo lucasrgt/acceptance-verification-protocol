@@ -204,6 +204,28 @@
       ]
     },
     {
+      "archetype": "input-purpose",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "personal-fields-declare-purpose",
+          "statement": "Every input that collects a known kind of personal data — identified unambiguously by its type (`email`/`tel`/`password`) or a high-confidence name/id (email, phone, first/last name, street, postal code, organization, credit card) — declares an `autocomplete` attribute (WCAG 1.3.5 Identify Input Purpose). A field whose purpose is opaque (a search box, an arbitrary text field) gets no opinion, and any present `autocomplete` (even `off`) is the author's decision; the escape is a personal-data field with NO autocomplete at all — no autofill, no programmatic purpose.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "substrate": "dom",
+          "seenIn": [
+            "calcom:24422",
+            "calcom:21065",
+            "calcom:6705",
+            "calcom:2645"
+          ]
+        }
+      ]
+    },
+    {
       "archetype": "layout-integrity",
       "version": "0.1.0",
       "criteria": [

@@ -23,6 +23,7 @@ import { colorContrast } from './archetypes/color-contrast';
 import { spacingRhythm } from './archetypes/spacing-rhythm';
 import { accessibleName } from './archetypes/accessible-name';
 import { imageAlt } from './archetypes/image-alt';
+import { inputPurpose } from './archetypes/input-purpose';
 import { layoutIntegrity } from './archetypes/layout-integrity';
 import { layerIntegrity } from './archetypes/layer-integrity';
 import { responsiveIntegrity } from './archetypes/responsive-integrity';
@@ -78,6 +79,7 @@ export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   spacingRhythm,
   accessibleName,
   imageAlt,
+  inputPurpose,
   layoutIntegrity,
   layerIntegrity,
   responsiveIntegrity,

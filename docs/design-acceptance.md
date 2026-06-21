@@ -291,14 +291,25 @@ hierarchy discrepancy that motivated the idea.)
      no-name, empty aria-label), false-alarm 0 — including the decorative divider left unflagged.
      `bench/image-alt.test.ts`. Grounded in cal.com alt-text fixes (fa20f19e, 55113f20) +
      documenso (df9c603a).
-     **Design catalog: 19 criteria — jsdom·style (7) + dom (2: accessible-name, image-alt) +
-     geometry (9: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
-     focus-visible · truncation) + model (1), 68/68 mutants killed, false-alarm 0.**
+   - **input-purpose** — ✅ **DONE.** `personal-fields-declare-purpose` (WCAG 1.3.5 Identify
+     Input Purpose): every input collecting a known kind of personal data — identified
+     unambiguously by its type (`email`/`tel`/`password`) or a high-confidence name/id (email,
+     phone, first/last name, street, postal code, organization, card) — declares an
+     `autocomplete` token. Scoped tight so false-alarm stays 0: an opaque field (a search box)
+     gets no opinion, and any present `autocomplete` (even `off`) is the author's decision — the
+     escape is its ABSENCE, mirroring image-alt's decorative branch. Same `dom` substrate.
+     Mutation 4/4 (email, password, phone, name each losing its token), false-alarm 0 — the
+     non-personal search box is never flagged. `bench/input-purpose.test.ts`. Grounded in
+     cal.com's autocomplete cluster (#24422, #21065, #6705, #2645).
+     **Design catalog: 20 criteria — jsdom·style (7) + dom (3: accessible-name, image-alt,
+     input-purpose) + geometry (9: layout · layer · responsive · reading-order · rtl ·
+     tap-target · layout-shift · focus-visible · truncation) + model (1), 72/72 mutants killed,
+     false-alarm 0.**
 6. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
    portable protocol. A `substrate` axis (`static`/`dom`/`http`/`style`/`geometry`/`model`)
    lives in `core/types.ts` (the layered-determinism axis) and every design criterion declares
-   it — the 7 jsdom ones `style`, accessible-name + image-alt `dom`, the 9 geometry ones `geometry`,
-   icon `model`. The 19 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
+   it — the 7 jsdom ones `style`, accessible-name + image-alt + input-purpose `dom`, the 9 geometry
+   ones `geometry`, icon `model`. The 20 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
    drift-guarded by `bench/protocol-sync.test.ts` exactly like the behaviour catalog (the
    behaviour `catalog.json` stays byte-identical — substrate is omitted where absent).
    `docs/PROTOCOL.md` documents the substrate axis + the design catalog + conformance, so
