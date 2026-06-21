@@ -1,9 +1,34 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <!-- Package identity: the .NET reference implementation of AVP, standalone like xUnit. -->
+  <PropertyGroup>
+    <PackageId>Assay.Net</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>lucasrgt</Authors>
+    <Description>The .NET reference implementation of the Acceptance Verification Protocol (AVP): runs catalog-driven acceptance archetypes over a real HTTP backend and emits an actionable verdict + acceptance score. The runtime sibling of the static doctor; standalone, like xUnit.</Description>
+    <PackageTags>avp;acceptance;verification;testing;archetypes;assay;http</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/lucasrgt/acceptance-verification-protocol</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/lucasrgt/acceptance-verification-protocol</PackageProjectUrl>
+  </PropertyGroup>
+
+  <!-- The neutral catalog ships INSIDE the package so consumers are self-contained:
+       Catalog.LoadDefault() reads this embedded copy. -->
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\..\protocol\catalog.json" Link="catalog.json" LogicalName="Assay.Net.catalog.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

@@ -23,8 +23,10 @@ public sealed record AuthorizationSubject(
 /// <summary>authorization — the caller may only touch what it owns, at the role its operation implies.</summary>
 public sealed class Authorization : Archetype<AuthorizationSubject>
 {
+    /// <inheritdoc/>
     public override string Name => "authorization";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<AuthorizationSubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<AuthorizationSubject, Task>>
         {

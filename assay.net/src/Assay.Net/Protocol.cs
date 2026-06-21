@@ -29,7 +29,17 @@ public sealed record Criterion(
 public sealed record Condition(string Id);
 
 /// <summary>Per-criterion outcome. `Skipped` never counts toward the score — a false green is the catastrophic error.</summary>
-public enum VerdictStatus { Pass, Fail, Skipped }
+public enum VerdictStatus
+{
+    /// <summary>The criterion held: the oracle ran without failing.</summary>
+    Pass,
+
+    /// <summary>The criterion was violated: the oracle threw <see cref="AvpFailException"/>.</summary>
+    Fail,
+
+    /// <summary>Not applicable to this subject (no seam / no bound oracle) — excluded from the score, never a pass.</summary>
+    Skipped,
+}
 
 /// <summary>The per-criterion verdict: status + an actionable reason (written for the agent to fix) + optional evidence.</summary>
 public sealed record CriterionVerdict(string CriterionId, VerdictStatus Status, string Reason, object? Evidence = null);
@@ -37,7 +47,10 @@ public sealed record CriterionVerdict(string CriterionId, VerdictStatus Status, 
 /// <summary>The aggregate verdict for a subject against one archetype.</summary>
 public sealed record Verdict(string Subject, string Archetype, IReadOnlyList<CriterionVerdict> Results)
 {
+    /// <summary>Criteria that actually applied (not skipped) — the denominator of the score.</summary>
     public int Applicable => Results.Count(r => r.Status != VerdictStatus.Skipped);
+
+    /// <summary>Criteria that passed — the numerator of the score.</summary>
     public int Passed => Results.Count(r => r.Status == VerdictStatus.Pass);
 
     /// <summary>passed / applicable, in [0,1] (skipped excluded); 1.0 when nothing applies.</summary>

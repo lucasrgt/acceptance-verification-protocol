@@ -121,9 +121,8 @@ internal static class Repro
     });
 }
 
-/// <summary>Loads the neutral catalog copied next to the test assembly (see the .csproj link).</summary>
+/// <summary>Loads the catalog the way a consumer does — embedded in the Assay.Net assembly.</summary>
 internal static class TestCatalog
 {
-    public static ProtocolCatalog Load() =>
-        Catalog.Load(Path.Combine(AppContext.BaseDirectory, "catalog.json"));
+    public static ProtocolCatalog Load() => Catalog.LoadDefault();
 }

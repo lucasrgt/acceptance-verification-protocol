@@ -12,8 +12,10 @@ public sealed record PaginationIntegritySubject(string BaseUrl, string ListPath,
 /// </summary>
 public sealed class PaginationIntegrity : Archetype<PaginationIntegritySubject>
 {
+    /// <inheritdoc/>
     public override string Name => "pagination-integrity";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<PaginationIntegritySubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<PaginationIntegritySubject, Task>>
         {

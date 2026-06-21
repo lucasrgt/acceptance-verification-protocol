@@ -1,3 +1,6 @@
 # .NET build artifacts (scoped to assay.net/ so it never touches assay/bin/, the JS CLI)
 bin/
 obj/
+
+# Regenerable NuGet output: `dotnet pack src/Assay.Net -c Release -o local-feed`. Consumers vendor a copy.
+local-feed/

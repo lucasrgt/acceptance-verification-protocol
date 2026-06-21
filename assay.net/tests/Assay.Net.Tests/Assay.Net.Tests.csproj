@@ -27,9 +27,4 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
 
-  <!-- Assay.Net consumes the NEUTRAL catalog at the monorepo root (the shared contract) -->
-  <ItemGroup>
-    <None Include="..\..\..\protocol\catalog.json" Link="catalog.json" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
 </Project>

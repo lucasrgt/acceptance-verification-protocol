@@ -22,8 +22,10 @@ public sealed record WebhookSubject(
 /// <summary>integration-integrity — only an authentically-signed inbound callback may mutate state.</summary>
 public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
 {
+    /// <inheritdoc/>
     public override string Name => "integration-integrity";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<WebhookSubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<WebhookSubject, Task>>
         {

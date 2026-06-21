@@ -12,8 +12,10 @@ public sealed record RequestIdempotencySubject(string BaseUrl, string CreatePath
 /// </summary>
 public sealed class RequestIdempotency : Archetype<RequestIdempotencySubject>
 {
+    /// <inheritdoc/>
     public override string Name => "request-idempotency";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<RequestIdempotencySubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<RequestIdempotencySubject, Task>>
         {

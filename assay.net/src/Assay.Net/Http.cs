@@ -9,8 +9,10 @@ namespace Assay.Net;
 /// </summary>
 public static class Http
 {
+    /// <summary>An <see cref="HttpClient"/> bound to the subject's base url.</summary>
     public static HttpClient Client(string baseUrl) => new() { BaseAddress = new Uri(baseUrl) };
 
+    /// <summary>Builds a request with an optional bearer token and body — the shape oracles send.</summary>
     public static HttpRequestMessage Request(HttpMethod method, string path, string? bearer = null, HttpContent? body = null)
     {
         var req = new HttpRequestMessage(method, path) { Content = body };

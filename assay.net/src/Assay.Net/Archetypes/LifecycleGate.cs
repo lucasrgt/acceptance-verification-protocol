@@ -16,8 +16,10 @@ public sealed record LifecycleGateSubject(
 /// </summary>
 public sealed class LifecycleGate : Archetype<LifecycleGateSubject>
 {
+    /// <inheritdoc/>
     public override string Name => "lifecycle-gate";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<LifecycleGateSubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<LifecycleGateSubject, Task>>
         {

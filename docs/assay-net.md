@@ -1,7 +1,10 @@
 # Assay.NET — the backend adapter (Phase 1 plan)
 
-> **Status:** known backend catalog CLOSED (2026-06-21) — `assay.net/` builds green,
-> **26 tests passing**, **11 backend criteria across 7 archetypes**: authorization
+> **Status:** known backend catalog CLOSED + **PACKAGED** (2026-06-21) — `assay.net/` builds green,
+> **28 tests passing**, shipped as the NuGet package **`Assay.Net` 0.1.0** (self-contained: the
+> neutral `catalog.json` is embedded, read via `Catalog.LoadDefault()`; XML docs + README ship in the
+> package). Generate the feed with `dotnet pack src/Assay.Net -c Release -o local-feed` (gitignored;
+> consumers vendor a copy). **11 backend criteria across 7 archetypes**: authorization
 > (own-resource-only, role-required, server-is-authoritative), integration-integrity
 > (webhook-signature-verified, callback-resolves-entity, redirect-urls-bound),
 > second-order-effects (notifies-all-parties), request-idempotency (idempotency-key-honored),
@@ -92,12 +95,25 @@ consume the same `protocol/` catalog; neither may diverge silently.
   catalog generation migrates to .NET; JS conforms. That is how ".NET leads" lands
   without throwing away the lockstep machinery already running.
 
-## Open Phase-1 questions
+## Resolved decisions
 
-1. **.NET HTTP substrate:** `WebApplicationFactory` (in-process ASP.NET) vs raw
-   Kestrel repro servers vs `HttpClient` + `TestServer`. *(lean: `WebApplicationFactory`
-   — closest to the framework's real runtime; raw repro servers for protocol-level tests.)*
-2. **Catalog consumption:** generate C# types from `catalog.json` at build, or read it
-   at runtime. *(lean: build-time codegen — fail-fast, matches the static-doctor ethos.)*
-3. **Naming/namespace:** keep neutral (`Assay.Net`, namespace `Assay`) to preserve the
-   standalone, reusable-by-anyone stance (xUnit-like), not under the AeroFortress brand.
+1. **.NET HTTP substrate:** raw **Kestrel** repro servers (`WebApplication.CreateSlimBuilder`,
+   `127.0.0.1:0`) over `HttpClient` — the calibration pair (good/bad backend) is the protocol-level
+   test, and a self-hosted Kestrel is the closest honest stand-in for a real backend without coupling
+   the package to a host's test harness. See `tests/.../Repro.cs`.
+2. **Catalog consumption:** read at **runtime** from the catalog **embedded** in the assembly
+   (`Catalog.LoadDefault()`), with `Catalog.Load(path)` for a specific/newer catalog on disk. Chosen
+   over build-time codegen: it keeps the package self-contained (no path to the monorepo) and the
+   neutral JSON the single source of truth — the adapter reads the contract, never regenerates it.
+3. **Naming:** **`Assay.Net`** (PackageId + assembly + namespace) — neutral, standalone, xUnit-like,
+   NOT under the `AeroFortress.Framework` namespace. Aligns with the rebrand rule "Assay mantém nome
+   Assay"; the npm sibling is `@aerofortress/assay` (the org scope is a JS-registry artifact .NET's
+   flat ids don't need).
+
+## Next: consumption (the Clockwork dogfood unblock)
+
+The package now exists in a local feed, so a consumer (the framework's `examples/sample-app` proof
+project, or a pilot) can `nuget.config` it and write real `[AVP("id")]` proofs against a slice. The
+remaining wiring for the `Withdraw` dogfood: repack the `aerofortress-framework` doctor with `LZ0030`
+into its `local-feed`, add the assay.net feed to the sample-app's `nuget.config`, emit
+`[Verify]`/`[AVP]` on `Withdraw`, watch the gate go red, implement idempotency, green.

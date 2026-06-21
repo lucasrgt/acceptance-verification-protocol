@@ -8,6 +8,7 @@ namespace Assay.Net;
 /// </summary>
 public abstract class Archetype<TSubject>
 {
+    /// <summary>The catalog archetype id this binds oracles to (e.g. "money-integrity").</summary>
     public abstract string Name { get; }
 
     /// <summary>criterion id → mechanical oracle (throws <see cref="AvpFailException"/> to fail).</summary>
@@ -21,6 +22,12 @@ public abstract class Archetype<TSubject>
 /// </summary>
 public static class Runner
 {
+    /// <summary>
+    /// Runs every criterion the catalog lists for <paramref name="archetype"/> against
+    /// <paramref name="subject"/> and aggregates the <see cref="Verdict"/>. A criterion with no bound
+    /// mechanical oracle is <c>Skipped</c> (never a false pass). Throws if the archetype is absent from
+    /// the catalog (protocol drift).
+    /// </summary>
     public static async Task<Verdict> Run<TSubject>(
         ProtocolCatalog catalog, Archetype<TSubject> archetype, string subjectName, TSubject subject)
     {

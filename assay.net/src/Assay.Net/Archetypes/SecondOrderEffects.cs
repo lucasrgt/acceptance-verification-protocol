@@ -8,8 +8,10 @@ public sealed record NotifySubject(string BaseUrl, string TriggerPath, IReadOnly
 /// <summary>second-order-effects — a state transition notifies EVERY party it concerns, not one or none.</summary>
 public sealed class SecondOrderEffects : Archetype<NotifySubject>
 {
+    /// <inheritdoc/>
     public override string Name => "second-order-effects";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<NotifySubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<NotifySubject, Task>>
         {

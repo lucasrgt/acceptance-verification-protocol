@@ -19,8 +19,10 @@ public sealed class MoneyIntegrity : Archetype<MoneyIntegritySubject>
     // where platform + host can drift from the total under naive Math.Round arithmetic.
     private static readonly int[] Totals = [1001, 333, 9999, 100, 1, 7, 4567, 12345];
 
+    /// <inheritdoc/>
     public override string Name => "money-integrity";
 
+    /// <inheritdoc/>
     public override IReadOnlyDictionary<string, Func<MoneyIntegritySubject, Task>> Oracles { get; } =
         new Dictionary<string, Func<MoneyIntegritySubject, Task>>
         {
