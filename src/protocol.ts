@@ -22,6 +22,7 @@ import { stateCoverage } from './archetypes/state-coverage';
 import { colorContrast } from './archetypes/color-contrast';
 import { spacingRhythm } from './archetypes/spacing-rhythm';
 import { accessibleName } from './archetypes/accessible-name';
+import { imageAlt } from './archetypes/image-alt';
 import { layoutIntegrity } from './archetypes/layout-integrity';
 import { layerIntegrity } from './archetypes/layer-integrity';
 import { responsiveIntegrity } from './archetypes/responsive-integrity';
@@ -75,6 +76,7 @@ export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   colorContrast,
   spacingRhythm,
   accessibleName,
+  imageAlt,
   layoutIntegrity,
   layerIntegrity,
   responsiveIntegrity,

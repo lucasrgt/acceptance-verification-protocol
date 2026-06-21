@@ -9,6 +9,7 @@ import { stateCoverageHooks } from './state-coverage';
 import { colorContrastHooks } from './color-contrast';
 import { spacingRhythmHooks } from './spacing-rhythm';
 import { accessibleNameHooks } from './accessible-name';
+import { imageAltHooks } from './image-alt';
 import { iconHooks } from './icon-correctness';
 
 type NamedSubject = { readonly name: string };
@@ -35,6 +36,7 @@ const REGISTRY: Record<string, (subject: never, opts: DesignOptions) => VerifyHo
   'color-contrast': colorContrastHooks as (subject: never) => VerifyHooks,
   'spacing-rhythm': spacingRhythmHooks as (subject: never) => VerifyHooks,
   'accessible-name': accessibleNameHooks as (subject: never) => VerifyHooks,
+  'image-alt': imageAltHooks as (subject: never) => VerifyHooks,
   'icon-correctness': iconHooks as (subject: never, opts: DesignOptions) => VerifyHooks,
 };
 

@@ -269,14 +269,24 @@ hierarchy discrepancy that motivated the idea.)
      Mutation 4/4 (no-indicator, transparent-ring, hover-only, zero-outline), false-alarm 0.
      `bench/focus-visible-integrity.test.ts`. Grounded in cal.com's focus-ring cluster
      (7393ba1d1, 689150d78, c1b41d825).
-     **Design catalog: 17 criteria — jsdom·style (7) + dom (1: accessible-name) + geometry
-     (8: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
-     focus-visible) + model (1), 60/60 mutants killed, false-alarm 0.**
+   - **image-alt** — ✅ **DONE.** `images-have-text-alternative`: every informative image
+     (`<img>` / `role="img"`) exposes a text alternative (alt / aria-label / aria-labelledby /
+     title), while a deliberately-decorative image (`alt=""`, `aria-hidden`, `role="presentation"`)
+     is NOT flagged — the decorative branch is the sharp distinction and the false-alarm guard.
+     The #2 most common real-world a11y violation (WebAIM Million). Same `dom` substrate as
+     accessible-name; distinct from it (accessible-name names INTERACTIVE controls, this names
+     non-interactive informative graphics). Mutation 4/4 (logo no-alt, avatar no-alt, role=img
+     no-name, empty aria-label), false-alarm 0 — including the decorative divider left unflagged.
+     `bench/image-alt.test.ts`. Grounded in cal.com alt-text fixes (fa20f19e, 55113f20) +
+     documenso (df9c603a).
+     **Design catalog: 18 criteria — jsdom·style (7) + dom (2: accessible-name, image-alt) +
+     geometry (8: layout · layer · responsive · reading-order · rtl · tap-target · layout-shift ·
+     focus-visible) + model (1), 64/64 mutants killed, false-alarm 0.**
 6. **Design protocol surface — ✅ DONE.** The design tier is now a first-class part of the
    portable protocol. A `substrate` axis (`static`/`dom`/`http`/`style`/`geometry`/`model`)
    lives in `core/types.ts` (the layered-determinism axis) and every design criterion declares
-   it — the 7 jsdom ones `style`, accessible-name `dom`, the 8 geometry ones `geometry`, icon
-   `model`. The 17 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
+   it — the 7 jsdom ones `style`, accessible-name + image-alt `dom`, the 8 geometry ones `geometry`,
+   icon `model`. The 18 design archetypes serialise to **`protocol/design-catalog.json`** via `buildDesignCatalog()`,
    drift-guarded by `bench/protocol-sync.test.ts` exactly like the behaviour catalog (the
    behaviour `catalog.json` stays byte-identical — substrate is omitted where absent).
    `docs/PROTOCOL.md` documents the substrate axis + the design catalog + conformance, so

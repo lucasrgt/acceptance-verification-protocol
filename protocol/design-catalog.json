@@ -183,6 +183,27 @@
       ]
     },
     {
+      "archetype": "image-alt",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "images-have-text-alternative",
+          "statement": "Every informative image (`<img>` or `role=\"img\"`) exposes a text alternative — a non-empty `alt`, `aria-label`, `aria-labelledby`, or `title`. An image deliberately marked decorative (`alt=\"\"`, `aria-hidden=\"true\"`, or `role=\"presentation\"`/`\"none\"`) is correct and is not flagged. The escape is an image with NO text alternative and NO decorative marking: it reaches the accessibility tree unnamed. Add descriptive `alt`, or mark it decorative if it carries no meaning.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "substrate": "dom",
+          "seenIn": [
+            "fa20f19e",
+            "55113f20",
+            "df9c603a"
+          ]
+        }
+      ]
+    },
+    {
       "archetype": "layout-integrity",
       "version": "0.1.0",
       "criteria": [
