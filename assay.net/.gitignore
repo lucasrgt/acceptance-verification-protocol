@@ -1,0 +1,3 @@
+# .NET build artifacts (scoped to assay.net/ so it never touches assay/bin/, the JS CLI)
+bin/
+obj/
