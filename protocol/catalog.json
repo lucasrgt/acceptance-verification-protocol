@@ -379,6 +379,22 @@
       ]
     },
     {
+      "archetype": "access-control",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "requires-authentication",
+          "statement": "A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every [Critical] authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "seenIn": []
+        }
+      ]
+    },
+    {
       "archetype": "integration-integrity",
       "version": "0.1.0",
       "criteria": [

@@ -41,6 +41,7 @@ public class ConformanceTests
         AssertOraclesExist(new CredentialAuthority().Name, new CredentialAuthority().Oracles.Keys);
         AssertOraclesExist(new TokenRotation().Name, new TokenRotation().Oracles.Keys);
         AssertOraclesExist(new ResourceUniqueness().Name, new ResourceUniqueness().Oracles.Keys);
+        AssertOraclesExist(new AccessControl().Name, new AccessControl().Oracles.Keys);
     }
 
     private static void AssertOraclesExist(string archetype, IEnumerable<string> oracleIds)

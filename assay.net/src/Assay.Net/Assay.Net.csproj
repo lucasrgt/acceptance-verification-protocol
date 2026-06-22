@@ -10,7 +10,7 @@
   <!-- Package identity: the .NET reference implementation of AVP, standalone like xUnit. -->
   <PropertyGroup>
     <PackageId>Assay.Net</PackageId>
-    <Version>0.1.6</Version>
+    <Version>0.1.7</Version>
     <Authors>lucasrgt</Authors>
     <Description>The .NET reference implementation of the Acceptance Verification Protocol (AVP): runs catalog-driven acceptance archetypes over a real HTTP backend and emits an actionable verdict + acceptance score. The runtime sibling of the static doctor; standalone, like xUnit.</Description>
     <PackageTags>avp;acceptance;verification;testing;archetypes;assay;http</PackageTags>
