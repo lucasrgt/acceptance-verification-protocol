@@ -600,6 +600,58 @@
           ]
         }
       ]
+    },
+    {
+      "archetype": "credential-authority",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rejects-invalid-credentials",
+          "statement": "An authentication endpoint denies invalid credentials and never issues a token on the deny path — a silent accept (a token for a wrong credential) is an auth bypass.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "seenIn": []
+        },
+        {
+          "id": "issues-token-on-valid",
+          "statement": "An authentication endpoint issues a session token for valid credentials.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": []
+        }
+      ]
+    },
+    {
+      "archetype": "token-rotation",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rotates-on-refresh",
+          "statement": "Exchanging a valid refresh token mints a NEW refresh token (rotation), never reissues the same one.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": []
+        },
+        {
+          "id": "replay-burns-family",
+          "statement": "Replaying an already-rotated (spent) refresh token is rejected AND revokes the whole token family — a leaked token cannot outlive its rotation (theft detection).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "seenIn": []
+        }
+      ]
     }
   ]
 }
