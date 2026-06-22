@@ -4,22 +4,26 @@ using System.Text.Json;
 namespace Assay.Net.Archetypes;
 
 /// <summary>
-/// Seam for the token-rotation archetype: a refresh endpoint that rotates the session and detects replay.
-/// <paramref name="InitialRefreshToken"/> is a live, unused refresh token; <paramref name="RefreshPath"/> exchanges
-/// it for a fresh access+refresh pair; <paramref name="TokenField"/> is the response field carrying the new refresh
-/// token. The endpoint takes the refresh token as <c>{ "refreshToken": "…" }</c> in the request body.
+/// Seam for the token-rotation archetype: a refresh endpoint that rotates the session and detects replay. The
+/// archetype is self-priming — each oracle mints its OWN fresh refresh token by logging in (<paramref name="LoginPath"/>
+/// with <paramref name="Credentials"/>), so the two oracles never contend over one spent token. <paramref name="RefreshPath"/>
+/// exchanges a refresh token for a fresh pair; <paramref name="RefreshField"/> is the field that carries the refresh
+/// token in BOTH the login and the refresh response. The refresh endpoint takes the token as
+/// <c>{ "refreshToken": "…" }</c> in the request body.
 /// </summary>
 public sealed record TokenRotationSubject(
     string BaseUrl,
+    string LoginPath,
+    object Credentials,
     string RefreshPath,
-    string InitialRefreshToken,
-    string TokenField = "refreshToken");
+    string RefreshField = "refreshToken");
 
 /// <summary>
 /// token-rotation — a refresh endpoint rotates the session on every exchange (a valid refresh mints a NEW token,
 /// never the same one), and replay of a spent token is theft: it is rejected AND burns the whole family, so a
 /// leaked token cannot outlive its rotation. The replay-burn is the security feature; the calibration proves the
-/// burn reaches even the legitimate just-rotated token.
+/// burn reaches even the legitimate just-rotated token. Each oracle logs in for its own token, so they run
+/// independently against shared state (running one does not spend the other's token).
 /// </summary>
 public sealed class TokenRotation : Archetype<TokenRotationSubject>
 {
@@ -33,26 +37,29 @@ public sealed class TokenRotation : Archetype<TokenRotationSubject>
             ["rotates-on-refresh"] = async s =>
             {
                 using var http = Http.Client(s.BaseUrl);
-                var res = await http.SendAsync(Refresh(s.RefreshPath, s.InitialRefreshToken));
+                var initial = await Login(http, s);
+
+                var res = await http.SendAsync(Refresh(s.RefreshPath, initial));
                 Http.Accepted(res, $"refresh at {s.RefreshPath}");
 
-                var next = await ReadToken(res, s.TokenField, "refresh response");
-                if (next == s.InitialRefreshToken)
+                var next = await ReadToken(res, s.RefreshField, "refresh response");
+                if (next == initial)
                     throw new AvpFailException(
-                        $"refresh returned the SAME '{s.TokenField}' it was given — a valid refresh must ROTATE the token, not reissue the same one.");
+                        $"refresh returned the SAME '{s.RefreshField}' it was given — a valid refresh must ROTATE the token, not reissue the same one.");
             },
             ["replay-burns-family"] = async s =>
             {
                 using var http = Http.Client(s.BaseUrl);
+                var initial = await Login(http, s);   // a fresh family, independent of the other oracle's
 
                 // First exchange: rotate. Yields a fresh (legitimate) token and spends the initial one.
-                var first = await http.SendAsync(Refresh(s.RefreshPath, s.InitialRefreshToken));
+                var first = await http.SendAsync(Refresh(s.RefreshPath, initial));
                 Http.Accepted(first, "first refresh (rotation)");
-                var legit = await ReadToken(first, s.TokenField, "first refresh response");
+                var legit = await ReadToken(first, s.RefreshField, "first refresh response");
 
                 // Replay the now-SPENT initial token: a live client still holds the rotated one, so a second
                 // presentation means it leaked — it must be rejected.
-                var replay = await http.SendAsync(Refresh(s.RefreshPath, s.InitialRefreshToken));
+                var replay = await http.SendAsync(Refresh(s.RefreshPath, initial));
                 if (replay.IsSuccessStatusCode)
                     throw new AvpFailException(
                         $"replaying the spent refresh token was accepted ({(int)replay.StatusCode}) — a rotated token must never be honored again (theft).");
@@ -64,6 +71,15 @@ public sealed class TokenRotation : Archetype<TokenRotationSubject>
                         "after a replayed (stolen) token, the legitimate rotated token still worked — replay must burn the WHOLE family, not just the replayed token.");
             },
         };
+
+    // Mint a fresh, unused refresh token by logging in — so each oracle owns an independent token family.
+    private static async Task<string> Login(HttpClient http, TokenRotationSubject s)
+    {
+        var res = await http.SendAsync(
+            Http.Request(HttpMethod.Post, s.LoginPath, body: JsonContent.Create(s.Credentials, s.Credentials.GetType())));
+        Http.Accepted(res, $"login at {s.LoginPath}");
+        return await ReadToken(res, s.RefreshField, "login response");
+    }
 
     private static HttpRequestMessage Refresh(string path, string refreshToken) =>
         Http.Request(HttpMethod.Post, path, body: JsonContent.Create(new { refreshToken }));
