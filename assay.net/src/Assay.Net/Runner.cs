@@ -27,10 +27,19 @@ public static class Runner
     /// <paramref name="subject"/> and aggregates the <see cref="Verdict"/>. A criterion with no bound
     /// mechanical oracle is <c>Skipped</c> (never a false pass). Throws if the archetype is absent from
     /// the catalog (protocol drift).
+    ///
+    /// Pass <paramref name="transport"/> to run the oracles over an in-memory test host instead of a real
+    /// socket: the factory's client (e.g. <c>WebApplicationFactory.CreateClient()</c>) is handed to every
+    /// oracle for this run, so a proof reuses an app's existing test fixture with no real port and the
+    /// subject's base url is immaterial. Omit it for the default — a real <see cref="HttpClient"/> per oracle
+    /// bound to the subject's base url.
     /// </summary>
     public static async Task<Verdict> Run<TSubject>(
-        ProtocolCatalog catalog, Archetype<TSubject> archetype, string subjectName, TSubject subject)
+        ProtocolCatalog catalog, Archetype<TSubject> archetype, string subjectName, TSubject subject,
+        Func<HttpClient>? transport = null)
     {
+        using var _ = Http.UseTransport(transport);
+
         var spec = catalog.Archetypes.FirstOrDefault(a => a.Archetype == archetype.Name)
                    ?? throw new InvalidOperationException(
                        $"Archetype '{archetype.Name}' is not in the catalog (protocol drift?).");
