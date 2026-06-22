@@ -652,6 +652,22 @@
           "seenIn": []
         }
       ]
+    },
+    {
+      "archetype": "resource-uniqueness",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rejects-duplicate",
+          "statement": "Creating a resource whose unique key already exists is rejected (a conflict) — the second create of the same key must fail, never silently duplicate (a duplicate breaks the invariant the key holds, e.g. one-human-one-account).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "seenIn": []
+        }
+      ]
     }
   ]
 }
