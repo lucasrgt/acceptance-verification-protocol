@@ -1,0 +1,35 @@
+name: publish
+
+# Publishes Assay.Net (the .NET reference implementation of AVP) to nuget.org on a version tag (e.g. `v0.1.1`) —
+# bump <Version> in assay.net/src/Assay.Net/Assay.Net.csproj first, then tag. Auth is Trusted Publishing (OIDC —
+# no stored key): the job exchanges the GitHub OIDC token for a short-lived nuget.org key via NuGet/login@v1.
+# Needs a trusted-publisher policy on nuget.org bound to: owner lucasrgt, repo acceptance-verification-protocol,
+# workflow publish.yml. The JS @aerofortress/assay package gets its own (npm) leg here once it's packaged.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  nuget:
+    name: pack + push Assay.Net to nuget.org
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC token for nuget.org Trusted Publishing
+      contents: read # checkout
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: pack
+        run: dotnet pack assay.net/src/Assay.Net/Assay.Net.csproj -c Release -o nupkgs
+      # Trusted Publishing: exchange the GitHub OIDC token for a short-lived (1h) nuget.org key — no stored secret.
+      # `user` is the public nuget.org profile name; the bound policy lives on nuget.org. Requested right before push.
+      - name: nuget login (OIDC → temp key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: lucasrgt
+      - name: push
+        run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
