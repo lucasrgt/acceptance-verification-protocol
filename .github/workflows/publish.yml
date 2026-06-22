@@ -1,10 +1,10 @@
 name: publish
 
-# Publishes Assay.Net (the .NET reference implementation of AVP) to nuget.org on a version tag (e.g. `v0.1.1`) —
-# bump <Version> in assay.net/src/Assay.Net/Assay.Net.csproj first, then tag. Auth is Trusted Publishing (OIDC —
-# no stored key): the job exchanges the GitHub OIDC token for a short-lived nuget.org key via NuGet/login@v1.
-# Needs a trusted-publisher policy on nuget.org bound to: owner lucasrgt, repo acceptance-verification-protocol,
-# workflow publish.yml. The JS @aerofortress/assay package gets its own (npm) leg here once it's packaged.
+# Publishes both AVP reference implementations off one version tag (e.g. `v0.1.1`): Assay.Net to nuget.org and
+# @aerofortress/assay (JS) to npm. Bump the version first (back: <Version> in assay.net/src/Assay.Net/Assay.Net.csproj;
+# front: assay/package.json), then tag. The two jobs are independent. nuget auth is Trusted Publishing (OIDC — no
+# stored key) via NuGet/login@v1, bound to a nuget.org policy (owner lucasrgt, repo acceptance-verification-protocol,
+# workflow publish.yml). npm auth is the NPM_TOKEN secret (an automation token for the @aerofortress scope).
 on:
   push:
     tags: ["v*"]
@@ -33,3 +33,35 @@ jobs:
           user: lucasrgt
       - name: push
         run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+  npm:
+    name: publish @aerofortress/assay to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+          cache: npm
+          cache-dependency-path: assay/package-lock.json
+      - name: install
+        working-directory: assay
+        run: npm ci
+      # Skip gracefully when NPM_TOKEN is unset (the nuget leg is independent and still ran) and when the version
+      # is already on npm (the npm analogue of nuget's --skip-duplicate). prepublishOnly builds dist via tsup.
+      - name: publish (skip if no token or version exists)
+        working-directory: assay
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "NPM_TOKEN not set — skipping npm publish (the nuget leg is independent and still ran)."
+            exit 0
+          fi
+          ver=$(node -p "require('./package.json').version")
+          if npm view "@aerofortress/assay@$ver" version >/dev/null 2>&1; then
+            echo "@aerofortress/assay@$ver already on npm — skip"
+          else
+            npm publish
+          fi
