@@ -1,41 +1,86 @@
 {
   "name": "@aerofortress/assay",
-  "version": "0.0.1",
-  "private": true,
-  "workspaces": [
-    "examples/*"
-  ],
+  "version": "0.1.0",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
+  "license": "MIT",
+  "author": "Lucas Tinoco",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucasrgt/acceptance-verification-protocol.git",
+    "directory": "assay"
+  },
+  "homepage": "https://github.com/lucasrgt/acceptance-verification-protocol#readme",
+  "bugs": "https://github.com/lucasrgt/acceptance-verification-protocol/issues",
+  "keywords": ["avp", "assay", "acceptance", "verification", "testing", "react", "archetypes"],
+  "workspaces": ["examples/*"],
   "bin": {
     "assay": "bin/assay.mjs"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "import": "./dist/react.js"
+    },
+    "./react/vitest": {
+      "types": "./dist/react/vitest.d.ts",
+      "import": "./dist/react/vitest.js"
+    },
+    "./http": {
+      "types": "./dist/http.d.ts",
+      "import": "./dist/http.js"
+    },
+    "./design": {
+      "types": "./dist/design.d.ts",
+      "import": "./dist/design.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": ["dist", "bin", "README.md"],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "msw": "^2.6.8"
+  },
   "peerDependencies": {
-    "@anthropic-ai/sdk": ">=0.40.0"
+    "@anthropic-ai/sdk": ">=0.40.0",
+    "jsdom": ">=25",
+    "react": ">=18",
+    "react-dom": ">=18",
+    "vitest": ">=2"
   },
   "peerDependenciesMeta": {
-    "@anthropic-ai/sdk": {
-      "optional": true
-    }
+    "@anthropic-ai/sdk": { "optional": true },
+    "jsdom": { "optional": true }
   },
   "devDependencies": {
     "@tanstack/react-router": "^1.170.16",
     "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/user-event": "^14.5.2",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "jsdom": "^25.0.1",
-    "msw": "^2.6.8",
     "puppeteer-core": "^25.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vitest": "^2.1.8"
   }
