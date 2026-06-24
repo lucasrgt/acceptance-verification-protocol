@@ -18,6 +18,14 @@ import { moneyDisplayHooks } from './money-integrity';
 export interface VerifyOptions {
   /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
   readonly judge?: Judge;
+  /**
+   * Escape hatch for an OFF-CATALOG archetype — a domain criterion you authored that the
+   * adapter's catalog registry doesn't know (see ADR 0002). Provide the hooks that bind
+   * your archetype to this substrate; `verify` runs it through the same neutral executor
+   * and verdict as a catalog archetype. Per-call, not a global registration — so custom
+   * criteria stay in your repo and never enter the package's accuracy benchmark.
+   */
+  readonly hooks?: (subject: NamedSubject, options: VerifyOptions) => VerifyHooks;
 }
 
 /** Minimal subject contract the registry dispatches on. */
@@ -101,10 +109,10 @@ export async function verify(
   subject: NamedSubject,
   options: VerifyOptions = {},
 ): Promise<Verdict> {
-  const build = REGISTRY[archetype.name];
+  const build = REGISTRY[archetype.name] ?? options.hooks;
   if (!build) {
     throw new Error(
-      `The React adapter has no hooks for archetype "${archetype.name}" — register it in adapter-react/verify.ts.`,
+      `The React adapter has no hooks for archetype "${archetype.name}" — register it in adapter-react/verify.ts, or pass { hooks } to verify() for an off-catalog criterion (ADR 0002).`,
     );
   }
   return runVerification(subject.name, archetype, build(subject as never, options));

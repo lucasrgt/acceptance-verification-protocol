@@ -1,5 +1,6 @@
 import { it, expect } from 'vitest';
 import type { Archetype, Judge } from '../core/dsl';
+import type { VerifyHooks } from '../core/run';
 import { verify } from './verify';
 import { formatVerdict } from '../core/format';
 
@@ -11,6 +12,12 @@ export interface VerificationOptions {
   /** Runs before the verification (e.g. baseline MSW handlers the subject needs on mount). */
   readonly setup?: () => void | Promise<void>;
   readonly label?: string;
+  /**
+   * Escape hatch for an OFF-CATALOG archetype — hooks binding a domain criterion you
+   * authored to the substrate (see ADR 0002). Lets your own criteria run on the same
+   * Vitest host (gating + verdict) as the catalog, without registering anything globally.
+   */
+  readonly hooks?: (subject: { readonly name: string }, options: { readonly judge?: Judge }) => VerifyHooks;
 }
 
 /**
@@ -27,7 +34,7 @@ export function defineVerification(
   const label = options.label ?? `${archetype.name} · ${subject.name}`;
   it(`assay: ${label}`, async () => {
     if (options.setup) await options.setup();
-    const verdict = await verify(archetype, subject, { judge: options.judge });
+    const verdict = await verify(archetype, subject, { judge: options.judge, hooks: options.hooks });
     // eslint-disable-next-line no-console
     console.log('\n' + formatVerdict(verdict));
     const fails = verdict.results.filter((r) => r.status === 'fail');

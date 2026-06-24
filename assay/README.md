@@ -35,4 +35,41 @@ import { verify } from "@aerofortress/assay/react";
 verify(actionEffect({ /* the criteria the feature must satisfy */ }));
 ```
 
+## Authoring your own criteria (off-catalog)
+
+The shipped catalog covers **universal** invariants, each grounded in a real escape. For a
+**domain rule specific to your product** — say, *"every bank integration must expose the same
+account protocol"* — you author your own criterion with the same public DSL and run it through
+the same engine. Custom criteria live in **your** repo and never enter the package's accuracy
+benchmark (see [ADR 0002](../../docs/adr/0002-custom-criteria-bring-your-own-off-catalog.md)).
+
+```ts
+import { archetype, criterion, mechanical, runVerification, AvpFail } from "@aerofortress/assay";
+
+// 1 — author the criterion (reads like any catalog archetype)
+const accountProtocol = archetype("account-protocol-conformance", "0.1.0", () => {
+  criterion(
+    "exposes-canonical-account-protocol",
+    "Every bank provider returns { id, currency, integer balanceMinor }.",
+    { substrate: "http" },
+    mechanical(async ({ act, expect }) => { await act(); expect.everyProviderIsCanonical(); }),
+  );
+});
+
+// 2 — bind it to a substrate with your own probe, then run it
+const verdict = await runVerification("all-banks", accountProtocol, { probe: () => myProbe(subject) });
+```
+
+Want it on the same Vitest host (gating + formatted verdict) as the catalog? Pass the hooks
+per-call — no global registration:
+
+```ts
+verify(accountProtocol, subject, { hooks: (s) => ({ probe: () => myProbe(s) }) });          // React
+verifyHttp(accountProtocol, subject, { hooks: (s) => ({ probe: () => myProbe(s) }) });        // HTTP
+defineVerification(accountProtocol, subject, { hooks: (s) => ({ probe: () => myProbe(s) }) });// Vitest
+```
+
+A full worked example, calibrated caos→verde (the verifier passes a compliant fleet and catches a
+bank that breaks the protocol), lives in [`test/custom-criterion.test.ts`](./test/custom-criterion.test.ts).
+
 MIT © Lucas Tinoco

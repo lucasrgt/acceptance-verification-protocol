@@ -10,6 +10,16 @@ import { idempotencyHooks } from './idempotency';
 
 type NamedSubject = { readonly name: string };
 
+export interface VerifyHttpOptions {
+  /**
+   * Escape hatch for an OFF-CATALOG backend archetype — a domain criterion you authored
+   * that the catalog registry doesn't know (see ADR 0002). Provide the hooks that bind it
+   * to the HTTP substrate; it runs through the same neutral executor. Per-call, never a
+   * global registration — custom criteria stay in your repo, off the accuracy benchmark.
+   */
+  readonly hooks?: (subject: NamedSubject) => VerifyHooks;
+}
+
 /**
  * Per-archetype HTTP hooks. Adding a backend archetype = one entry here; the
  * neutral `runVerification` (shared with the React adapter) does the rest. The
@@ -29,10 +39,16 @@ const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
  * reuses the SAME neutral core runner as the React adapter (src/core/run.ts) — the
  * proof that the core is substrate-neutral: DOM and HTTP are just two adapters.
  */
-export async function verifyHttp(archetype: Archetype, subject: NamedSubject): Promise<Verdict> {
-  const build = REGISTRY[archetype.name];
+export async function verifyHttp(
+  archetype: Archetype,
+  subject: NamedSubject,
+  options: VerifyHttpOptions = {},
+): Promise<Verdict> {
+  const build = REGISTRY[archetype.name] ?? options.hooks;
   if (!build) {
-    throw new Error(`The HTTP adapter has no hooks for archetype "${archetype.name}".`);
+    throw new Error(
+      `The HTTP adapter has no hooks for archetype "${archetype.name}" — pass { hooks } to verifyHttp() for an off-catalog criterion (ADR 0002).`,
+    );
   }
   return runVerification(subject.name, archetype, build(subject as never));
 }
