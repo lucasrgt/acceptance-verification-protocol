@@ -684,6 +684,22 @@
           "seenIn": []
         }
       ]
+    },
+    {
+      "archetype": "submission-gate",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "gate-enforced-on-submission",
+          "statement": "The server enforces the precondition of a body-bearing submission: the SAME well-formed payload is accepted (2xx) on a resource whose precondition is met (ready) and refused (4xx) on one whose precondition is unmet. The ready acceptance proves the payload is well-formed, so the unmet refusal is the gate firing on the precondition — not the body being rejected. A required body is never a key past the gate; the FE form-gate is a courtesy, the server is the guard. The body-bearing sibling of lifecycle-gate's gate-enforced-server-side, for a mutation a body-less probe cannot reach.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": []
+        }
+      ]
     }
   ]
 }
