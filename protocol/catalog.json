@@ -389,8 +389,7 @@
           "scope": "invariant",
           "condition": {
             "id": "api-error"
-          },
-          "seenIn": []
+          }
         }
       ]
     },
@@ -628,8 +627,7 @@
           "scope": "invariant",
           "condition": {
             "id": "api-error"
-          },
-          "seenIn": []
+          }
         },
         {
           "id": "issues-token-on-valid",
@@ -638,8 +636,7 @@
           "scope": "invariant",
           "condition": {
             "id": "success"
-          },
-          "seenIn": []
+          }
         }
       ]
     },
@@ -654,8 +651,7 @@
           "scope": "invariant",
           "condition": {
             "id": "success"
-          },
-          "seenIn": []
+          }
         },
         {
           "id": "replay-burns-family",
@@ -664,8 +660,7 @@
           "scope": "invariant",
           "condition": {
             "id": "double-activate"
-          },
-          "seenIn": []
+          }
         }
       ]
     },
@@ -680,8 +675,7 @@
           "scope": "invariant",
           "condition": {
             "id": "double-activate"
-          },
-          "seenIn": []
+          }
         }
       ]
     },
@@ -696,8 +690,7 @@
           "scope": "invariant",
           "condition": {
             "id": "success"
-          },
-          "seenIn": []
+          }
         },
         {
           "id": "gate-enforced-on-body-target",
@@ -706,8 +699,7 @@
           "scope": "invariant",
           "condition": {
             "id": "success"
-          },
-          "seenIn": []
+          }
         }
       ]
     }

@@ -14,6 +14,11 @@ import { temporalIntegrity } from './archetypes/temporal-integrity';
 import { paginationIntegrity } from './archetypes/pagination-integrity';
 import { renderResilience } from './archetypes/render-resilience';
 import { requestIdempotency } from './archetypes/request-idempotency';
+import { accessControl } from './archetypes/access-control';
+import { credentialAuthority } from './archetypes/credential-authority';
+import { resourceUniqueness } from './archetypes/resource-uniqueness';
+import { submissionGate } from './archetypes/submission-gate';
+import { tokenRotation } from './archetypes/token-rotation';
 import { tokenAdherence } from './archetypes/token-adherence';
 import { themeParity } from './archetypes/theme-parity';
 import { typeHierarchy } from './archetypes/type-hierarchy';
@@ -53,6 +58,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   navigationIntegrity,
   mountStability,
   authorization,
+  accessControl,
   integrationIntegrity,
   secondOrderEffects,
   moneyIntegrity,
@@ -61,6 +67,10 @@ export const ARCHETYPES: readonly Archetype[] = [
   paginationIntegrity,
   renderResilience,
   requestIdempotency,
+  credentialAuthority,
+  tokenRotation,
+  resourceUniqueness,
+  submissionGate,
 ];
 
 /**

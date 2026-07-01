@@ -28,6 +28,11 @@ export { temporalIntegrity, type TemporalExpect } from './archetypes/temporal-in
 export { paginationIntegrity, type PaginationExpect } from './archetypes/pagination-integrity';
 export { renderResilience, type RenderResilienceExpect } from './archetypes/render-resilience';
 export { requestIdempotency, type IdempotencyExpect } from './archetypes/request-idempotency';
+export { accessControl, type AccessControlExpect } from './archetypes/access-control';
+export { credentialAuthority, type CredentialAuthorityExpect } from './archetypes/credential-authority';
+export { resourceUniqueness, type ResourceUniquenessExpect } from './archetypes/resource-uniqueness';
+export { submissionGate, type SubmissionGateExpect } from './archetypes/submission-gate';
+export { tokenRotation, type TokenRotationExpect } from './archetypes/token-rotation';
 // The reference model-oracle judge (Claude-backed). Lazy-loads @anthropic-ai/sdk — an
 // optional peer dependency — so importing the factory never pulls the SDK into core.
 export { claudeJudge, type ClaudeJudgeOptions, type AnthropicLike } from './judge/claude';

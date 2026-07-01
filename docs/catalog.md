@@ -219,7 +219,7 @@ subscription sync" (3887aa67).
 | reach | archetypes | home |
 |---|---|---|
 | **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
-| **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency | future backend adapter |
+| **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency, access-control, credential-authority, token-rotation, resource-uniqueness, submission-gate | HTTP adapter today; Assay.NET for .NET-native proofs |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (AeroFortress `LZ*`/`LZFE*`) |
 
 This three-way split is the thesis in one table: **determinism is layered.** Some
@@ -231,6 +231,12 @@ the *catalog* is, and it routes each criterion to where it can actually be decid
 
 What's executable today vs catalogued. "Executed" = a faithful repro fails the
 criterion and a fix passes it, in `bench/`.
+
+Catalog parity note: `access-control`, `credential-authority`,
+`token-rotation`, `resource-uniqueness`, and `submission-gate` are exported by
+the TypeScript DSL so `protocol-sync` preserves the shared AVP protocol instead
+of erasing Assay.NET-backed criteria. They are not counted in the JavaScript
+runtime ledger unless a faithful Node/HTTP repro and adapter hook exist.
 
 | archetype | criteria executed (green) | benchmark |
 |---|---|---|
