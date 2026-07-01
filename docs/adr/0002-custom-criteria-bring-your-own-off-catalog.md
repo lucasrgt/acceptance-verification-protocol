@@ -25,10 +25,11 @@ Vitest host (`defineVerification`) **dispatch by a closed catalog registry** and
 unknown archetype name — so a custom criterion lost the nice host (gating + formatted verdict).
 We close it with a **per-call escape hatch**, not a registry:
 
-- `verify(archetype, subject, { hooks })`, `verifyHttp(archetype, subject, { hooks })`, and
-  `defineVerification(archetype, subject, { hooks })` accept caller-provided hooks. When the
-  archetype isn't in the catalog registry, those hooks run it — through the *same* neutral
-  executor and verdict as a catalog archetype.
+- `verify(archetype, subject, { hooks })`, `verifyHttp(archetype, subject, { hooks })`,
+  `defineVerification(archetype, subject, { hooks })`, and — since 0.2.0 — the design tiers
+  (`verifyDesign(..., { hooks })`, `verifyDesignBrowser(..., page, { hooks })`) accept
+  caller-provided hooks. When the archetype isn't in the catalog registry, those hooks run
+  it — through the *same* neutral executor and verdict as a catalog archetype.
 - This is exactly what `runVerification` already accepts, surfaced on the convenience entries.
   It is **per-call**, never a global registration — so custom criteria stay in the dev's repo.
 

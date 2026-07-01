@@ -1,5 +1,7 @@
 # Transfer evidence (RQ4) — the catalog isn't overfit
 
+> Numbers in this document are a snapshot (measured 2026-06; re-measure via `node tools/measure/measure.mjs`).
+
 > **RQ4: does a verifier mined from one project catch the same failure class in a
 > different project?** This is the question that separates "a checklist for one
 > app" from "a dictionary of acceptance invariants". The answer, with executed
@@ -106,3 +108,19 @@ executed.
   here — they need a router-mounted probe (the real TanStack/expo router) and a
   paint-timing probe respectively. Listed as the next runtime criteria, not claimed
   as covered.
+
+
+## Reproducing a transfer run (one command per project)
+
+Transfer is now an operational loop, not a bespoke experiment:
+
+1. In the TARGET repo, install the verifier: `npm i -D @aerofortress/assay vitest` (+ the
+   react peers if verifying DOM criteria).
+2. Author the subjects — one `*.assay.*` file per feature, declaring the seams that
+   already exist (see `docs/getting-started.md`).
+3. Run **`npx assay verify`** — every criterion the archetypes can observe in that project
+   executes; criteria whose seams the subject lacks are skipped honestly.
+
+A criterion mined in project A catching an escape in project B **through that command,
+unchanged**, is the transfer claim holding. For .NET targets the same loop is
+`Runner.Run(Catalog.LoadDefault(), …)` inside the project's own xUnit suite.

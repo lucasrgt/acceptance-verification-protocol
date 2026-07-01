@@ -83,6 +83,17 @@ The runner loops the criteria: mechanical → build probe, run the body, pass/fa
 The DOM and HTTP adapters both implement exactly this — that two substrates run
 through one runner is the proof the core is not framework-shaped.
 
+**Error semantics (normative — where implementations must agree):**
+
+- An oracle failing with the implementation's fail signal (`AvpFail` / `AvpFailException`)
+  → a `fail` verdict carrying the actionable reason + evidence.
+- An oracle raising the skip signal (`AvpSkipException` in .NET; `applies()` returning a
+  reason in JS) → a `skipped` verdict — honest non-applicability, never a pass.
+- An **unexpected** error (infrastructure, a bug in the probe) → still a `fail` verdict,
+  with the error message/stack as evidence. A run ALWAYS ends in a Verdict; aborting the
+  run on an oracle error is non-conformant.
+- Caller-initiated cancellation is the one thing that may abandon a run without a Verdict.
+
 ## The catalog
 
 The archetypes + criteria are the contribution (the dictionary). Forms:

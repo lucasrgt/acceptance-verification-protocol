@@ -1,19 +1,23 @@
-# Assay.NET — the backend adapter (Phase 1 plan)
+# Assay.NET — the backend adapter
 
-> **Status:** known backend catalog CLOSED + **PACKAGED** (2026-06-21) — `assay.net/` builds green,
-> **28 tests passing**, shipped as the NuGet package **`Assay.Net` 0.1.0** (self-contained: the
-> neutral `catalog.json` is embedded, read via `Catalog.LoadDefault()`; XML docs + README ship in the
-> package). Generate the feed with `dotnet pack src/Assay.Net -c Release -o local-feed` (gitignored;
-> consumers vendor a copy). **11 backend criteria across 7 archetypes**: authorization
-> (own-resource-only, role-required, server-is-authoritative), integration-integrity
-> (webhook-signature-verified, callback-resolves-entity, redirect-urls-bound),
-> second-order-effects (notifies-all-parties), request-idempotency (idempotency-key-honored),
-> lifecycle-gate (gate-enforced-server-side), money-integrity (split-invariant),
-> pagination-integrity (pages-cover-the-set). Every criterion is calibrated caos→verde
+> **Status (2026-07-01):** shipping as the NuGet package **`Assay.Net` 0.2.0** — builds green with
+> `-warnaserror`, **47 tests passing**. **13 archetype implementations** binding the backend
+> criteria: authorization (own-resource-only, role-required, server-is-authoritative),
+> access-control (requires-authentication), integration-integrity (webhook-signature-verified,
+> callback-resolves-entity, redirect-urls-bound), second-order-effects (notifies-all-parties),
+> request-idempotency (idempotency-key-honored), lifecycle-gate (gate-enforced-server-side),
+> money-integrity (split-invariant), pagination-integrity (pages-cover-the-set),
+> credential-authority, token-rotation, resource-uniqueness, and submission-gate
+> (gate-enforced-on-submission + the body-target variant, mergeable via `Verdict.Merge`).
+> Self-contained: BOTH neutral catalogs are embedded (`Catalog.LoadDefault()` /
+> `Catalog.LoadDesignDefault()`); XML docs + README ship in the package. Local dev feed:
+> `dotnet pack src/Assay.Net -c Release -o local-feed` (git-ignored) — the canonical feed is
+> nuget.org, published by the tag-gated workflow. Every criterion is calibrated caos→verde
 > (passes the correct repro server, FAILS the vulnerable one) over real Kestrel HTTP, and
-> dom/frontend criteria are honestly `Skipped` (the JS `assay` adapter's job). Slice 1 +
-> waves 1–2 were orchestrated by the `avp-backend-smith` specialist, ~5 in parallel on
-> disjoint criteria. Assay.NET was the documented next frontier (~40% of escapes are backend).
+> dom/frontend criteria are honestly `Skipped` (the JS `assay` adapter's job).
+> Unexpected oracle errors are FAIL verdicts with evidence (never an aborted run); runs accept
+> a CancellationToken + progress callback; `Format.Verdict` renders the one-block summary;
+> `SpecManifest.MissingFrom(verdicts)` closes the manifest↔proofs loop standalone.
 
 ## What it is
 
@@ -40,7 +44,7 @@ runner. Assay.NET is the `http`/native sibling of that.
   silently passed (a false green is the catastrophic error).
 - **Standalone.** Assay.NET knows nothing about `aerofortress-framework` or the
   Harness. The dependency is one-way: the Framework → AVP, never the reverse (the
-  `[Verify]`/`LZ*` enforcement lives in the Framework, Phase 2).
+  `[Verify]`/`AF*` enforcement lives in the Framework, Phase 2).
 - Repo language: **English**, neutral (no client names).
 
 ## Conformance target (`docs/PROTOCOL.md` §Conformance)
@@ -114,6 +118,6 @@ consume the same `protocol/` catalog; neither may diverge silently.
 
 The package now exists in a local feed, so a consumer (the framework's `examples/sample-app` proof
 project, or a pilot) can `nuget.config` it and write real `[AVP("id")]` proofs against a slice. The
-remaining wiring for the `Withdraw` dogfood: repack the `aerofortress-framework` doctor with `LZ0030`
+remaining wiring for the `Withdraw` dogfood: repack the `aerofortress-framework` doctor with `AF0030`
 into its `local-feed`, add the assay.net feed to the sample-app's `nuget.config`, emit
 `[Verify]`/`[AVP]` on `Withdraw`, watch the gate go red, implement idempotency, green.

@@ -22,6 +22,13 @@ export interface ActionEffectSubject {
   readonly successResponse?: unknown;
   /** A sibling projection of the mutated data (a list/badge/count) that must reflect a successful mutation. */
   readonly projection?: { readonly role: string; readonly name?: string | RegExp };
+  /**
+   * CROSS-SCREEN projection seam: a SECOND screen (another route/surface reading the same
+   * shared source) mounted AFTER the action. When declared, `projections-converge` is
+   * judged there — the mutation must reach a screen that wasn't even mounted when it
+   * happened (a stale client cache/module snapshot is exactly what this catches).
+   */
+  readonly projectionScreen?: () => ReactElement;
   /** The backend's acceptance contract: returns false for a body the endpoint would 400. Enables `request-accepted`. */
   readonly accepts?: (body: unknown) => boolean;
   /** Opt-in: the action is a single logical operation that a retry must not duplicate. Enables `idempotent-retry`. */

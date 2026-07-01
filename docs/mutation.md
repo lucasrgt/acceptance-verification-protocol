@@ -1,5 +1,7 @@
 # Mutation testing — hardening the verifier
 
+> Numbers in this document are a snapshot (measured 2026-06; the mutation bench re-runs on every `npx vitest run`).
+
 The benchmark asks "does the verifier catch the one bug I showed it?" Mutation
 testing asks the harder question: **"does the criterion catch the whole failure
 CLASS, or just that one example?"** A criterion that passes the benchmark but

@@ -4,11 +4,11 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 (stored as network item 82f42d4f). Mark [x] only after implemented AND suite green.
 
 ## Block 1 — Git hygiene (L partial)
-- [ ] 98 nupkgs committed in local-feed → untrack + gitignore (nupkgs/, local-feed/)
-- [ ] 99 pre-scrub branches → bundle offline (outside repo) + delete local
-- [ ] 100 delete merged branch mine/submission-gate
-- [ ] 101 commit untracked .aerofortress items; ignore tool-compiler-*.{jsonl,json}
-- [ ] 102 remove tracked dead .redesign-*.mjs
+- [x] 98 nupkgs committed in local-feed → untrack + gitignore (nupkgs/, local-feed/)
+- [x] 99 pre-scrub branches → bundle offline (outside repo) + delete local
+- [x] 100 delete merged branch mine/submission-gate
+- [x] 101 commit untracked .aerofortress items; ignore tool-compiler-*.{jsonl,json}
+- [x] 102 remove tracked dead .redesign-*.mjs
 
 ## Block 2 — Core (A)
 - [x] 1 defineVerification threshold governs the gate
@@ -120,41 +120,41 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] 86 --help/--version/--json passthrough
 
 ## Block 13 — Packaging/CI (L rest)
-- [ ] 87 ci.yml: vitest + tsc + lint + dotnet test on push/PR
-- [ ] 88 publish gated on tests + version==tag assertion
-- [ ] 89 versions synced (JS+NET → 0.2.0) + policy in workflow
-- [ ] 90 npm provenance + permissions
-- [ ] 91 actions pinned by SHA
-- [ ] 92 RTL/user-event/msw → optional peers
+- [x] 87 ci.yml: vitest + tsc + lint + dotnet test on push/PR
+- [x] 88 publish gated on tests + version==tag assertion
+- [x] 89 versions synced (JS+NET → 0.2.0) + policy in workflow
+- [x] 90 npm provenance + permissions
+- [x] 91 actions pinned by SHA
+- [x] 92 RTL/user-event/msw → optional peers
 - [x] 93 sideEffects:false + engines
 - [x] 94 exports: ./judge + ./design/browser
 - [x] 95 LICENSE in npm tarball
-- [ ] 96 root README quickstart fixed (cd assay)
-- [ ] 97 README rewritten to current state
-- [ ] 103 eslint flat config + prettier check + .editorconfig; lint script
-- [ ] 104 dependabot + SECURITY + CONTRIBUTING + CHANGELOG
-- [ ] 105 tsup target + ESM-only documented
-- [ ] 106 example imports @aerofortress/assay (+ vite comment fix)
-- [ ] 107 example PATCH validates body
-- [ ] 108 publish npm ci --workspaces=false
+- [x] 96 root README quickstart fixed (cd assay)
+- [x] 97 README rewritten to current state
+- [x] 103 eslint flat config + prettier check + .editorconfig; lint script
+- [x] 104 dependabot + SECURITY + CONTRIBUTING + CHANGELOG
+- [x] 105 tsup target + ESM-only documented
+- [x] 106 example imports @aerofortress/assay (+ vite comment fix)
+- [x] 107 example PATCH validates body
+- [x] 108 publish npm ci --workspaces=false
 
 ## Block 14 — Docs (M)
-- [ ] 109 assay-net.md refreshed (0.2.0 reality)
-- [ ] 110 LZ* → AF* sweep in docs
-- [ ] 111 catalog.md status table covers backend archetypes
-- [ ] 112 CONTEXT.md: substrate/seam/probe/judge/version terms
-- [ ] 113 PROTOCOL.md: unexpected-error + skip-exception semantics
-- [ ] 114 ADR 0002 notes design hatch
-- [ ] 115 transfer/mutation numbers dated + refreshed
-- [ ] 116 docs/getting-started.md (react/http/design)
-- [ ] 117 CLI documented honestly
+- [x] 109 assay-net.md refreshed (0.2.0 reality)
+- [x] 110 LZ* → AF* sweep in docs
+- [x] 111 catalog.md status table covers backend archetypes
+- [x] 112 CONTEXT.md: substrate/seam/probe/judge/version terms
+- [x] 113 PROTOCOL.md: unexpected-error + skip-exception semantics
+- [x] 114 ADR 0002 notes design hatch
+- [x] 115 transfer/mutation numbers dated + refreshed
+- [x] 116 docs/getting-started.md (react/http/design)
+- [x] 117 CLI documented honestly
 
 ## Block 15 — Science (N)
-- [ ] 118 caos→verde loop harness (bench/loop-closure)
-- [ ] 119 convergence artifact generator (with 73/76)
-- [ ] 120 transfer one-command story (CLI + transfer.md)
-- [ ] 121 clock-not-frozen explicit in status table
-- [ ] 122 cross-screen projection seam + calibration
-- [ ] 123 live judge calibration test (env-gated)
-- [ ] 124 composeVerdicts (feature verdict) TS + .NET merge
-- [ ] 125 determinism harness (N-run variance report)
+- [x] 118 caos→verde loop harness (bench/loop-closure)
+- [x] 119 convergence artifact generator (with 73/76)
+- [x] 120 transfer one-command story (CLI + transfer.md)
+- [x] 121 clock-not-frozen explicit in status table
+- [x] 122 cross-screen projection seam + calibration
+- [x] 123 live judge calibration test (env-gated)
+- [x] 124 composeVerdicts (feature verdict) TS + .NET merge
+- [x] 125 determinism harness (N-run variance report)

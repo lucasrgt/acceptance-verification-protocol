@@ -4,7 +4,7 @@ Assay verifies behavior at **runtime**, but only for features that *have* a veri
 static gap — "you never wrote a verification" or "you didn't run the archetype this feature
 needs" — must be caught upstream, by a **static doctor**. Assay stays runtime-only (ADR 0001);
 this rule plugs the coverage check into an existing static doctor (in an AeroFortress Framework project, its
-ESLint/LZFE layer).
+ESLint/AFFE layer).
 
 ## The honest boundary
 
@@ -54,14 +54,14 @@ with each listed archetype. Missing → report on the feature file.
 1. **Assay ships a generic `eslint-plugin-assay`** with `require-verification`; the AeroFortress Framework
    doctor *enables + configures* it (maps AeroFortress slice/view types → archetypes). Reusable by any
    ecosystem — matches "AVP is for everyone". **← recommended.**
-2. AeroFortress authors a bespoke LZFE rule (e.g. `LZFE0NN`) with the same semantics. Tighter AeroFortress
+2. AeroFortress authors a bespoke AFFE rule (e.g. `AFFE0NN`) with the same semantics. Tighter AeroFortress
    idiom, but not reusable outside AeroFortress.
 
 ## Where it runs
 
-The AeroFortress `doctor` already runs ESLint (LZFE) in dev + CI. This rule rides that — no new runner,
+The AeroFortress `doctor` already runs ESLint (AFFE) in dev + CI. This rule rides that — no new runner,
 no new doctor. The static coverage check (doctor) + runtime correctness (Assay `verify`) +
-existing shape rules (LZFE loading/error/empty) together give an AeroFortress app its full completeness
+existing shape rules (AFFE loading/error/empty) together give an AeroFortress app its full completeness
 story: *present → covered → correct*.
 
 ## Status — built (option 1) + dogfooded read-only

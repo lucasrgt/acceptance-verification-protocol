@@ -143,6 +143,14 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
     }
   }
 
+  // Cross-screen convergence: mount the SECOND screen after the mutation; from here on the
+  // projection readout comes from it — the screen that must not be fed a stale snapshot.
+  if (subject.projectionScreen) {
+    cleanup();
+    render(subject.projectionScreen());
+    await settle(60);
+  }
+
   return {
     requests,
     inputValue() {

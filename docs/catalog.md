@@ -32,7 +32,7 @@ real effect" is the invariant the example is one instance of.
   signatures, money math at rest). The frontend adapter *cannot see it*; it is
   bound to a backend adapter (**Assay.NET**, future) or an HTTP adapter.
 - **STATIC** — best caught before runtime, by static analysis. These belong in the
-  host project's linter/doctor (in this codebase's case, the AeroFortress `LZ*`/`LZFE*`
+  host project's linter/doctor (in this codebase's case, the AeroFortress `AF*`/`AFFE*`
   doctor), **not** in Assay. Listed here for completeness of the dictionary.
 
 ## Oracle — what decides it
@@ -147,12 +147,12 @@ Never fixtures, stock imagery, or fabricated content on a real-content surface. 
 
 ### 10. `state-completeness` — every async surface has loading / error / empty *(STATIC)*
 
-Already enforced statically by the host project's doctor (`LZFE010`). Listed for
+Already enforced statically by the host project's doctor (`AFFE010`). Listed for
 completeness; **not** an Assay runtime criterion — caught cheaper before runtime.
 
 ### 11. `i18n-honesty` — copy is translated and parity-complete *(STATIC)*
 
-`LZFE011` (locale parity) + `LZFE014` (no hardcoded copy). Static-doctor territory.
+`AFFE011` (locale parity) + `AFFE014` (no hardcoded copy). Static-doctor territory.
 
 ### 12. `temporal-integrity` — time is correct: an instant is shown in the user's zone *(FE + BE)*
 
@@ -220,7 +220,7 @@ subscription sync" (3887aa67).
 |---|---|---|
 | **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
 | **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency, access-control, credential-authority, token-rotation, resource-uniqueness, submission-gate | HTTP adapter today; Assay.NET for .NET-native proofs |
-| **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (AeroFortress `LZ*`/`LZFE*`) |
+| **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (AeroFortress `AF*`/`AFFE*`) |
 
 This three-way split is the thesis in one table: **determinism is layered.** Some
 acceptance invariants are cheapest as static rules (the doctor), some need a running
@@ -347,7 +347,7 @@ is, for now, harvested. **The next bulk of value is backend depth — Assay.NET*
 - **~40% are backend-only** — authorization, integration, second-order effects.
   This empirically justifies **Assay.NET**: no frontend verifier can reach them.
 - **~15% are best left static** — already absorbed by the host project's doctor as
-  `LZ*`/`LZFE*` rules. Several escapes here *became* doctor rules after the fact
-  (e.g. the redirect-loop fix shipped `LZFE015`, the navigation-cast ban is
-  `LZFE030`). That organic migration — escape → static rule — is the convergence
+  `AF*`/`AFFE*` rules. Several escapes here *became* doctor rules after the fact
+  (e.g. the redirect-loop fix shipped `AFFE015`, the navigation-cast ban is
+  `AFFE030`). That organic migration — escape → static rule — is the convergence
   story happening on its own; Assay formalizes the runtime half of it.

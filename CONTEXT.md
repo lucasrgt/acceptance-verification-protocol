@@ -46,3 +46,25 @@ _Avoid:_ "plugin", "driver".
 **escape** — a defect that slipped past the verifiers and was found later (in prod, by a human).
 **escape accrual** = every escape becomes a new criterion → the ruler converges empirically.
 _Avoid:_ generic "bug".
+
+**substrate** — the ENGINE a criterion needs to be decided (`static`, `dom`, `http`, `style`,
+`geometry`, `model`) — the layered-determinism axis: the cheapest engine that can decide it.
+_Avoid:_ "platform", "environment".
+
+**seam** — a hook the subject already has that the adapter drives or observes (how to mount,
+which endpoint, which control). A criterion's **`requires`** names the seam that must be
+declared for it to apply; without it the adapter skips honestly.
+_Avoid:_ "config", "option".
+
+**probe** — the adapter-built observation surface a mechanical oracle speaks through:
+`act()` (drive the subject under the condition) + `expect` (the archetype's assertion
+vocabulary). The probe hides the substrate plumbing; archetypes read in acceptance language.
+_Avoid:_ "driver", "fixture".
+
+**judge** — the injectable decider for `model` oracles (an LLM behind a rubric). Fail-closed:
+no parseable verdict = fail, never a silent pass. Absent judge = the criterion is `skipped`.
+_Avoid:_ "AI", "grader".
+
+**version (archetype / protocol)** — archetypes version independently as their criteria
+evolve; `protocolVersion` versions the data model + vocabularies. Every verdict is stamped
+with both, so a historical verdict names the exact ruler that produced it.

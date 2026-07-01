@@ -46,7 +46,7 @@ Two findings shape everything:
    78, icon 50. Design fidelity is a property of *UI software*, not of one team.
 
 2. **The distribution shifts with how codified the design system is.** The AeroFortress apps
-   already run a **static design-token doctor** (`LZFE012` design-tokens, `LZFE010`
+   already run a **static design-token doctor** (`AFFE012` design-tokens, `AFFE010`
    state-completeness) — so their *residual* runtime escapes skew to token/theme/
    composition (jsdom-reachable). cal.com, less codified, is dominated by **geometry**
    (overflow, overlap, responsive) that no DOM-only check can see. The more you codify
@@ -103,7 +103,7 @@ same three-way split as `docs/catalog.md`:
 
 - **STATIC (host doctor — already exists).** Hard-coded hex/spacing literals, a
   non-token value, a bespoke component where a DS one exists, an icon name off the
-  registry. This is `LZFE012`/`LZFE010` territory — caught before runtime, *not* Assay
+  registry. This is `AFFE012`/`AFFE010` territory — caught before runtime, *not* Assay
   Design's job to re-own. Assay Design *formalises the runtime half*, exactly as AVP
   does for behaviour.
 - **RUNTIME · jsdom (RTL + `getComputedStyle`).** Resolved **colours, fonts, contrast,
@@ -174,7 +174,7 @@ hierarchy discrepancy that motivated the idea.)
      missing icon, bespoke back, missing back), false-alarm 0.
      `bench/composition-canonical.test.ts`.
    - **state-coverage** — ✅ **DONE.** Renders default + each declared state and asserts
-     each is visually distinct (the runtime sibling of LZFE010): a `disabled` button
+     each is visually distinct (the runtime sibling of AFFE010): a `disabled` button
      that isn't dimmed or a loading button with no spinner is the escape. Mutation 3/3
      (disabled-not-dimmed, loading-no-spinner, all-flat), false-alarm 0.
      `bench/state-coverage.test.ts`.
