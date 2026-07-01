@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Assay.Net;
 
 /// <summary>
@@ -18,7 +20,8 @@ public abstract class Archetype<TSubject>
 /// <summary>
 /// The substrate-neutral core runner: it loops the catalog's criteria for an archetype, runs each
 /// bound oracle, and aggregates a <see cref="Verdict"/>. Faithful to the protocol's execution model —
-/// mechanical → run the body, pass unless it throws <see cref="AvpFailException"/>; no oracle → skip.
+/// mechanical → run the body, pass unless it throws <see cref="AvpFailException"/>; an UNEXPECTED
+/// exception is a FAIL with the error as evidence (never an aborted run); no oracle → skip.
 /// </summary>
 public static class Runner
 {
@@ -33,10 +36,16 @@ public static class Runner
     /// oracle for this run, so a proof reuses an app's existing test fixture with no real port and the
     /// subject's base url is immaterial. Omit it for the default — a real <see cref="HttpClient"/> per oracle
     /// bound to the subject's base url.
+    ///
+    /// <paramref name="onCriterion"/> reports each verdict as it lands (progress in long suites);
+    /// <paramref name="cancellationToken"/> stops BETWEEN criteria (the verdict so far is discarded —
+    /// cancellation is abandonment, not a partial verdict).
     /// </summary>
     public static async Task<Verdict> Run<TSubject>(
         ProtocolCatalog catalog, Archetype<TSubject> archetype, string subjectName, TSubject subject,
-        Func<HttpClient>? transport = null)
+        Func<HttpClient>? transport = null,
+        Action<CriterionVerdict>? onCriterion = null,
+        CancellationToken cancellationToken = default)
     {
         using var _ = Http.UseTransport(transport);
 
@@ -44,33 +53,58 @@ public static class Runner
                    ?? throw new InvalidOperationException(
                        $"Archetype '{archetype.Name}' is not in the catalog (protocol drift?).");
 
+        var total = Stopwatch.StartNew();
         var results = new List<CriterionVerdict>();
         foreach (var c in spec.Criteria)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (c.Oracle != "mechanical" || !archetype.Oracles.TryGetValue(c.Id, out var oracle))
             {
-                results.Add(new CriterionVerdict(c.Id, VerdictStatus.Skipped,
+                var skipped = new CriterionVerdict(c.Id, VerdictStatus.Skipped,
                     c.Oracle == "mechanical"
                         ? "no .NET oracle bound yet"
-                        : $"oracle '{c.Oracle}' is not run by this adapter"));
+                        : $"oracle '{c.Oracle}' is not run by this adapter");
+                results.Add(skipped);
+                onCriterion?.Invoke(skipped);
                 continue;
             }
 
+            var sw = Stopwatch.StartNew();
+            CriterionVerdict verdict;
             try
             {
                 await oracle(subject);
-                results.Add(new CriterionVerdict(c.Id, VerdictStatus.Pass, c.Statement));
+                verdict = new CriterionVerdict(c.Id, VerdictStatus.Pass, c.Statement, DurationMs: sw.Elapsed.TotalMilliseconds);
             }
             catch (AvpSkipException ex)
             {
-                results.Add(new CriterionVerdict(c.Id, VerdictStatus.Skipped, ex.Message));
+                verdict = new CriterionVerdict(c.Id, VerdictStatus.Skipped, ex.Message, DurationMs: sw.Elapsed.TotalMilliseconds);
             }
             catch (AvpFailException ex)
             {
-                results.Add(new CriterionVerdict(c.Id, VerdictStatus.Fail, ex.Message));
+                verdict = new CriterionVerdict(c.Id, VerdictStatus.Fail, ex.Message, ex.Evidence, sw.Elapsed.TotalMilliseconds);
             }
+            catch (OperationCanceledException)
+            {
+                throw; // cancellation is the caller's decision, never a criterion verdict
+            }
+            catch (Exception ex)
+            {
+                // Not an AvpFail: an infrastructure/logic error. Still a FAIL (the run must
+                // always end in a Verdict — same contract as the TS core), with the error kept
+                // as evidence so the cause is diagnosable.
+                verdict = new CriterionVerdict(
+                    c.Id,
+                    VerdictStatus.Fail,
+                    $"Unexpected error while verifying: {ex.Message}",
+                    new { error = ex.Message, type = ex.GetType().FullName, stack = ex.StackTrace },
+                    sw.Elapsed.TotalMilliseconds);
+            }
+            results.Add(verdict);
+            onCriterion?.Invoke(verdict);
         }
 
-        return new Verdict(subjectName, archetype.Name, results);
+        return new Verdict(subjectName, archetype.Name, results) { DurationMs = total.Elapsed.TotalMilliseconds };
     }
 }

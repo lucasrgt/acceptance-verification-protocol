@@ -35,7 +35,8 @@
             "3988ad19"
           ]
         }
-      ]
+      ],
+      "description": "Every rendered colour/space/radius/font is a design-token value."
     },
     {
       "archetype": "theme-parity",
@@ -57,7 +58,8 @@
             "6ac555ae"
           ]
         }
-      ]
+      ],
+      "description": "Every colour resolves through the ACTIVE theme — nothing renders stuck in the other theme."
     },
     {
       "archetype": "type-hierarchy",
@@ -79,7 +81,8 @@
             "7a2dfc74"
           ]
         }
-      ]
+      ],
+      "description": "Heading/type sizes step down the scale in order."
     },
     {
       "archetype": "composition-canonical",
@@ -101,7 +104,8 @@
             "c596531b"
           ]
         }
-      ]
+      ],
+      "description": "Landmark slots are built from the canonical DS components."
     },
     {
       "archetype": "state-coverage",
@@ -123,7 +127,8 @@
             "876f7734"
           ]
         }
-      ]
+      ],
+      "description": "Interactive states (disabled/loading/…) are visually distinct from default."
     },
     {
       "archetype": "color-contrast",
@@ -143,7 +148,8 @@
             "dd834c98"
           ]
         }
-      ]
+      ],
+      "description": "Text clears the WCAG contrast ratio against its effective background."
     },
     {
       "archetype": "spacing-rhythm",
@@ -165,7 +171,8 @@
             "dc4dd857"
           ]
         }
-      ]
+      ],
+      "description": "Declared spacing values sit on the spacing scale."
     },
     {
       "archetype": "accessible-name",
@@ -188,7 +195,8 @@
             "02a86f1d"
           ]
         }
-      ]
+      ],
+      "description": "Every control exposes an accessible name."
     },
     {
       "archetype": "image-alt",
@@ -210,7 +218,8 @@
             "df9c603a"
           ]
         }
-      ]
+      ],
+      "description": "Every meaningful image has a text alternative."
     },
     {
       "archetype": "input-purpose",
@@ -233,7 +242,8 @@
             "calcom:2645"
           ]
         }
-      ]
+      ],
+      "description": "Personal-data fields declare their purpose (autocomplete)."
     },
     {
       "archetype": "layout-integrity",
@@ -254,7 +264,8 @@
             "calcom:e8e50b70"
           ]
         }
-      ]
+      ],
+      "description": "No unintended overflow or overlap in the real layout."
     },
     {
       "archetype": "layer-integrity",
@@ -275,7 +286,8 @@
             "calcom:0e900a73"
           ]
         }
-      ]
+      ],
+      "description": "Layered regions (modals, dropdowns) stack and occlude correctly."
     },
     {
       "archetype": "responsive-integrity",
@@ -296,7 +308,8 @@
             "gitea:b9f69b4a"
           ]
         }
-      ]
+      ],
+      "description": "The layout holds across the declared breakpoints without horizontal overflow."
     },
     {
       "archetype": "reading-order-integrity",
@@ -315,7 +328,8 @@
             "mastodon:d20d0492"
           ]
         }
-      ]
+      ],
+      "description": "Visual order matches DOM/reading order."
     },
     {
       "archetype": "rtl-integrity",
@@ -335,7 +349,8 @@
             "mastodon:af157939d"
           ]
         }
-      ]
+      ],
+      "description": "The layout mirrors correctly under RTL."
     },
     {
       "archetype": "tap-target-integrity",
@@ -357,7 +372,8 @@
             "gitea:06eaf74e"
           ]
         }
-      ]
+      ],
+      "description": "Touch targets meet the minimum hit area."
     },
     {
       "archetype": "layout-shift-integrity",
@@ -378,7 +394,8 @@
             "documenso:1a23744d"
           ]
         }
-      ]
+      ],
+      "description": "Loading→loaded transitions do not shift settled content."
     },
     {
       "archetype": "focus-visible-integrity",
@@ -399,7 +416,8 @@
             "calcom:c1b41d825"
           ]
         }
-      ]
+      ],
+      "description": "Keyboard focus is visible on every interactive element."
     },
     {
       "archetype": "truncation-integrity",
@@ -420,7 +438,8 @@
             "calcom:3af6fee05"
           ]
         }
-      ]
+      ],
+      "description": "Text truncates by design, never by accident."
     },
     {
       "archetype": "icon-correctness",
@@ -442,7 +461,8 @@
             "mastodon:9576434d"
           ]
         }
-      ]
+      ],
+      "description": "An icon's meaning fits the action it decorates (model-judged)."
     }
   ]
 }

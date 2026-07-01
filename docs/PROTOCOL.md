@@ -37,7 +37,9 @@ an `acceptanceScore`.
 - **Condition vocabulary**, three axes (the precondition an adapter must force):
   - fault: `success | api-error | slow | offline`
   - data: `empty | partial`
-  - interaction/recovery: `retry | token-expired`
+  - interaction/recovery: `retry | double-activate | token-expired`
+  - Custom ids beyond this vocabulary are legal for OFF-CATALOG criteria (ADR 0002) —
+    the adapter that binds them must know how to force them.
 - **Oracle kinds**: `mechanical` (deterministic), `model` (LLM-as-judge,
   injectable), `human` (queued).
 - **Substrate axis** — the *layered-determinism* axis: the cheapest engine that can decide a

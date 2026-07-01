@@ -33,24 +33,29 @@ public sealed class RequestIdempotency : Archetype<RequestIdempotencySubject>
             {
                 using var http = Http.Client(s.BaseUrl);
 
-                // First call under key k1 — establishes the canonical effect value A.
-                var first = await Send(http, s, "k1");
-                var idA = await ReadField(first, s.IdField, "first call with key k1");
+                // Fresh keys per run: fixed keys silently degrade to replays against a
+                // persistent server (nothing is ever re-created) and collide across subjects.
+                var keyA = $"assay-idem-{Guid.NewGuid():N}";
+                var keyB = $"assay-idem-{Guid.NewGuid():N}";
 
-                // Repeat under the SAME key k1 — must replay the ORIGINAL, not apply again.
-                var replay = await Send(http, s, "k1");
-                var idReplay = await ReadField(replay, s.IdField, "repeat call with key k1");
+                // First call under keyA — establishes the canonical effect value A.
+                var first = await Send(http, s, keyA);
+                var idA = await ReadField(first, s.IdField, "first call with the first key");
+
+                // Repeat under the SAME key — must replay the ORIGINAL, not apply again.
+                var replay = await Send(http, s, keyA);
+                var idReplay = await ReadField(replay, s.IdField, "repeat call with the same key");
                 if (idReplay != idA)
                     throw new AvpFailException(
-                        $"same idempotency key 'k1' produced two distinct '{s.IdField}' values ('{idA}' then '{idReplay}') — " +
+                        $"the same idempotency key produced two distinct '{s.IdField}' values ('{idA}' then '{idReplay}') — " +
                         "the key must replay the original, never apply twice.");
 
-                // A DIFFERENT key k2 — must apply again, yielding a DISTINCT value.
-                var other = await Send(http, s, "k2");
-                var idB = await ReadField(other, s.IdField, "call with key k2");
+                // A DIFFERENT key — must apply again, yielding a DISTINCT value.
+                var other = await Send(http, s, keyB);
+                var idB = await ReadField(other, s.IdField, "call with a different key");
                 if (idB == idA)
                     throw new AvpFailException(
-                        $"different idempotency keys 'k1' and 'k2' collapsed to one '{s.IdField}' value ('{idA}') — " +
+                        $"two different idempotency keys collapsed to one '{s.IdField}' value ('{idA}') — " +
                         "a distinct key must apply again, not dedup regardless of the key.");
             },
         };

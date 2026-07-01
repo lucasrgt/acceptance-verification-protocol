@@ -10,7 +10,9 @@
   <!-- Package identity: the .NET reference implementation of AVP, standalone like xUnit. -->
   <PropertyGroup>
     <PackageId>Assay.Net</PackageId>
-    <Version>0.1.9</Version>
+    <!-- One version, both implementations: a vX.Y.Z tag publishes JS and .NET at the SAME version
+         (the publish workflow asserts tag == this == assay/package.json). -->
+    <Version>0.2.0</Version>
     <Authors>lucasrgt</Authors>
     <Description>The .NET reference implementation of the Acceptance Verification Protocol (AVP): runs catalog-driven acceptance archetypes over a real HTTP backend and emits an actionable verdict + acceptance score. The runtime sibling of the static doctor; standalone, like xUnit.</Description>
     <PackageTags>avp;acceptance;verification;testing;archetypes;assay;http</PackageTags>
@@ -21,10 +23,11 @@
     <PackageProjectUrl>https://github.com/lucasrgt/acceptance-verification-protocol</PackageProjectUrl>
   </PropertyGroup>
 
-  <!-- The neutral catalog ships INSIDE the package so consumers are self-contained:
-       Catalog.LoadDefault() reads this embedded copy. -->
+  <!-- The neutral catalogs ship INSIDE the package so consumers are self-contained:
+       Catalog.LoadDefault()/LoadDesignDefault() read these embedded copies. -->
   <ItemGroup>
     <EmbeddedResource Include="..\..\..\protocol\catalog.json" Link="catalog.json" LogicalName="Assay.Net.catalog.json" />
+    <EmbeddedResource Include="..\..\..\protocol\design-catalog.json" Link="design-catalog.json" LogicalName="Assay.Net.design-catalog.json" />
   </ItemGroup>
 
   <ItemGroup>

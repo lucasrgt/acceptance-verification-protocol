@@ -16,14 +16,21 @@ public static class Http
     // AsyncLocal (not a plain static) so concurrent runs on separate async flows never see each other's transport.
     private static readonly AsyncLocal<Func<HttpClient>?> Ambient = new();
 
+    /// <summary>Per-request deadline (default 10s; override via ASSAY_HTTP_TIMEOUT_MS) — a hung endpoint fails the criterion, it never hangs the verification.</summary>
+    private static TimeSpan Timeout =>
+        double.TryParse(Environment.GetEnvironmentVariable("ASSAY_HTTP_TIMEOUT_MS"), out var ms) && ms > 0
+            ? TimeSpan.FromMilliseconds(ms)
+            : TimeSpan.FromSeconds(10);
+
     /// <summary>
     /// The client an oracle drives the subject through: the ambient transport's client when a run supplied one
     /// (the subject's base url is then immaterial — the injected client carries its own address), otherwise a
-    /// fresh <see cref="HttpClient"/> bound to <paramref name="baseUrl"/>. Always a fresh instance the caller
-    /// owns and disposes, whether real or injected, so the per-oracle <c>using</c> stays correct.
+    /// fresh <see cref="HttpClient"/> bound to <paramref name="baseUrl"/> with an explicit timeout. Always a
+    /// fresh instance the caller owns and disposes, whether real or injected, so the per-oracle <c>using</c>
+    /// stays correct.
     /// </summary>
     public static HttpClient Client(string baseUrl) =>
-        Ambient.Value is { } transport ? transport() : new() { BaseAddress = new Uri(baseUrl) };
+        Ambient.Value is { } transport ? transport() : new() { BaseAddress = new Uri(baseUrl), Timeout = Timeout };
 
     /// <summary>
     /// Installs <paramref name="transport"/> as the ambient client factory for the current async flow until the
@@ -51,13 +58,19 @@ public static class Http
         return req;
     }
 
-    /// <summary>The request was REFUSED at the authorization boundary (401/403/404).</summary>
-    public static void Refused(HttpResponseMessage res, string what)
+    /// <summary>
+    /// The request was REFUSED at the authorization boundary. Default canonical statuses are
+    /// 401/403/404; pass <paramref name="rejectWith"/> when the subject's API refuses with
+    /// something else. A 5xx never counts — a crash is not a refusal.
+    /// </summary>
+    public static void Refused(HttpResponseMessage res, string what, IReadOnlyCollection<int>? rejectWith = null)
     {
+        var canonical = rejectWith is { Count: > 0 } ? rejectWith : [401, 403, 404];
         var code = (int)res.StatusCode;
-        if (code is not (401 or 403 or 404))
+        if (!canonical.Contains(code))
             throw new AvpFailException(
-                $"{what}: expected a refusal (401/403/404), got {code} — the server let it through.");
+                $"{what}: expected a refusal ({string.Join('/', canonical)}), got {code} — " +
+                (code is >= 200 and < 300 ? "the server let it through." : "a crash/unexpected status is not a refusal."));
     }
 
     /// <summary>The request was ACCEPTED (2xx).</summary>

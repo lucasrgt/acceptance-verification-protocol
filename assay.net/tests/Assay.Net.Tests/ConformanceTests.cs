@@ -35,25 +35,26 @@ public class ConformanceTests
     public void every_bound_oracle_targets_a_real_catalog_criterion()
     {
         // No oracle may bind a criterion id absent from the catalog — that would be silent drift.
-        AssertOraclesExist(new Authorization().Name, new Authorization().Oracles.Keys);
-        AssertOraclesExist(new IntegrationIntegrity().Name, new IntegrationIntegrity().Oracles.Keys);
-        AssertOraclesExist(new SecondOrderEffects().Name, new SecondOrderEffects().Oracles.Keys);
-        AssertOraclesExist(new CredentialAuthority().Name, new CredentialAuthority().Oracles.Keys);
-        AssertOraclesExist(new TokenRotation().Name, new TokenRotation().Oracles.Keys);
-        AssertOraclesExist(new ResourceUniqueness().Name, new ResourceUniqueness().Oracles.Keys);
-        AssertOraclesExist(new AccessControl().Name, new AccessControl().Oracles.Keys);
-        AssertOraclesExist(new LifecycleGate().Name, new LifecycleGate().Oracles.Keys);
-        AssertOraclesExist(new MoneyIntegrity().Name, new MoneyIntegrity().Oracles.Keys);
-        AssertOraclesExist(new PaginationIntegrity().Name, new PaginationIntegrity().Oracles.Keys);
-        AssertOraclesExist(new RequestIdempotency().Name, new RequestIdempotency().Oracles.Keys);
-        AssertOraclesExist(new SubmissionGate().Name, new SubmissionGate().Oracles.Keys);
-        AssertOraclesExist(new SubmissionGateBodyTarget().Name, new SubmissionGateBodyTarget().Oracles.Keys);
-    }
+        // Discovered by REFLECTION over the assembly: a new Archetype<T> is covered automatically,
+        // so forgetting to list it here can never open a silent hole.
+        var archetypeTypes = typeof(Runner).Assembly.GetTypes()
+            .Where(t => t is { IsAbstract: false, IsClass: true }
+                        && t.BaseType is { IsGenericType: true } b
+                        && b.GetGenericTypeDefinition() == typeof(Archetype<>))
+            .ToArray();
+        Assert.NotEmpty(archetypeTypes);
 
-    private static void AssertOraclesExist(string archetype, IEnumerable<string> oracleIds)
-    {
-        var spec = Catalog.Archetypes.First(a => a.Archetype == archetype);
-        foreach (var id in oracleIds)
-            Assert.Contains(spec.Criteria, c => c.Id == id);
+        foreach (var type in archetypeTypes)
+        {
+            var instance = Activator.CreateInstance(type)!;
+            var name = (string)type.GetProperty("Name")!.GetValue(instance)!;
+            var oracles = (System.Collections.IDictionary)type.GetProperty("Oracles")!.GetValue(instance)!;
+
+            var spec = Catalog.Archetypes.FirstOrDefault(a => a.Archetype == name);
+            Assert.True(spec is not null, $"{type.Name}: archetype '{name}' is not in the catalog.");
+            foreach (var id in oracles.Keys.Cast<string>())
+                Assert.True(spec!.Criteria.Any(c => c.Id == id),
+                    $"{type.Name}: oracle '{id}' has no matching criterion in catalog archetype '{name}'.");
+        }
     }
 }

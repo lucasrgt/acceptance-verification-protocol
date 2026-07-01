@@ -14,6 +14,21 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
     public IReadOnlyList<string> DeclaredCriteria =>
         Slices.Values.SelectMany(c => c).Distinct().ToArray();
 
+    /// <summary>
+    /// Declared criteria with no DECIDED verdict (pass or fail) in <paramref name="verdicts"/> —
+    /// the standalone half of the doctor's bridge: the manifest is the expected set, the proofs'
+    /// verdicts are the observed set, and a declared-but-skipped criterion is still a gap.
+    /// </summary>
+    public IReadOnlyList<string> MissingFrom(IEnumerable<Verdict> verdicts)
+    {
+        var decided = verdicts
+            .SelectMany(v => v.Results)
+            .Where(r => r.Status != VerdictStatus.Skipped)
+            .Select(r => r.CriterionId)
+            .ToHashSet();
+        return DeclaredCriteria.Where(id => !decided.Contains(id)).ToArray();
+    }
+
     /// <summary>Reads and parses a <c>&lt;Module&gt;.spec.toml</c> from disk.</summary>
     public static SpecManifest Load(string path) => Parse(File.ReadAllText(path));
 
@@ -21,6 +36,8 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
     /// Parses the manifest's known TOML shape — <c>module = "X"</c> plus <c>[slices.&lt;Name&gt;]</c> tables each
     /// carrying <c>criteria = ["a", "b"]</c>. Deliberately a focused reader for this controlled shape, not a general
     /// TOML parser: the manifest is a curated, doctor-enforced contract, not free-form config.
+    /// Known limits (by design): single-line arrays only; keys match EXACTLY (a `module_x` key is ignored, never
+    /// mistaken for `module`).
     /// </summary>
     public static SpecManifest Parse(string toml)
     {
@@ -34,7 +51,7 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
             if (line.Length == 0)
                 continue;
 
-            if (line.StartsWith("module", StringComparison.Ordinal) && line.Contains('='))
+            if (IsKey(line, "module"))
             {
                 module = Unquote(line[(line.IndexOf('=') + 1)..].Trim());
                 currentSlice = null;
@@ -44,7 +61,7 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
                 currentSlice = line["[slices.".Length..^1].Trim();
                 slices[currentSlice] = Array.Empty<string>();
             }
-            else if (currentSlice is not null && line.StartsWith("criteria", StringComparison.Ordinal) && line.Contains('='))
+            else if (currentSlice is not null && IsKey(line, "criteria"))
             {
                 slices[currentSlice] = ParseList(line[(line.IndexOf('=') + 1)..]);
             }
@@ -53,6 +70,14 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
         if (string.IsNullOrEmpty(module))
             throw new FormatException("spec.toml has no 'module = \"…\"' key.");
         return new SpecManifest(module, slices);
+    }
+
+    /// <summary>True when the line assigns exactly <paramref name="key"/> (`key = …`), not a longer key sharing the prefix.</summary>
+    private static bool IsKey(string line, string key)
+    {
+        if (!line.StartsWith(key, StringComparison.Ordinal)) return false;
+        var rest = line[key.Length..].TrimStart();
+        return rest.StartsWith('=');
     }
 
     private static string StripComment(string line)

@@ -160,7 +160,8 @@
             "documenso:ed7a0011"
           ]
         }
-      ]
+      ],
+      "description": "An action produces its real effect — no visible control is a no-op, failures tell the truth."
     },
     {
       "archetype": "data-honesty",
@@ -220,7 +221,8 @@
             "documenso:5f4e0ccf"
           ]
         }
-      ]
+      ],
+      "description": "Rendered data traces to a real source — never fixtures, stock media, or invented rows."
     },
     {
       "archetype": "persona-scoped-visibility",
@@ -254,7 +256,8 @@
             "bitwarden:e4359f071"
           ]
         }
-      ]
+      ],
+      "description": "An actor sees and reaches only the affordances/routes of its role."
     },
     {
       "archetype": "navigation-integrity",
@@ -330,7 +333,8 @@
             "documenso:ef79eb3c"
           ]
         }
-      ]
+      ],
+      "description": "Every affordance leads somewhere real — no dead ends, loops, or ghost params."
     },
     {
       "archetype": "mount-stability",
@@ -349,7 +353,8 @@
             "projp:626c8ce"
           ]
         }
-      ]
+      ],
+      "description": "Mounting is quiet and convergent — no request storms or render loops."
     },
     {
       "archetype": "authorization",
@@ -397,7 +402,8 @@
             "bitwarden:3b5bb7680"
           ]
         }
-      ]
+      ],
+      "description": "A caller acts only on resources it owns, with the role the operation implies."
     },
     {
       "archetype": "access-control",
@@ -412,7 +418,8 @@
             "id": "api-error"
           }
         }
-      ]
+      ],
+      "description": "A protected endpoint refuses unauthenticated callers."
     },
     {
       "archetype": "integration-integrity",
@@ -460,7 +467,8 @@
             "documenso:8fbace0f"
           ]
         }
-      ]
+      ],
+      "description": "External callbacks are verified, resolvable, and bound to the real environment."
     },
     {
       "archetype": "second-order-effects",
@@ -479,7 +487,8 @@
             "fbc56236"
           ]
         }
-      ]
+      ],
+      "description": "A state transition fires ALL its downstream effects (every party notified)."
     },
     {
       "archetype": "money-integrity",
@@ -514,7 +523,8 @@
             "firefly:ebc7ea0e"
           ]
         }
-      ]
+      ],
+      "description": "Money is exact at rest and in display — splits sum to the whole, no float artifacts."
     },
     {
       "archetype": "lifecycle-gate",
@@ -548,7 +558,8 @@
             "documenso:6d754acf"
           ]
         }
-      ]
+      ],
+      "description": "A transition is gated on its real preconditions, server-side, with the FE disabled+explained."
     },
     {
       "archetype": "temporal-integrity",
@@ -584,7 +595,8 @@
             "documenso:22fd1b5b"
           ]
         }
-      ]
+      ],
+      "description": "Time renders in the user's zone; date-only values are never zone-shifted."
     },
     {
       "archetype": "pagination-integrity",
@@ -605,7 +617,8 @@
             "calcom:367e2666"
           ]
         }
-      ]
+      ],
+      "description": "Paging the whole list yields every item exactly once."
     },
     {
       "archetype": "render-resilience",
@@ -626,7 +639,8 @@
             "documenso:43fe5584"
           ]
         }
-      ]
+      ],
+      "description": "A surface degrades gracefully on bad data — it never white-screens."
     },
     {
       "archetype": "request-idempotency",
@@ -646,7 +660,8 @@
             "documenso:31be5489"
           ]
         }
-      ]
+      ],
+      "description": "A mutation with an idempotency key applies at most once."
     },
     {
       "archetype": "credential-authority",
@@ -670,7 +685,8 @@
             "id": "success"
           }
         }
-      ]
+      ],
+      "description": "An auth endpoint denies invalid credentials and issues tokens only on valid ones."
     },
     {
       "archetype": "token-rotation",
@@ -694,7 +710,8 @@
             "id": "double-activate"
           }
         }
-      ]
+      ],
+      "description": "Session tokens rotate and expire the way the flow promises."
     },
     {
       "archetype": "resource-uniqueness",
@@ -709,7 +726,8 @@
             "id": "double-activate"
           }
         }
-      ]
+      ],
+      "description": "A uniqueness rule holds server-side — duplicates are refused."
     },
     {
       "archetype": "submission-gate",
@@ -733,7 +751,8 @@
             "id": "success"
           }
         }
-      ]
+      ],
+      "description": "A body-bearing submission is gated on its precondition; a valid body is never a key past the gate."
     }
   ]
 }
