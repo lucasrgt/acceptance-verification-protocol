@@ -32,11 +32,27 @@ const REGISTRY: Record<string, (subject: ReactDesignSubject, page: Page) => Veri
   'truncation-integrity': truncationHooks,
 };
 
-/** Runs a geometry design archetype against a surface in a real browser page. */
-export async function verifyDesignBrowser(archetype: Archetype, subject: ReactDesignSubject, page: Page): Promise<Verdict> {
-  const build = REGISTRY[archetype.name];
+/** Options for a geometry run — the ADR 0002 escape hatch for off-catalog geometry archetypes. */
+export interface BrowserDesignOptions {
+  readonly hooks?: (subject: ReactDesignSubject, page: Page) => VerifyHooks;
+}
+
+/**
+ * Runs a geometry design archetype against a surface in a real browser page. Catalog
+ * archetypes use the registry's calibrated hooks; `options.hooks` binds an off-catalog
+ * geometry archetype (ADR 0002).
+ */
+export async function verifyDesignBrowser(
+  archetype: Archetype,
+  subject: ReactDesignSubject,
+  page: Page,
+  options: BrowserDesignOptions = {},
+): Promise<Verdict> {
+  const build = REGISTRY[archetype.name] ?? options.hooks;
   if (!build) {
-    throw new Error(`The browser design adapter has no hooks for archetype "${archetype.name}".`);
+    throw new Error(
+      `The browser design adapter has no hooks for archetype "${archetype.name}" — pass { hooks } to verifyDesignBrowser() for an off-catalog criterion (ADR 0002).`,
+    );
   }
   return runVerification(subject.name, archetype, build(subject, page));
 }

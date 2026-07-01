@@ -26,6 +26,18 @@ export interface ReactTemporalSubject {
   readonly timeZone?: string;
   /** Floating-date seam (floating-date-not-shifted): a calendar date (`YYYY-MM-DD`) with no time and no zone, displayed as authored. */
   readonly dateOnly?: string;
+  /**
+   * Readout seam: scopes date extraction to ONE element (by `data-testid`) instead of the
+   * whole body — declare it when the screen shows several dates, so the probe never checks
+   * the wrong one.
+   */
+  readonly readoutTestId?: string;
+  /**
+   * Custom extractor for non-ISO displays (e.g. "Jun 21, 2026"): receives the readout text
+   * and returns the shown date as `YYYY-MM-DD` (or null when absent). Without it only an
+   * ISO `YYYY-MM-DD` in the text is recognized.
+   */
+  readonly parseShown?: (text: string) => string | null;
 }
 
 /** The calendar date (`YYYY-MM-DD`) of an instant in a given IANA zone — deterministic on any host. */
@@ -36,9 +48,13 @@ function localDate(instantIso: string, timeZone: string): string {
   );
 }
 
-/** The first ISO calendar date (`YYYY-MM-DD`) shown in the rendered text, if any. */
-function shownDate(): string | null {
-  const text = document.body.textContent ?? '';
+/** The shown date (`YYYY-MM-DD`) — from the declared readout element when scoped, else the first ISO date in the body. */
+function shownDate(subject: ReactTemporalSubject): string | null {
+  const scope = subject.readoutTestId
+    ? document.querySelector(`[data-testid="${subject.readoutTestId}"]`)
+    : document.body;
+  const text = scope?.textContent ?? '';
+  if (subject.parseShown) return subject.parseShown(text);
   return text.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? null;
 }
 
@@ -58,7 +74,7 @@ export function temporalProbe(subject: ReactTemporalSubject): Probe<TemporalExpe
         if (!subject.instantIso || !subject.timeZone) throw new AvpFail('zoned-to-user needs the instant seam (instantIso + timeZone).');
         const userDate = localDate(subject.instantIso, subject.timeZone);
         const utcDate = localDate(subject.instantIso, 'UTC');
-        const shown = shownDate();
+        const shown = shownDate(subject);
         if (!shown) {
           throw new AvpFail(
             `No ISO calendar date (YYYY-MM-DD) was found in the readout — render the date for the user's zone (${subject.timeZone}) so it can be verified.`,
@@ -80,7 +96,7 @@ export function temporalProbe(subject: ReactTemporalSubject): Probe<TemporalExpe
       floatingDateNotShifted() {
         if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
         if (!subject.dateOnly) throw new AvpFail('floating-date-not-shifted needs the floating-date seam (dateOnly).');
-        const shown = shownDate();
+        const shown = shownDate(subject);
         if (!shown) {
           throw new AvpFail(
             `No ISO calendar date (YYYY-MM-DD) was found in the readout — render the floating date ${subject.dateOnly} as authored so it can be verified.`,

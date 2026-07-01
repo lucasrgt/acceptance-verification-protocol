@@ -18,6 +18,13 @@ type NamedSubject = { readonly name: string };
 /** Options for a design run — the judge is needed only by `model`-oracle archetypes (icon-correctness). */
 export interface DesignOptions {
   readonly judge?: Judge;
+  /**
+   * Escape hatch for an OFF-CATALOG design archetype (ADR 0002) — hooks binding a domain
+   * design criterion you authored to the style substrate. Per-call, never a global
+   * registration, exactly like verify()/verifyHttp().
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly hooks?: (subject: any, opts: DesignOptions) => VerifyHooks;
 }
 
 /**
@@ -28,25 +35,34 @@ export interface DesignOptions {
  * sibling adapter, not a fork of the protocol. The opts bag carries the judge to the
  * model-oracle archetypes; mechanical archetypes ignore it.
  */
-const REGISTRY: Record<string, (subject: never, opts: DesignOptions) => VerifyHooks> = {
-  'token-adherence': tokenAdherenceHooks as (subject: never) => VerifyHooks,
-  'theme-parity': themeParityHooks as (subject: never) => VerifyHooks,
-  'type-hierarchy': typeHierarchyHooks as (subject: never) => VerifyHooks,
-  'composition-canonical': compositionHooks as (subject: never) => VerifyHooks,
-  'state-coverage': stateCoverageHooks as (subject: never) => VerifyHooks,
-  'color-contrast': colorContrastHooks as (subject: never) => VerifyHooks,
-  'spacing-rhythm': spacingRhythmHooks as (subject: never) => VerifyHooks,
-  'accessible-name': accessibleNameHooks as (subject: never) => VerifyHooks,
-  'image-alt': imageAltHooks as (subject: never) => VerifyHooks,
-  'input-purpose': inputPurposeHooks as (subject: never) => VerifyHooks,
-  'icon-correctness': iconHooks as (subject: never, opts: DesignOptions) => VerifyHooks,
+// One `any` at the registry seam instead of a cast per entry — see adapter-react/verify.ts.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySubjectHooks = (subject: any, opts: DesignOptions) => VerifyHooks;
+const REGISTRY: Record<string, AnySubjectHooks> = {
+  'token-adherence': tokenAdherenceHooks,
+  'theme-parity': themeParityHooks,
+  'type-hierarchy': typeHierarchyHooks,
+  'composition-canonical': compositionHooks,
+  'state-coverage': stateCoverageHooks,
+  'color-contrast': colorContrastHooks,
+  'spacing-rhythm': spacingRhythmHooks,
+  'accessible-name': accessibleNameHooks,
+  'image-alt': imageAltHooks,
+  'input-purpose': inputPurposeHooks,
+  'icon-correctness': iconHooks,
 };
 
-/** Runs a design archetype against a surface (jsdom + computed style) and returns a Verdict. */
+/**
+ * Runs a design archetype against a surface (jsdom + computed style) and returns a Verdict.
+ * Catalog archetypes always use the registry's calibrated hooks; `opts.hooks` binds an
+ * off-catalog design archetype (ADR 0002), exactly like verify()/verifyHttp().
+ */
 export async function verifyDesign(archetype: Archetype, subject: NamedSubject, opts: DesignOptions = {}): Promise<Verdict> {
-  const build = REGISTRY[archetype.name];
+  const build = REGISTRY[archetype.name] ?? opts.hooks;
   if (!build) {
-    throw new Error(`The design adapter has no hooks for archetype "${archetype.name}".`);
+    throw new Error(
+      `The design adapter has no hooks for archetype "${archetype.name}" — pass { hooks } to verifyDesign() for an off-catalog criterion (ADR 0002).`,
+    );
   }
-  return runVerification(subject.name, archetype, build(subject as never, opts));
+  return runVerification(subject.name, archetype, build(subject, opts));
 }

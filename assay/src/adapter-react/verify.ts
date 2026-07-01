@@ -85,24 +85,35 @@ function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, optio
  * Per-archetype hooks builders. Adding an archetype to the React adapter = adding
  * one entry here; the neutral `runVerification` does the rest. This registry is
  * the seam that proves the core isn't action-effect-shaped.
+ *
+ * One `any` at the registry seam instead of a cast per entry: builders take
+ * heterogeneous subject types keyed by a RUNTIME archetype name, which the type
+ * system cannot correlate. Each builder's own signature stays fully typed, and the
+ * archetype↔subject pairing is enforced by the calibration bench.
  */
-const REGISTRY: Record<string, (subject: never, options: VerifyOptions) => VerifyHooks> = {
-  'action-effect': actionEffectHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'data-honesty': dataHonestyHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'persona-scoped-visibility': personaHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'navigation-integrity': navHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'mount-stability': mountStabilityHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'lifecycle-gate': lifecycleFeHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'temporal-integrity': temporalHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'pagination-integrity': paginationHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'render-resilience': resilienceHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
-  'money-integrity': moneyDisplayHooks as (subject: never, options: VerifyOptions) => VerifyHooks,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySubjectHooks = (subject: any, options: VerifyOptions) => VerifyHooks;
+const REGISTRY: Record<string, AnySubjectHooks> = {
+  'action-effect': actionEffectHooks,
+  'data-honesty': dataHonestyHooks,
+  'persona-scoped-visibility': personaHooks,
+  'navigation-integrity': navHooks,
+  'mount-stability': mountStabilityHooks,
+  'lifecycle-gate': lifecycleFeHooks,
+  'temporal-integrity': temporalHooks,
+  'pagination-integrity': paginationHooks,
+  'render-resilience': resilienceHooks,
+  'money-integrity': moneyDisplayHooks,
 };
 
 /**
  * Runs an archetype against a subject with the React adapter and returns a Verdict.
  * Dispatches by archetype name to the right hooks; the orchestration is neutral
  * (in core). Throws if the adapter has no hooks for the archetype.
+ *
+ * Precedence (deliberate): a CATALOG archetype always uses the registry's calibrated
+ * hooks — `options.hooks` binds only off-catalog archetypes (ADR 0002). Overriding a
+ * calibrated probe would silently detach the criterion from its accuracy benchmark.
  */
 export async function verify(
   archetype: Archetype,
@@ -115,5 +126,5 @@ export async function verify(
       `The React adapter has no hooks for archetype "${archetype.name}" — register it in adapter-react/verify.ts, or pass { hooks } to verify() for an off-catalog criterion (ADR 0002).`,
     );
   }
-  return runVerification(subject.name, archetype, build(subject as never, options));
+  return runVerification(subject.name, archetype, build(subject, options));
 }

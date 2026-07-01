@@ -24,14 +24,20 @@ export interface VerifyHttpOptions {
  * Per-archetype HTTP hooks. Adding a backend archetype = one entry here; the
  * neutral `runVerification` (shared with the React adapter) does the rest. The
  * registry is the seam that proves the core isn't DOM-shaped either.
+ *
+ * One `any` at the registry seam instead of a cast per entry — see the same note in
+ * adapter-react/verify.ts: the subject↔archetype pairing is runtime-keyed, and each
+ * builder's own signature stays fully typed.
  */
-const REGISTRY: Record<string, (subject: never) => VerifyHooks> = {
-  'authorization': authHooks as (subject: never) => VerifyHooks,
-  'integration-integrity': webhookHooks as (subject: never) => VerifyHooks,
-  'second-order-effects': notifyHooks as (subject: never) => VerifyHooks,
-  'money-integrity': moneyHooks as (subject: never) => VerifyHooks,
-  'lifecycle-gate': lifecycleHooks as (subject: never) => VerifyHooks,
-  'request-idempotency': idempotencyHooks as (subject: never) => VerifyHooks,
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnySubjectHooks = (subject: any) => VerifyHooks;
+const REGISTRY: Record<string, AnySubjectHooks> = {
+  'authorization': authHooks,
+  'integration-integrity': webhookHooks,
+  'second-order-effects': notifyHooks,
+  'money-integrity': moneyHooks,
+  'lifecycle-gate': lifecycleHooks,
+  'request-idempotency': idempotencyHooks,
 };
 
 /**
@@ -50,5 +56,5 @@ export async function verifyHttp(
       `The HTTP adapter has no hooks for archetype "${archetype.name}" — pass { hooks } to verifyHttp() for an off-catalog criterion (ADR 0002).`,
     );
   }
-  return runVerification(subject.name, archetype, build(subject as never));
+  return runVerification(subject.name, archetype, build(subject));
 }

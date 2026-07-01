@@ -35,9 +35,9 @@ const present = (marker: string | RegExp): boolean => {
   return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 };
 
-const stub = (what: string) => () => {
-  throw new AvpFail(`${what} is an action-subject criterion; not applicable to an identity subject.`);
-};
+/** Builds the whole not-applicable half of an Expect vocabulary in one line (defensive: applies() should have skipped these). */
+const notApplicable = <K extends string>(keys: readonly K[], why: string): Record<K, () => never> =>
+  Object.fromEntries(keys.map((k) => [k, () => { throw new AvpFail(`${k} ${why}`); }])) as Record<K, () => never>;
 
 /** The React adapter's `action-effect` identity probe (cache-cleared-on-identity). */
 export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpect> {
@@ -56,7 +56,13 @@ export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpec
       render(subject.render());
       await settle(60); // initial session loads the first identity's rows
       const el = screen.queryByRole(subject.switchControl.role, { name: subject.switchControl.name });
-      if (el) await user.click(el);
+      if (!el) {
+        // Fail loudly — silently not clicking would later blame the cache with a misleading reason.
+        throw new AvpFail(
+          `The identity switch control ("${String(subject.switchControl.name)}", role "${subject.switchControl.role}") was not found — the probe cannot drive the identity switch. Fix the seam (role/name) or render the control.`,
+        );
+      }
+      await user.click(el);
       await settle(60); // the new identity's session settles
       acted = true;
     },
@@ -76,16 +82,21 @@ export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpec
           );
         }
       },
-      effectFired: stub('effectFired'),
-      draftSurvived: stub('draftSurvived'),
-      errorShown: stub('errorShown'),
-      projectionConverged: stub('projectionConverged'),
-      requestAccepted: stub('requestAccepted'),
-      idempotentRetry: stub('idempotentRetry'),
-      firesOnce: stub('firesOnce'),
-      noFalseSuccess: stub('noFalseSuccess'),
-      survivesTokenRefresh: stub('survivesTokenRefresh'),
-      optimisticReconcile: stub('optimisticReconcile'),
+      ...notApplicable(
+        [
+          'effectFired',
+          'draftSurvived',
+          'errorShown',
+          'projectionConverged',
+          'requestAccepted',
+          'idempotentRetry',
+          'firesOnce',
+          'noFalseSuccess',
+          'survivesTokenRefresh',
+          'optimisticReconcile',
+        ] as const,
+        'is an action-subject criterion; not applicable to an identity subject.',
+      ),
     },
   };
 }

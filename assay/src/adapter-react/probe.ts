@@ -25,9 +25,7 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
     expect: {
       effectFired() {
         const d = seen();
-        const hits = d.requests.filter(
-          (r) => r.method.toUpperCase() === subject.endpoint.method.toUpperCase(),
-        );
+        const hits = endpointHits(d, subject);
         if (hits.length === 0) {
           throw new AvpFail(
             `No ${subject.endpoint.method} request to ${subject.endpoint.path} after activating "${String(subject.action.name)}". The control may be a no-op — wire the action to its real effect.`,
@@ -115,7 +113,10 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
       noFalseSuccess() {
         seen();
         const m = subject.successMarker;
-        if (!m) return; // no-op when the subject declares no success affirmation
+        // Deliberate no-op without the marker seam: this assertion runs INSIDE the
+        // composite `no-phantom-success` criterion, whose draft+error assertions still
+        // hold — an undeclared marker narrows the criterion, it never inflates a pass.
+        if (!m) return;
         const text = (document.body.textContent ?? '').replace(/\s+/g, ' ');
         const shown = typeof m.text === 'string' ? text.includes(m.text) : m.text.test(text);
         if (shown) {
@@ -164,7 +165,24 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
   };
 }
 
-/** Requests that hit the subject's domain endpoint (by method). */
+/** True when a recorded request URL's pathname matches an MSW-style path (`:param` segments wildcarded). */
+function pathMatches(url: string, path: string): boolean {
+  let pathname: string;
+  try {
+    pathname = new URL(url).pathname;
+  } catch {
+    pathname = url;
+  }
+  const target = path.replace(/^https?:\/\/[^/]+/, ''); // subject paths may carry an origin
+  const pattern = new RegExp(
+    '^' + target.split('/').map((seg) => (seg.startsWith(':') ? '[^/]+' : seg.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))).join('/') + '$',
+  );
+  return pattern.test(pathname);
+}
+
+/** Requests that hit the subject's domain endpoint — matched by method AND path, so a sibling same-method call never miscounts. */
 function endpointHits(d: Driven, subject: ActionEffectSubject) {
-  return d.requests.filter((r) => r.method.toUpperCase() === subject.endpoint.method.toUpperCase());
+  return d.requests.filter(
+    (r) => r.method.toUpperCase() === subject.endpoint.method.toUpperCase() && pathMatches(r.url, subject.endpoint.path),
+  );
 }
