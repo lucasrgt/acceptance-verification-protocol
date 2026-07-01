@@ -6,6 +6,7 @@ import { server } from './msw-server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { MountStabilityExpect } from '../archetypes/mount-stability';
+import { settle } from './settle';
 
 /**
  * Descriptor of a `mount-stability` subject: mount the screen and watch one
@@ -41,9 +42,7 @@ export function mountProbe(subject: MountStabilitySubject): Probe<MountStability
       );
       render(subject.render());
       // settle long enough for a storm to manifest (a real loop would exceed this many times over)
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 120));
-      });
+      await settle(120);
       count = observed;
     },
     expect: {

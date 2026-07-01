@@ -4,6 +4,7 @@ import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { MoneyExpect } from '../archetypes/money-integrity';
+import { settle } from './settle';
 
 /**
  * Descriptor of a React `money-integrity` subject — the DISPLAY half
@@ -34,11 +35,6 @@ function canonical(amountMinor: number, precision: number): string {
   const frac = String(abs % div).padStart(precision, '0');
   return (neg ? '-' : '') + (precision > 0 ? `${whole}.${frac}` : String(whole));
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 /** The React adapter's `money-integrity` probe (display half — amount-rendered-exact). */
 export function moneyDisplayProbe(subject: ReactMoneySubject): Probe<MoneyExpect> {

@@ -5,11 +5,7 @@ import type { VerifyHooks } from '../core/run';
 import type { ColorContrastExpect } from '../archetypes/color-contrast';
 import type { ReactDesignSubject } from './subject';
 import { contrastRatio, aaThreshold } from '../design/contrast';
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
+import { settle } from '../adapter-react/settle';
 
 /** The effective background of an element: the nearest self-or-ancestor with an inline background, else white. */
 function effectiveBg(el: HTMLElement): string {

@@ -4,16 +4,12 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { CompositionExpect } from '../archetypes/composition-canonical';
 import type { ReactDesignSubject } from './subject';
+import { settle } from '../adapter-react/settle';
 
 interface Slot {
   readonly slot: string;
   readonly ds: string;
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 /** Read the rendered landmark slots (`[data-slot]`) in DOM order, with their DS marker (`data-ds`). */
 function collectSlots(): Slot[] {

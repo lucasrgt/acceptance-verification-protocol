@@ -8,6 +8,7 @@ import type { Condition } from '../core/types';
 import type { VerifyHooks } from '../core/run';
 import type { DataHonestyExpect } from '../archetypes/data-honesty';
 import { detailProbe, isDetailSubject, type DetailHonestySubject } from './data-detail';
+import { settle } from './settle';
 
 /**
  * Descriptor of a `data-honesty` subject: the seams needed to compare what an API
@@ -51,9 +52,7 @@ async function driveData(subject: DataHonestySubject, condition: Condition): Pro
   server.use(register(subject.endpoint.path, () => HttpResponse.json(body as object)));
 
   render(subject.render());
-  await act(async () => {
-    await new Promise((r) => setTimeout(r, 60));
-  });
+  await settle(60);
 
   return {
     itemCount: () => screen.queryAllByRole(subject.items.role).length,

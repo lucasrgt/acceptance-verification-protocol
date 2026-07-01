@@ -4,11 +4,7 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { InputPurposeExpect } from '../archetypes/input-purpose';
 import type { ReactDesignSubject } from './subject';
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
+import { settle } from '../adapter-react/settle';
 
 /**
  * The expected autocomplete purpose of an input, inferred ONLY when it is unambiguous —

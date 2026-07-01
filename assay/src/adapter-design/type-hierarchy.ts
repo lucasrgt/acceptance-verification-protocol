@@ -4,17 +4,13 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { TypeHierarchyExpect } from '../archetypes/type-hierarchy';
 import type { ReactDesignSubject } from './subject';
+import { settle } from '../adapter-react/settle';
 
 interface Heading {
   readonly level: number;
   readonly size: number;
   readonly text: string;
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 /** Collect rendered headings (h1–h6) with their inline font-size in px. */
 function collectHeadings(): Heading[] {

@@ -5,14 +5,10 @@ import type { VerifyHooks } from '../core/run';
 import type { SpacingRhythmExpect } from '../archetypes/spacing-rhythm';
 import type { ReactDesignSubject } from './subject';
 import { tokens } from '../design/tokens';
+import { settle } from '../adapter-react/settle';
 
 /** Legal padding values (in px) from the spacing scale. */
 const SPACE_PX = new Set(Object.values(tokens.space).map((v) => parseFloat(v)));
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 interface Pad {
   readonly level: number;

@@ -5,11 +5,7 @@ import type { VerifyHooks } from '../core/run';
 import type { StateCoverageExpect } from '../archetypes/state-coverage';
 import type { ReactDesignSubject } from './subject';
 import { normColor } from '../design/tokens';
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
+import { settle } from '../adapter-react/settle';
 
 /**
  * The visual signature of the control in the current render: opacity + text colour +

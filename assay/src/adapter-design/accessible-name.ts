@@ -4,11 +4,7 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { AccessibleNameExpect } from '../archetypes/accessible-name';
 import type { ReactDesignSubject } from './subject';
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
+import { settle } from '../adapter-react/settle';
 
 /** The interactive controls that must carry an accessible name. */
 const INTERACTIVE =

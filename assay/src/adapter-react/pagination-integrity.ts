@@ -5,6 +5,7 @@ import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { PaginationExpect } from '../archetypes/pagination-integrity';
+import { settle } from './settle';
 
 /**
  * Descriptor of a React `pagination-integrity` subject. Mounts a paginated list,
@@ -25,11 +26,6 @@ export interface ReactPagingSubject {
   /** Safety bound on page traversal (default 50). */
   readonly maxPages?: number;
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 function isDisabled(el: Element): boolean {
   if ((el as HTMLButtonElement).disabled === true) return true;

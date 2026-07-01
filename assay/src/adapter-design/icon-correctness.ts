@@ -3,16 +3,12 @@ import { act } from 'react';
 import { AvpFail, type Judge, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { ReactDesignSubject } from './subject';
+import { settle } from '../adapter-react/settle';
 
 export interface IconEvidence {
   /** Every rendered icon (`[data-icon]`) with the accessible label of the control it belongs to. */
   readonly icons: ReadonlyArray<{ readonly icon: string; readonly label: string }>;
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 /** The accessible meaning of an icon's control: its host's aria-label, else its trimmed text, else the icon's own label. */
 function labelFor(el: HTMLElement): string {

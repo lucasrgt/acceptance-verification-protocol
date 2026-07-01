@@ -5,17 +5,13 @@ import type { VerifyHooks } from '../core/run';
 import type { TokenAdherenceExpect } from '../archetypes/token-adherence';
 import type { ReactDesignSubject } from './subject';
 import { tokenScale, normColor } from '../design/tokens';
+import { settle } from '../adapter-react/settle';
 
 interface Violation {
   readonly prop: string;
   readonly value: string;
   readonly category: string;
 }
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 /** The style properties we check, each against its token category. */
 const CHECKS: ReadonlyArray<{ prop: 'color' | 'backgroundColor' | 'padding' | 'borderRadius' | 'fontSize'; category: keyof typeof tokenScale; color?: boolean }> = [

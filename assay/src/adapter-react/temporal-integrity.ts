@@ -4,6 +4,7 @@ import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { TemporalExpect } from '../archetypes/temporal-integrity';
+import { settle } from './settle';
 
 /**
  * Descriptor of a React `temporal-integrity` subject. Mounts a screen that displays
@@ -48,9 +49,7 @@ export function temporalProbe(subject: ReactTemporalSubject): Probe<TemporalExpe
     async act() {
       cleanup();
       render(subject.render());
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 0));
-      });
+      await settle();
       acted = true;
     },
     expect: {

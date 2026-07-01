@@ -5,14 +5,10 @@ import type { VerifyHooks } from '../core/run';
 import type { ThemeParityExpect } from '../archetypes/theme-parity';
 import type { ReactDesignSubject } from './subject';
 import { themeColorScale, normColor, type DesignTheme } from '../design/tokens';
+import { settle } from '../adapter-react/settle';
 
 const THEMES: readonly DesignTheme[] = ['light', 'dark'];
 const COLOR_PROPS = ['color', 'backgroundColor', 'borderColor'] as const;
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
 
 interface Off {
   readonly theme: DesignTheme;

@@ -3,6 +3,7 @@ import { act } from 'react';
 import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { PersonaExpect } from '../archetypes/persona-visibility';
+import { settle } from './settle';
 
 /**
  * Descriptor of a router-mounted `persona-scoped-visibility` subject. Unlike the
@@ -28,11 +29,6 @@ const present = (marker: string | RegExp): boolean => {
   return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 };
 
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 80));
-  });
-
 /** The React adapter's router-mounted `persona-scoped-visibility` probe. */
 export function personaRouterProbe(subject: PersonaRouteSubject): Probe<PersonaExpect> {
   let acted = false;
@@ -40,7 +36,7 @@ export function personaRouterProbe(subject: PersonaRouteSubject): Probe<PersonaE
     async act() {
       cleanup();
       render(<RouterProvider router={subject.router()} />);
-      await settle();
+      await settle(80);
       acted = true;
     },
     expect: {

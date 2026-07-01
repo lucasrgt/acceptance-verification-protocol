@@ -6,6 +6,7 @@ import { http, HttpResponse } from 'msw';
 import { server } from './msw-server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { ActionEffectExpect } from '../archetypes/action-effect';
+import { settle } from './settle';
 
 /**
  * Descriptor of an `action-effect` IDENTITY subject — the seams to drive a sign-out
@@ -34,11 +35,6 @@ const present = (marker: string | RegExp): boolean => {
   return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 };
 
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 60));
-  });
-
 const stub = (what: string) => () => {
   throw new AvpFail(`${what} is an action-subject criterion; not applicable to an identity subject.`);
 };
@@ -58,10 +54,10 @@ export function identityProbe(subject: IdentitySubject): Probe<ActionEffectExpec
       );
       const user = userEvent.setup();
       render(subject.render());
-      await settle(); // initial session loads the first identity's rows
+      await settle(60); // initial session loads the first identity's rows
       const el = screen.queryByRole(subject.switchControl.role, { name: subject.switchControl.name });
       if (el) await user.click(el);
-      await settle(); // the new identity's session settles
+      await settle(60); // the new identity's session settles
       acted = true;
     },
     expect: {

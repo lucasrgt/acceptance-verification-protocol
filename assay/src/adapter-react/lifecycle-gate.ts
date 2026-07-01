@@ -4,6 +4,7 @@ import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { LifecycleGateExpect } from '../archetypes/lifecycle-gate';
+import { settle } from './settle';
 
 /**
  * Descriptor of a React `lifecycle-gate` subject — the DOM half of the archetype.
@@ -37,9 +38,7 @@ export function lifecycleFeProbe(subject: ReactLifecycleSubject): Probe<Lifecycl
     async act() {
       cleanup();
       render(subject.render());
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 0));
-      });
+      await settle();
       acted = true;
     },
     expect: {

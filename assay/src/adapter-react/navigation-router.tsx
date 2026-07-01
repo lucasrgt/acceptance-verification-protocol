@@ -4,6 +4,7 @@ import { act } from 'react';
 import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { NavigationExpect } from '../archetypes/navigation-integrity';
+import { settle } from './settle';
 
 /**
  * Descriptor of a router-mounted navigation subject. Unlike the navigate-spy
@@ -46,11 +47,6 @@ const present = (marker: string | RegExp): boolean => {
   return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 };
 
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 80));
-  });
-
 /** The React adapter's router-mounted `navigation-integrity` probe. */
 export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> {
   let acted = false;
@@ -78,7 +74,7 @@ export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> 
       }
       try {
         render(<RouterProvider router={router} />);
-        await settle();
+        await settle(80);
       } catch (e) {
         mountError = e as Error;
       }
@@ -86,7 +82,7 @@ export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> 
       if (subject.back) {
         const el = screen.queryByRole(subject.back.trigger.role, { name: subject.back.trigger.name });
         if (el) await user.click(el);
-        await settle();
+        await settle(80);
       }
       acted = true;
     },

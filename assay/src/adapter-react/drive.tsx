@@ -5,6 +5,7 @@ import { http, HttpResponse, delay } from 'msw';
 import { server } from './msw-server';
 import type { ActionEffectSubject } from './subject';
 import type { Condition } from '../core/types';
+import { settle } from './settle';
 
 /** One observed request to the subject's endpoint, with the status the seam returned. */
 export interface ReqRecord {
@@ -37,67 +38,76 @@ async function safeJson(request: Request): Promise<unknown> {
   }
 }
 
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 60));
-  });
-
 /**
  * Forces `condition` on the subject's endpoint, mounts, types the draft (if any),
  * snapshots the projection, activates the control, and lets the effects settle.
  * Handles the fault, data and recovery condition axes (see ConditionId).
  */
+// Handlers the PREVIOUS drive() registered. Each drive removes its predecessor's before
+// registering its own, so criteria inside one verify() never see a stale condition handler —
+// while baseline handlers a host `setup()` registered are preserved.
+let previousDriveHandlers: ReadonlyArray<unknown> = [];
+
 export async function drive(subject: ActionEffectSubject, condition: Condition): Promise<Driven> {
   cleanup(); // unmount any previous render (several criteria within one verify)
+
+  if (previousDriveHandlers.length > 0) {
+    const keep = server.listHandlers().filter((h) => !previousDriveHandlers.includes(h));
+    server.resetHandlers(...(keep as Parameters<typeof server.resetHandlers>));
+  }
 
   const requests: ReqRecord[] = [];
   let refreshed = false;
   let refreshCount = 0;
+  // double-activate: the FIRST request is held in flight until the second activation has
+  // happened, so a guarded control provably had time to disable — a gate, not a timing race.
+  let releaseFirstRequest!: () => void;
+  const firstRequestGate = new Promise<void>((r) => (releaseFirstRequest = r));
 
   const verb = subject.endpoint.method.toLowerCase() as 'post' | 'get' | 'put' | 'delete' | 'patch';
   const register = http[verb] as typeof http.post;
-  server.use(
-    register(subject.endpoint.path, async ({ request }) => {
-      const body = await safeJson(request);
-      const base = { method: request.method, url: request.url, body };
+  const endpointHandler = register(subject.endpoint.path, async ({ request }) => {
+    const body = await safeJson(request);
+    const base = { method: request.method, url: request.url, body };
 
-      // recovery axis: an expired token 401s until a refresh has happened.
-      if (condition.id === 'token-expired' && !refreshed) {
-        requests.push({ ...base, status: 401 });
-        return new HttpResponse(null, { status: 401 });
-      }
-      // double-activate: keep the first request in flight so a guarded control has time
-      // to disable before the second activation lands.
-      if (condition.id === 'slow' || condition.id === 'double-activate') await delay(50);
-      if (condition.id === 'offline') {
-        requests.push({ ...base, status: 0 });
-        return HttpResponse.error();
-      }
-      if (condition.id === 'api-error') {
-        requests.push({ ...base, status: 500 });
-        return new HttpResponse(null, { status: 500 });
-      }
-      // contract: a body the backend won't accept is a 400 (before any effect).
-      if (subject.accepts && !subject.accepts(body)) {
-        requests.push({ ...base, status: 400 });
-        return new HttpResponse(null, { status: 400 });
-      }
-      requests.push({ ...base, status: 200 });
-      return HttpResponse.json((subject.successResponse ?? { ok: true }) as object);
-    }),
-  );
+    // recovery axis: an expired token 401s until a refresh has happened.
+    if (condition.id === 'token-expired' && !refreshed) {
+      requests.push({ ...base, status: 401 });
+      return new HttpResponse(null, { status: 401 });
+    }
+    if (condition.id === 'slow') await delay(50);
+    if (condition.id === 'double-activate') await firstRequestGate;
+    if (condition.id === 'offline') {
+      requests.push({ ...base, status: 0 });
+      return HttpResponse.error();
+    }
+    if (condition.id === 'api-error') {
+      requests.push({ ...base, status: 500 });
+      return new HttpResponse(null, { status: 500 });
+    }
+    // contract: a body the backend won't accept is a 400 (before any effect).
+    if (subject.accepts && !subject.accepts(body)) {
+      requests.push({ ...base, status: 400 });
+      return new HttpResponse(null, { status: 400 });
+    }
+    requests.push({ ...base, status: 200 });
+    return HttpResponse.json((subject.successResponse ?? { ok: true }) as object);
+  });
+  server.use(endpointHandler);
+  const ownHandlers: unknown[] = [endpointHandler];
 
   if (subject.refreshEndpoint) {
     const rverb = subject.refreshEndpoint.method.toLowerCase() as 'post' | 'get';
     const rregister = http[rverb] as typeof http.post;
-    server.use(
-      rregister(subject.refreshEndpoint.path, () => {
-        refreshed = true;
-        refreshCount += 1;
-        return HttpResponse.json({ token: 'refreshed' });
-      }),
-    );
+    const refreshHandler = rregister(subject.refreshEndpoint.path, () => {
+      refreshed = true;
+      refreshCount += 1;
+      return HttpResponse.json({ token: 'refreshed' });
+    });
+    server.use(refreshHandler);
+    ownHandlers.push(refreshHandler);
   }
+  previousDriveHandlers = ownHandlers;
 
   const projectionText = (): string | null => {
     if (!subject.projection) return null;
@@ -116,19 +126,21 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
   const trigger = () => user.click(screen.getByRole(subject.action.role, { name: subject.action.name }));
 
   if (condition.id === 'double-activate') {
-    // Two activations in quick succession. The first awaits long enough for a guarded
-    // control to commit its disabled state (React re-render); the slow endpoint keeps
-    // the first request in flight so a correct guard makes the second a no-op.
+    // Two activations in quick succession. The FIRST request is gated in flight until the
+    // second click has landed (deterministic — no delay race): a correct guard disabled the
+    // control after click one, so click two is a no-op; only then is the request released.
     await trigger();
     await trigger();
-    await settle();
+    releaseFirstRequest();
+    await settle(60);
   } else {
+    releaseFirstRequest(); // gate only matters under double-activate; never hold otherwise
     await trigger();
-    await settle();
+    await settle(60);
     // interaction axis: a retry activates the SAME action again on the same mount.
     if (condition.id === 'retry') {
       await trigger();
-      await settle();
+      await settle(60);
     }
   }
 

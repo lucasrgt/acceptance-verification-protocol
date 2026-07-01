@@ -4,11 +4,7 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { ImageAltExpect } from '../archetypes/image-alt';
 import type { ReactDesignSubject } from './subject';
-
-const settle = () =>
-  act(async () => {
-    await new Promise((r) => setTimeout(r, 0));
-  });
+import { settle } from '../adapter-react/settle';
 
 /** The graphics that must carry a text alternative (or be marked decorative). */
 const IMAGES = 'img, [role="img"]';

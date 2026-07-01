@@ -5,6 +5,7 @@ import { http, HttpResponse, delay } from 'msw';
 import { server } from './msw-server';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { DataHonestyExpect } from '../archetypes/data-honesty';
+import { settle } from './settle';
 
 /**
  * Descriptor of a `data-honesty` DETAIL subject: a screen that resolves an entity
@@ -48,14 +49,10 @@ export function detailProbe(subject: DetailHonestySubject): Probe<DataHonestyExp
       );
       render(subject.render());
       // sample the gap: the entity has resolved, the name has not.
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 50));
-      });
+      await settle(50);
       flashed = present(subject.rawId);
       // let the name finish so no update dangles past the test.
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 160));
-      });
+      await settle(160);
       acted = true;
     },
     expect: {

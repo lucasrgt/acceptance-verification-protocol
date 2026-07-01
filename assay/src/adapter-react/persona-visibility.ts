@@ -5,6 +5,7 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { PersonaExpect } from '../archetypes/persona-visibility';
 import { personaRouterProbe, isPersonaRouteSubject, type PersonaRouteSubject } from './persona-router';
+import { settle } from './settle';
 
 /** A single affordance that belongs to another actor/tier and must not leak. */
 export interface ForeignAffordance {
@@ -38,9 +39,7 @@ export function personaProbe(subject: PersonaSubject): Probe<PersonaExpect> {
     async act() {
       cleanup();
       render(subject.render());
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 0));
-      });
+      await settle();
       acted = true;
     },
     expect: {

@@ -6,6 +6,7 @@ import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { NavigationExpect } from '../archetypes/navigation-integrity';
 import { routerProbe, isRouterSubject, type RouterNavSubject } from './navigation-router';
+import { settle } from './settle';
 
 /**
  * Descriptor of a `navigation-integrity` subject. The component renders with an
@@ -48,9 +49,7 @@ export function navProbe(subject: NavigationSubject): Probe<NavigationExpect> {
         const el = screen.queryByRole(a.role, { name: a.name });
         if (el) await user.click(el);
       }
-      await act(async () => {
-        await new Promise((r) => setTimeout(r, 0));
-      });
+      await settle();
       acted = true;
     },
     expect: {
