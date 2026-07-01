@@ -57,15 +57,15 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] 38 refusal = rejectWith list (default 401/403/404); 5xx never a refusal
 
 ## Block 6 — Adapter Design (E)
-- [ ] 39 computed-style fallback for token checks
-- [ ] 40 injectable token scale/themes (options seam)
-- [ ] 41 normColor: rgba/hsl/named/oklch
-- [ ] 42 contrast composites alpha over bg
-- [ ] 43 AA/AAA threshold option
-- [ ] 44 geometry tier exported (design/browser entry)
-- [ ] 45 chrome detection: LOCALAPPDATA/Brave/Chromium
-- [ ] 46 goto timeout option + actionable error
-- [ ] 47 loadMarkup custom css/font hook
+- [x] 39 computed-style fallback for token checks
+- [x] 40 injectable token scale/themes (options seam)
+- [x] 41 normColor: rgba/hsl/named/oklch
+- [x] 42 contrast composites alpha over bg
+- [x] 43 AA/AAA threshold option
+- [x] 44 geometry tier exported (design/browser entry)
+- [x] 45 chrome detection: LOCALAPPDATA/Brave/Chromium
+- [x] 46 goto timeout option + actionable error
+- [x] 47 loadMarkup custom css/font hook
 - [x] 48 verifyDesign hooks escape hatch
 - [x] 49 verifyDesignBrowser hooks + judge options
 
