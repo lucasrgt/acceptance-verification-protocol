@@ -96,28 +96,28 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] (64b) zero-warning build kept
 
 ## Block 9 — Bench (H)
-- [ ] 71 accuracy number derived without re-running
-- [ ] 72 shared pair-harness helper for benches
-- [ ] 73 accuracy numbers persisted (bench/results JSONL)
-- [ ] 74 quiet expected mutant console noise
-- [ ] 75 geometry: honest visible skip without Chrome + CI job with Chrome
-- [ ] 76 tools/measure — re-measure + history artifact (convergence data)
+- [x] 71 accuracy number derived without re-running
+- [x] 72 shared pair-harness helper for benches
+- [x] 73 accuracy numbers persisted (bench/results JSONL)
+- [x] 74 quiet expected mutant console noise
+- [x] 75 geometry: honest visible skip without Chrome + CI job with Chrome
+- [x] 76 tools/measure — re-measure + history artifact (convergence data)
 
 ## Block 10 — eslint-plugin (I)
-- [ ] 77 per-directory cache (mtime invalidation)
-- [ ] 78 comment-stripping before match + renamed-import note
-- [ ] 79 publishable package.json + distribution story
-- [ ] 80 glob subset documented
+- [x] 77 per-directory cache (mtime invalidation)
+- [x] 78 comment-stripping before match + renamed-import note
+- [x] 79 publishable package.json + distribution story
+- [x] 80 glob subset documented
 
 ## Block 11 — escape-miner (J)
-- [ ] 81 sln regex typo removed
-- [ ] 82 multi-label classify (primary + all)
-- [ ] 83 streaming git log (no 256MB sync buffer)
+- [x] 81 sln regex typo removed
+- [x] 82 multi-label classify (primary + all)
+- [x] 83 streaming git log (no 256MB sync buffer)
 
 ## Block 12 — CLI (K)
-- [ ] 84 default *.assay.* filter
-- [ ] 85 no shell:true; resolve local vitest; safe args
-- [ ] 86 --help/--version/--json passthrough
+- [x] 84 default *.assay.* filter
+- [x] 85 no shell:true; resolve local vitest; safe args
+- [x] 86 --help/--version/--json passthrough
 
 ## Block 13 — Packaging/CI (L rest)
 - [ ] 87 ci.yml: vitest + tsc + lint + dotnet test on push/PR
