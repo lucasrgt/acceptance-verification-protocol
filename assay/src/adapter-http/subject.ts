@@ -21,7 +21,7 @@ export interface HttpAuthSubject {
   readonly request?: HttpRequestSpec;
   /** A privileged operation called as a role that should not have it (role-required). */
   readonly privileged?: HttpRequestSpec;
-  /** Statuses that count as a correct refusal (default: any non-2xx; 401/403/404 are canonical). */
+  /** Statuses that count as a correct refusal (default: any 4xx; a 5xx crash NEVER counts as a refusal). */
   readonly rejectWith?: readonly number[];
   /** Authority seam: writes to one resource, each carrying a different client-tampered value. */
   readonly writes?: readonly HttpRequestSpec[];
@@ -43,7 +43,7 @@ export interface HttpLifecycleSubject {
   readonly transition: HttpRequestSpec;
   /** The same transition on a ready resource — must succeed. */
   readonly whenReady?: HttpRequestSpec;
-  /** Statuses that count as a correct refusal (default: any non-2xx; 409/422/403 canonical). */
+  /** Statuses that count as a correct refusal (default: any 4xx; a 5xx crash NEVER counts as a refusal — 409/422/403 canonical). */
   readonly rejectWith?: readonly number[];
 }
 

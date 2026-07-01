@@ -1,16 +1,8 @@
 import { AvpFail, type Probe } from '../core/dsl';
 import type { MoneyExpect } from '../archetypes/money-integrity';
 import type { VerifyHooks } from '../core/run';
-import type { HttpMoneySubject, HttpRequestSpec } from './subject';
-
-async function fetchJson(r: HttpRequestSpec): Promise<unknown> {
-  const res = await fetch(r.url, {
-    method: r.method,
-    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
-    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
-  });
-  return res.json().catch(() => ({}));
-}
+import type { HttpMoneySubject } from './subject';
+import { sendJson } from './wire';
 
 interface Leak {
   readonly total: number;
@@ -33,8 +25,11 @@ export function moneyProbe(subject: HttpMoneySubject): Probe<MoneyExpect> {
 
   return {
     async act() {
+      if (subject.totals.length === 0) {
+        throw new AvpFail('The money subject declares an EMPTY totals list — nothing to probe. Declare the totals to sweep (include leak-prone cases).');
+      }
       for (const total of subject.totals) {
-        const { platformCents, hostCents } = subject.readShares(await fetchJson(subject.splitRequest(total)));
+        const { platformCents, hostCents } = subject.readShares((await sendJson(subject.splitRequest(total))).body);
         probed++;
         const lo = Math.floor((total * subject.platformBps) / 10000);
         const hi = Math.ceil((total * subject.platformBps) / 10000);

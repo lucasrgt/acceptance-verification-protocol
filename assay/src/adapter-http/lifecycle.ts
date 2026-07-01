@@ -1,18 +1,8 @@
 import { AvpFail, type Probe } from '../core/dsl';
 import type { LifecycleGateExpect } from '../archetypes/lifecycle-gate';
 import type { VerifyHooks } from '../core/run';
-import type { HttpLifecycleSubject, HttpRequestSpec } from './subject';
-
-async function sendStatus(r: HttpRequestSpec): Promise<number> {
-  const res = await fetch(r.url, {
-    method: r.method,
-    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
-    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
-  });
-  return res.status;
-}
-
-const ok = (s: number | null) => s !== null && s >= 200 && s < 300;
+import type { HttpLifecycleSubject } from './subject';
+import { ok, refused, sendStatus } from './wire';
 
 /**
  * The HTTP adapter's `lifecycle-gate` probe. Fires the transition on a resource
@@ -35,6 +25,12 @@ export function lifecycleProbe(subject: HttpLifecycleSubject): Probe<LifecycleGa
         if (ok(unmet)) {
           throw new AvpFail(
             `A state transition succeeded (${unmet}) on a resource whose precondition is unmet — the gate is only client-side, bypassable by a direct request. Enforce the precondition server-side and refuse (${(subject.rejectWith ?? [409, 422, 403]).join('/')}).`,
+            { unmet },
+          );
+        }
+        if (!refused(unmet, subject.rejectWith)) {
+          throw new AvpFail(
+            `The unmet transition returned ${unmet} — a crash/unexpected status is not a gate. Refuse it deliberately (${(subject.rejectWith ?? [409, 422, 403]).join('/')}).`,
             { unmet },
           );
         }

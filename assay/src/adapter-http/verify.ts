@@ -8,6 +8,8 @@ import { moneyHooks } from './money';
 import { lifecycleHooks } from './lifecycle';
 import { idempotencyHooks } from './idempotency';
 
+import type { Judge } from '../core/dsl';
+
 type NamedSubject = { readonly name: string };
 
 export interface VerifyHttpOptions {
@@ -18,6 +20,8 @@ export interface VerifyHttpOptions {
    * global registration — custom criteria stay in your repo, off the accuracy benchmark.
    */
   readonly hooks?: (subject: NamedSubject) => VerifyHooks;
+  /** Judge for `model` oracles — plumbed into the hooks so a future model criterion on the http substrate can run. */
+  readonly judge?: Judge;
 }
 
 /**
@@ -56,5 +60,6 @@ export async function verifyHttp(
       `The HTTP adapter has no hooks for archetype "${archetype.name}" — pass { hooks } to verifyHttp() for an off-catalog criterion (ADR 0002).`,
     );
   }
-  return runVerification(subject.name, archetype, build(subject));
+  const hooks = build(subject);
+  return runVerification(subject.name, archetype, options.judge ? { ...hooks, judge: hooks.judge ?? options.judge } : hooks);
 }

@@ -1,27 +1,8 @@
 import { AvpFail, type Probe } from '../core/dsl';
 import type { IntegrationExpect } from '../archetypes/integration-integrity';
 import type { VerifyHooks } from '../core/run';
-import type { HttpIntegrationSubject, HttpRequestSpec, ReturnTransition } from './subject';
-
-async function send(r: HttpRequestSpec): Promise<number> {
-  const res = await fetch(r.url, {
-    method: r.method,
-    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
-    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
-  });
-  return res.status;
-}
-
-async function fetchJson(r: HttpRequestSpec): Promise<unknown> {
-  const res = await fetch(r.url, {
-    method: r.method,
-    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
-    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
-  });
-  return res.json().catch(() => ({}));
-}
-
-const ok = (s: number | null) => s !== null && s >= 200 && s < 300;
+import type { HttpIntegrationSubject, ReturnTransition } from './subject';
+import { ok, sendJson, sendStatus } from './wire';
 
 /** Hosts that mean "not bound to a real environment" — a dev/placeholder return URL. */
 const PLACEHOLDER_HOSTS = new Set([
@@ -64,14 +45,20 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
 
   return {
     async act() {
-      if (subject.forged) forged = await send(subject.forged);
-      if (subject.valid) valid = await send(subject.valid);
+      if (subject.forged) forged = await sendStatus(subject.forged);
+      if (subject.valid) valid = await sendStatus(subject.valid);
       if (subject.checkout) {
-        const body = await fetchJson(subject.checkout);
-        returnUrls = subject.readReturnUrls ? subject.readReturnUrls(body) : {};
+        const reply = await sendJson(subject.checkout);
+        if (reply.parseError) {
+          throw new AvpFail(
+            `The checkout response body is not parseable JSON (${reply.parseError}) — the return URLs cannot be read.`,
+            { status: reply.status, body: reply.body },
+          );
+        }
+        returnUrls = subject.readReturnUrls ? subject.readReturnUrls(reply.body) : {};
       }
-      if (subject.unresolvable) unresolvable = await send(subject.unresolvable);
-      if (subject.resolvable) resolvable = await send(subject.resolvable);
+      if (subject.unresolvable) unresolvable = await sendStatus(subject.unresolvable);
+      if (subject.resolvable) resolvable = await sendStatus(subject.resolvable);
     },
     expect: {
       webhookSignatureVerified() {

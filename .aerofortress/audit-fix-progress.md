@@ -31,18 +31,18 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] 16 structured-output param verified against SDK
 
 ## Block 4 — Adapter React (C)
-- [ ] 17 shared settle() helper; waitFor-based (kill 26 magic sleeps)
-- [ ] 18 drive() resets MSW handlers at start
-- [ ] 19 endpointHits filters by path too
-- [ ] 20 onUnhandledRequest: 'warn'
-- [ ] 21 identity: fail loudly when switchControl missing
-- [ ] 22 stub boilerplate → notApplicable() factory
-- [ ] 23 noFalseSuccess gated (requires successMarker seam awareness)
-- [ ] 24 temporal: declarable date readout seam (role/testid) + multi-date safe
-- [ ] 25 typed Registry — remove `as never` casts (all 3 registries)
-- [ ] 26 options.hooks override precedence documented/explicit
-- [ ] 27 export missing subject types from adapter-react/index
-- [ ] 28 double-activate synced on state, not delay race
+- [x] 17 shared settle() helper; waitFor-based (kill 26 magic sleeps)
+- [x] 18 drive() resets MSW handlers at start
+- [x] 19 endpointHits filters by path too
+- [x] 20 onUnhandledRequest: 'warn'
+- [x] 21 identity: fail loudly when switchControl missing
+- [x] 22 stub boilerplate → notApplicable() factory
+- [x] 23 noFalseSuccess gated (requires successMarker seam awareness)
+- [x] 24 temporal: declarable date readout seam (role/testid) + multi-date safe
+- [x] 25 typed Registry — remove `as never` casts (all 3 registries)
+- [x] 26 options.hooks override precedence documented/explicit
+- [x] 27 export missing subject types from adapter-react/index
+- [x] 28 double-activate synced on state, not delay race
 
 ## Block 5 — Adapter HTTP (D)
 - [ ] 29 single http helper module (kill 7 duplicates)
@@ -66,8 +66,8 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [ ] 45 chrome detection: LOCALAPPDATA/Brave/Chromium
 - [ ] 46 goto timeout option + actionable error
 - [ ] 47 loadMarkup custom css/font hook
-- [ ] 48 verifyDesign hooks escape hatch
-- [ ] 49 verifyDesignBrowser hooks + judge options
+- [x] 48 verifyDesign hooks escape hatch
+- [x] 49 verifyDesignBrowser hooks + judge options
 
 ## Block 7 — Protocol (F)
 - [ ] 50 PROTOCOL.md adds double-activate

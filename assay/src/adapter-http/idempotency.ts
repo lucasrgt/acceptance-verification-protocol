@@ -1,16 +1,8 @@
 import { AvpFail, type Probe } from '../core/dsl';
 import type { IdempotencyExpect } from '../archetypes/request-idempotency';
 import type { VerifyHooks } from '../core/run';
-import type { HttpIdempotencySubject, HttpRequestSpec } from './subject';
-
-async function fetchJson(r: HttpRequestSpec): Promise<unknown> {
-  const res = await fetch(r.url, {
-    method: r.method,
-    headers: { 'content-type': 'application/json', ...(r.headers ?? {}) },
-    body: r.body !== undefined ? JSON.stringify(r.body) : undefined,
-  });
-  return res.json().catch(() => ({}));
-}
+import type { HttpIdempotencySubject } from './subject';
+import { sendJson } from './wire';
 
 /**
  * The HTTP adapter's `request-idempotency` probe. Fires the create twice with the
@@ -25,11 +17,16 @@ export function idempotencyProbe(subject: HttpIdempotencySubject): Probe<Idempot
   let id3: string | number | null = null;
   let acted = false;
 
+  // Fresh keys per run: fixed keys silently degrade to replays against a persistent
+  // server (the "create" recreates nothing) and collide across subjects.
+  const keyA = `assay-idem-${crypto.randomUUID()}`;
+  const keyB = `assay-idem-${crypto.randomUUID()}`;
+
   return {
     async act() {
-      id1 = subject.readId(await fetchJson(subject.createWithKey('idem-key-A')));
-      id2 = subject.readId(await fetchJson(subject.createWithKey('idem-key-A'))); // same key — a repeat
-      id3 = subject.readId(await fetchJson(subject.createWithKey('idem-key-B'))); // different key — distinct op
+      id1 = subject.readId((await sendJson(subject.createWithKey(keyA))).body);
+      id2 = subject.readId((await sendJson(subject.createWithKey(keyA))).body); // same key — a repeat
+      id3 = subject.readId((await sendJson(subject.createWithKey(keyB))).body); // different key — distinct op
       acted = true;
     },
     expect: {
