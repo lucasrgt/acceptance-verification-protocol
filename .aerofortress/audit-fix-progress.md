@@ -70,30 +70,30 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] 49 verifyDesignBrowser hooks + judge options
 
 ## Block 7 — Protocol (F)
-- [ ] 50 PROTOCOL.md adds double-activate
-- [ ] 51 doc-drift guard for PROTOCOL.md vocab tokens
-- [ ] 52 protocol-sync path via import.meta.dirname
-- [ ] 53 requires serialized into catalog specs
-- [ ] 54 PROTOCOL_VERSION bump 0.2.0 + policy note
-- [ ] 55 archetype description (+ substrate=machine reach) in catalog
+- [x] 50 PROTOCOL.md adds double-activate
+- [x] 51 doc-drift guard for PROTOCOL.md vocab tokens
+- [x] 52 protocol-sync path via import.meta.dirname
+- [x] 53 requires serialized into catalog specs
+- [x] 54 PROTOCOL_VERSION bump 0.2.0 + policy note
+- [x] 55 archetype description (+ substrate=machine reach) in catalog
 
 ## Block 8 — Assay.Net (G)
-- [ ] 56 Runner catches unexpected exceptions → Fail verdict
-- [ ] 57 AvpFailException carries evidence → verdict
-- [ ] 58 C# model: SeenIn, Condition.Params, ConditionAxes, Requires
-- [ ] 59 design-catalog embedded + LoadDesignDefault
-- [ ] 60 HttpClient explicit timeout
-- [ ] 61 Refused accepts custom reject list
-- [ ] 62 Guid idempotency keys
-- [ ] 63 ConformanceTests via reflection
-- [ ] 64 xUnit1013 fixed
-- [ ] 65 Verdict merge helper (submission-gate pair)
-- [ ] 66 SpecManifest × verdicts gap checker
-- [ ] 67 SpecManifest parser exact-key match + limits doc
-- [ ] 68 CancellationToken on Runner.Run
-- [ ] 69 progress callback on Runner.Run
-- [ ] 70 FormatVerdict .NET
-- [ ] (64b) zero-warning build kept
+- [x] 56 Runner catches unexpected exceptions → Fail verdict
+- [x] 57 AvpFailException carries evidence → verdict
+- [x] 58 C# model: SeenIn, Condition.Params, ConditionAxes, Requires
+- [x] 59 design-catalog embedded + LoadDesignDefault
+- [x] 60 HttpClient explicit timeout
+- [x] 61 Refused accepts custom reject list
+- [x] 62 Guid idempotency keys
+- [x] 63 ConformanceTests via reflection
+- [x] 64 xUnit1013 fixed
+- [x] 65 Verdict merge helper (submission-gate pair)
+- [x] 66 SpecManifest × verdicts gap checker
+- [x] 67 SpecManifest parser exact-key match + limits doc
+- [x] 68 CancellationToken on Runner.Run
+- [x] 69 progress callback on Runner.Run
+- [x] 70 FormatVerdict .NET
+- [x] (64b) zero-warning build kept
 
 ## Block 9 — Bench (H)
 - [ ] 71 accuracy number derived without re-running

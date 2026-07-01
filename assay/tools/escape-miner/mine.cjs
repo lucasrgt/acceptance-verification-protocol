@@ -13,11 +13,27 @@
  * Reads nothing but git; mutates nothing. Works on a blobless/no-checkout clone
  * (uses `git log` + `git ls-tree`, never the working tree).
  */
-const { execFileSync } = require("child_process");
+const { execFileSync, spawn } = require("child_process");
 const path = require("path");
+const readline = require("readline");
 
+// Bounded call for the file listing only; the LOG is streamed (see logLines) so a
+// million-commit repo never needs a giant sync buffer.
 function git(repo, args) {
-  return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  return execFileSync("git", ["-C", repo, ...args], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+}
+
+/** Streams `git log` one commit per line — constant memory on any history size. */
+async function* logLines(repo) {
+  const child = spawn("git", ["-C", repo, "log", "--no-merges", "--pretty=format:%H%x1f%s"], {
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  let stderr = "";
+  child.stderr.on("data", (d) => (stderr += d));
+  const rl = readline.createInterface({ input: child.stdout, crlfDelay: Infinity });
+  for await (const line of rl) if (line) yield line;
+  const code = await new Promise((r) => child.on("close", r));
+  if (code !== 0) throw new Error(stderr.trim() || `git log exited ${code}`);
 }
 
 function inferStack(repo) {
@@ -32,7 +48,7 @@ function inferStack(repo) {
   if (has(/(^|\/)go\.mod$/m)) stacks.push("go");
   if (has(/(^|\/)Gemfile$/m)) stacks.push("rails/ruby");
   if (has(/(^|\/)composer\.json$/m)) stacks.push("laravel/php");
-  if (has(/\.csproj$/m) || has(/\.sln x?$/m) || has(/\.slnx?$/m)) stacks.push("dotnet");
+  if (has(/\.csproj$/m) || has(/\.slnx?$/m)) stacks.push("dotnet");
   if (has(/(^|\/)package\.json$/m)) stacks.push("node/js");
   if (has(/(^|\/)pyproject\.toml$/m) || has(/(^|\/)requirements\.txt$/m)) stacks.push("python");
   return stacks.length ? stacks.join("+") : "unknown";
@@ -61,12 +77,18 @@ const FIX = /(^|\W)(fix|bug|hotfix|bugfix|patch|repair|broken|incorrect|wrong|re
 // …and not noise (deps, release, pure docs/test/style/ci).
 const NOISE = /^(?:chore|docs?|test|ci|build|style|refactor|release|bump|merge)\b|\b(dependabot|bump|lockfile|changelog|readme|typo|whitespace|formatting|prettier|eslint config)\b/i;
 
+/**
+ * Every archetype whose signal matches — MULTI-LABEL (a "fix stale cache after webhook"
+ * commit counts for both classes). The first match (catalog order) is the PRIMARY label,
+ * used for the ranked table; the [MINE] machine line carries all labels.
+ */
 function classify(subject) {
-  for (const [name, re] of ARCHETYPES) if (re.test(subject)) return name;
-  return null;
+  const labels = [];
+  for (const [name, re] of ARCHETYPES) if (re.test(subject)) labels.push(name);
+  return labels;
 }
 
-function main() {
+async function main() {
   const repo = process.argv[2];
   const label = process.argv[3] || path.basename(repo || "");
   if (!repo) {
@@ -93,15 +115,18 @@ function main() {
 
   const fixes = commits.filter((c) => FIX.test(c.subject) && !NOISE.test(c.subject));
   const byArch = new Map();
+  const bySecondary = new Map();
   let unclassified = 0;
   for (const c of fixes) {
-    const a = classify(c.subject);
-    if (!a) {
+    const labels = classify(c.subject);
+    if (labels.length === 0) {
       unclassified++;
       continue;
     }
-    if (!byArch.has(a)) byArch.set(a, []);
-    byArch.get(a).push(c);
+    const [primary, ...rest] = labels;
+    if (!byArch.has(primary)) byArch.set(primary, []);
+    byArch.get(primary).push(c);
+    for (const extra of rest) bySecondary.set(extra, (bySecondary.get(extra) || 0) + 1);
   }
 
   const ranked = [...byArch.entries()].sort((x, y) => y[1].length - x[1].length);
@@ -117,6 +142,12 @@ function main() {
       .map((c) => `${c.hash.slice(0, 8)} ${c.subject.slice(0, 60).replace(/\|/g, "/")}`)
       .join(" · ");
     console.log(`| ${arch} | ${list.length} | ${samples} |`);
+  }
+
+  if (bySecondary.size > 0) {
+    const extras = [...bySecondary.entries()].sort((a, b) => b[1] - a[1]).map(([a, n]) => `${a}:+${n}`).join(", ");
+    console.log(`
+secondary labels (multi-class commits): ${extras}`);
   }
 
   // Machine line for aggregation.

@@ -25,20 +25,50 @@ const path = require("path");
 const ASSAY_FILE = /\.assay\.[jt]sx?$/;
 const DEFINE_CALL = /defineVerification\s*\(\s*([A-Za-z_$][\w$]*)/g;
 
+/**
+ * Comments must not count as coverage: a commented-out defineVerification is exactly the
+ * false green this rule exists to prevent. Strips /* *​/ blocks and // line tails (string
+ * contents may be over-stripped in pathological cases — acceptable: identifiers inside
+ * strings are not calls either). Known limit: a RENAMED import
+ * (`import { defineVerification as dv }`) is not recognized — the convention is the
+ * literal call name, and the rule checks the convention.
+ */
+function stripComments(src) {
+  return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+}
+
+// Per-directory cache keyed by the assay files' names+mtimes — the rule runs once per
+// LINTED FILE, and large repos have thousands; without this every linted file re-reads
+// its whole directory.
+const dirCache = new Map();
+
 /** The archetype identifiers a co-located `*.assay.*` covers (the 1st arg of each defineVerification call). */
 function coveredArchetypes(dir) {
-  const covered = new Set();
   let entries;
   try {
     entries = fs.readdirSync(dir);
   } catch {
-    return covered; // unreadable dir → nothing covered
+    return new Set(); // unreadable dir → nothing covered
   }
-  for (const name of entries) {
-    if (!ASSAY_FILE.test(name)) continue;
+  const assayFiles = entries.filter((name) => ASSAY_FILE.test(name));
+
+  const stamp = assayFiles
+    .map((name) => {
+      try {
+        return `${name}:${fs.statSync(path.join(dir, name)).mtimeMs}`;
+      } catch {
+        return `${name}:?`;
+      }
+    })
+    .join("|");
+  const cached = dirCache.get(dir);
+  if (cached && cached.stamp === stamp) return cached.covered;
+
+  const covered = new Set();
+  for (const name of assayFiles) {
     let src;
     try {
-      src = fs.readFileSync(path.join(dir, name), "utf8");
+      src = stripComments(fs.readFileSync(path.join(dir, name), "utf8"));
     } catch {
       continue;
     }
@@ -46,6 +76,7 @@ function coveredArchetypes(dir) {
     DEFINE_CALL.lastIndex = 0;
     while ((m = DEFINE_CALL.exec(src))) covered.add(m[1]);
   }
+  dirCache.set(dir, { stamp, covered });
   return covered;
 }
 
@@ -60,7 +91,12 @@ function hasAnyVerification(filePath) {
   return coveredArchetypes(path.dirname(filePath)).size > 0;
 }
 
-/** Minimal glob (`**`, `**​/`, `*`) → RegExp anchored at the path's end (paths are absolute). */
+/**
+ * Minimal glob → RegExp anchored at the path's end (paths are absolute). SUPPORTED SUBSET
+ * (documented, deliberate): `**​/` (any directories), `**` (anything), `*` (within a segment).
+ * NOT supported: `?`, `{a,b}` braces, `[...]` classes — the coverage selectors this rule
+ * takes are directory+suffix shapes, nothing more.
+ */
 function globToRegExp(glob) {
   const norm = glob.replace(/\\/g, "/");
   const body = norm

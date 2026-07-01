@@ -9,3 +9,6 @@ dev/_acervo/
 
 # Package artifacts — outputs of dotnet pack; the canonical feed is nuget.org, never git
 nupkgs/
+
+# Accuracy datapoints (ASSAY_RECORD=1) — aggregated into docs/measurements.md, never committed raw
+assay/bench/results/
