@@ -6,3 +6,6 @@ coverage/
 
 # Mining acervo — blobless scratch clones (never committed)
 dev/_acervo/
+
+# Package artifacts — outputs of dotnet pack; the canonical feed is nuget.org, never git
+nupkgs/
