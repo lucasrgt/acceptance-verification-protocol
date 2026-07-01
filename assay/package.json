@@ -1,10 +1,14 @@
 {
   "name": "@aerofortress/assay",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
   "license": "MIT",
   "author": "Lucas Tinoco",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lucasrgt/acceptance-verification-protocol.git",
@@ -41,9 +45,17 @@
       "types": "./dist/design.d.ts",
       "import": "./dist/design.js"
     },
+    "./design/browser": {
+      "types": "./dist/design/browser.d.ts",
+      "import": "./dist/design/browser.js"
+    },
+    "./judge": {
+      "types": "./dist/judge.d.ts",
+      "import": "./dist/judge.js"
+    },
     "./package.json": "./package.json"
   },
-  "files": ["dist", "bin", "README.md"],
+  "files": ["dist", "bin", "README.md", "LICENSE"],
   "publishConfig": {
     "access": "public"
   },
@@ -52,36 +64,49 @@
     "prepublishOnly": "npm run build",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@testing-library/react": "^16.0.1",
-    "@testing-library/user-event": "^14.5.2",
-    "msw": "^2.6.8"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.40.0",
+    "@testing-library/react": ">=16",
+    "@testing-library/user-event": ">=14",
     "jsdom": ">=25",
+    "msw": ">=2.6",
+    "puppeteer-core": ">=23",
     "react": ">=18",
     "react-dom": ">=18",
     "vitest": ">=2"
   },
   "peerDependenciesMeta": {
     "@anthropic-ai/sdk": { "optional": true },
-    "jsdom": { "optional": true }
+    "@testing-library/react": { "optional": true },
+    "@testing-library/user-event": { "optional": true },
+    "jsdom": { "optional": true },
+    "msw": { "optional": true },
+    "puppeteer-core": { "optional": true },
+    "react": { "optional": true },
+    "react-dom": { "optional": true },
+    "vitest": { "optional": true }
   },
   "devDependencies": {
+    "@eslint/js": "^9.17.0",
     "@tanstack/react-router": "^1.170.16",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "eslint": "^9.17.0",
     "jsdom": "^25.0.1",
+    "msw": "^2.6.8",
     "puppeteer-core": "^25.1.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tsup": "^8.3.5",
     "typescript": "^5.6.3",
+    "typescript-eslint": "^8.19.0",
     "vitest": "^2.1.8"
   }
 }

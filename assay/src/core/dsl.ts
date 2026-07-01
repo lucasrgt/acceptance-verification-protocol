@@ -58,6 +58,8 @@ export interface JudgeRequest {
 export interface JudgeVerdict {
   readonly pass: boolean;
   readonly reason: string;
+  /** The model that judged (auditability of the probabilistic oracle). */
+  readonly model?: string;
 }
 export type Judge = (request: JudgeRequest) => Promise<JudgeVerdict> | JudgeVerdict;
 
@@ -90,8 +92,13 @@ export interface Archetype {
 
 let collecting: CompiledCriterion[] | null = null;
 
+export interface ArchetypeMeta {
+  /** One-line human description of the feature class, serialized into the catalog. */
+  readonly description?: string;
+}
+
 /** Declarative authoring entry (≈ `describe`). Emits a serializable spec. */
-export function archetype(name: string, version: string, define: () => void): Archetype {
+export function archetype(name: string, version: string, define: () => void, meta: ArchetypeMeta = {}): Archetype {
   const previous = collecting;
   const collected: CompiledCriterion[] = [];
   collecting = collected;
@@ -103,6 +110,7 @@ export function archetype(name: string, version: string, define: () => void): Ar
   const spec: Specification = {
     archetype: name,
     version,
+    ...(meta.description ? { description: meta.description } : {}),
     criteria: collected.map((c) => ({
       id: c.id,
       statement: c.statement,
@@ -110,6 +118,7 @@ export function archetype(name: string, version: string, define: () => void): Ar
       scope: c.scope,
       condition: c.condition,
       ...(c.substrate ? { substrate: c.substrate } : {}),
+      ...(c.requires ? { requires: c.requires } : {}),
       ...(c.seenIn ? { seenIn: c.seenIn } : {}),
     })),
   };
@@ -119,6 +128,9 @@ export function archetype(name: string, version: string, define: () => void): Ar
 /** Declares one criterion (≈ `it`). Stable `id` first (the protocol identifier), then statement, options, oracle. */
 export function criterion(id: string, statement: string, options: CriterionOptions, oracle: Oracle): void {
   if (!collecting) throw new Error('criterion() must be called inside archetype()');
+  if (collecting.some((c) => c.id === id)) {
+    throw new Error(`criterion id "${id}" is declared twice in the same archetype — ids are the protocol identifiers and must be unique.`);
+  }
   collecting.push({
     id,
     statement,

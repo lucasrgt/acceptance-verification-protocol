@@ -11,24 +11,24 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [ ] 102 remove tracked dead .redesign-*.mjs
 
 ## Block 2 — Core (A)
-- [ ] 1 defineVerification threshold governs the gate
-- [ ] 2 Verdict exposes applicable/passed (no vacuous-green ambiguity)
-- [ ] 3 unexpected error keeps stack/evidence; non-Error throws safe
-- [ ] 4 per-criterion + total durationMs in verdict
-- [ ] 5 formatVerdict shows skip reasons
-- [ ] 6 archetype(): reentrancy guard + duplicate criterion id throw
-- [ ] 7 custom conditions (open ConditionId union) + params usable
-- [ ] 8 verdict carries archetype version + protocolVersion
-- [ ] 9 canonical JSON form of Verdict (helper + doc)
-- [ ] 10 JudgeVerdict optional model/confidence, filled by claudeJudge
+- [x] 1 defineVerification threshold governs the gate
+- [x] 2 Verdict exposes applicable/passed (no vacuous-green ambiguity)
+- [x] 3 unexpected error keeps stack/evidence; non-Error throws safe
+- [x] 4 per-criterion + total durationMs in verdict
+- [x] 5 formatVerdict shows skip reasons
+- [x] 6 archetype(): reentrancy guard + duplicate criterion id throw
+- [x] 7 custom conditions (open ConditionId union) + params usable
+- [x] 8 verdict carries archetype version + protocolVersion
+- [x] 9 canonical JSON form of Verdict (helper + doc)
+- [x] 10 JudgeVerdict optional model/confidence, filled by claudeJudge
 
 ## Block 3 — Judge (B)
-- [ ] 11 memoize client
-- [ ] 12 1 retry with backoff on transient failure
-- [ ] 13 configurable timeout
-- [ ] 14 ./judge subpath export (comment truth)
-- [ ] 15 maxTokens/system configurable
-- [ ] 16 structured-output param verified against SDK
+- [x] 11 memoize client
+- [x] 12 1 retry with backoff on transient failure
+- [x] 13 configurable timeout
+- [x] 14 ./judge subpath export (comment truth)
+- [x] 15 maxTokens/system configurable
+- [x] 16 structured-output param verified against SDK
 
 ## Block 4 — Adapter React (C)
 - [ ] 17 shared settle() helper; waitFor-based (kill 26 magic sleeps)
@@ -126,9 +126,9 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [ ] 90 npm provenance + permissions
 - [ ] 91 actions pinned by SHA
 - [ ] 92 RTL/user-event/msw → optional peers
-- [ ] 93 sideEffects:false + engines
-- [ ] 94 exports: ./judge + ./design/browser
-- [ ] 95 LICENSE in npm tarball
+- [x] 93 sideEffects:false + engines
+- [x] 94 exports: ./judge + ./design/browser
+- [x] 95 LICENSE in npm tarball
 - [ ] 96 root README quickstart fixed (cd assay)
 - [ ] 97 README rewritten to current state
 - [ ] 103 eslint flat config + prettier check + .editorconfig; lint script

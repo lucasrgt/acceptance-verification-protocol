@@ -13,7 +13,8 @@ export {
   type ProtocolCatalog,
   type DesignProtocolCatalog,
 } from './protocol';
-export { formatVerdict } from './core/format';
+export { formatVerdict, verdictToJsonLine } from './core/format';
+export { composeVerdicts, type FeatureVerdict } from './core/compose';
 export { actionEffect, type ActionEffectExpect } from './archetypes/action-effect';
 export { dataHonesty, type DataHonestyExpect } from './archetypes/data-honesty';
 export { personaVisibility, type PersonaExpect } from './archetypes/persona-visibility';

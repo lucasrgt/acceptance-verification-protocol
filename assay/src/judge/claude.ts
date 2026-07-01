@@ -8,7 +8,7 @@ import type { Judge, JudgeRequest, JudgeVerdict } from '../core/dsl';
  * `@anthropic-ai/sdk` is an optional peer dependency. Configure via env/options,
  * never a config file (ADR 0001).
  *
- *   import { claudeJudge } from 'assay/judge';
+ *   import { claudeJudge } from '@aerofortress/assay/judge';
  *   const verdict = await verify(actionEffect, subject, { judge: claudeJudge() });
  *
  * Tests inject a fake `client` so the prompt-building and parsing are deterministic
@@ -30,6 +30,14 @@ export interface ClaudeJudgeOptions {
   readonly model?: string;
   /** Inject a client (real or fake). When absent, `@anthropic-ai/sdk` is loaded lazily. */
   readonly client?: AnthropicLike;
+  /** Per-request timeout in ms, passed to the SDK client (default: the SDK's own default). */
+  readonly timeoutMs?: number;
+  /** Max output tokens for the verdict (default 1024 — a verdict is one small JSON object). */
+  readonly maxTokens?: number;
+  /** Appended to the judge's system prompt (domain guidance) — never replaces the fail-closed core. */
+  readonly systemSuffix?: string;
+  /** Extra retries at the judge level after the SDK's own retries are exhausted (default 1). */
+  readonly retries?: number;
 }
 
 const VERDICT_SCHEMA = {
@@ -63,48 +71,69 @@ function buildPrompt(request: JudgeRequest): string {
   ].join('\n');
 }
 
-function parseVerdict(content: ReadonlyArray<{ type: string; text?: string }>): JudgeVerdict {
+function parseVerdict(content: ReadonlyArray<{ type: string; text?: string }>, model: string): JudgeVerdict {
   const text = content.find((b) => b.type === 'text' && typeof b.text === 'string')?.text ?? '';
   try {
     const parsed = JSON.parse(text) as { pass?: unknown; reason?: unknown };
     if (typeof parsed.pass === 'boolean') {
-      return { pass: parsed.pass, reason: typeof parsed.reason === 'string' ? parsed.reason : '' };
+      return { pass: parsed.pass, reason: typeof parsed.reason === 'string' ? parsed.reason : '', model };
     }
   } catch {
     /* fall through to fail-closed */
   }
   // Fail closed: a judge that can't produce a verdict must not pass the criterion.
-  return { pass: false, reason: 'The judge did not return a parseable verdict — treated as a failure (fail-closed).' };
+  return { pass: false, reason: 'The judge did not return a parseable verdict — treated as a failure (fail-closed).', model };
 }
 
-async function defaultClient(apiKey?: string): Promise<AnthropicLike> {
+async function defaultClient(options: ClaudeJudgeOptions): Promise<AnthropicLike> {
   // Indirect specifier so the type-checker doesn't require the optional SDK to be installed.
   const pkg = '@anthropic-ai/sdk';
-  const mod = (await import(pkg)) as { default: new (opts?: { apiKey?: string }) => AnthropicLike };
-  return new mod.default(apiKey ? { apiKey } : undefined);
+  const mod = (await import(pkg)) as {
+    default: new (opts?: { apiKey?: string; timeout?: number }) => AnthropicLike;
+  };
+  return new mod.default({
+    ...(options.apiKey ? { apiKey: options.apiKey } : {}),
+    ...(options.timeoutMs ? { timeout: options.timeoutMs } : {}),
+  });
 }
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Builds a Claude-backed `model`-oracle judge. */
 export function claudeJudge(options: ClaudeJudgeOptions = {}): Judge {
   const model = options.model ?? 'claude-opus-4-8';
+  const retries = options.retries ?? 1;
+  const system = options.systemSuffix ? `${SYSTEM} ${options.systemSuffix}` : SYSTEM;
+  // Memoized: the client (and its lazy SDK import) is built once per judge, not per call.
+  let clientPromise: Promise<AnthropicLike> | null = null;
+  const getClient = () => (clientPromise ??= options.client ? Promise.resolve(options.client) : defaultClient(options));
+
   return async (request: JudgeRequest): Promise<JudgeVerdict> => {
     let client: AnthropicLike;
     try {
-      client = options.client ?? (await defaultClient(options.apiKey));
+      client = await getClient();
     } catch (e) {
-      return { pass: false, reason: `Judge unavailable (could not load the Anthropic client): ${(e as Error).message}` };
+      clientPromise = null; // a failed load shouldn't poison later calls
+      return { pass: false, reason: `Judge unavailable (could not load the Anthropic client): ${(e as Error).message}`, model };
     }
-    try {
-      const res = await client.messages.create({
-        model,
-        max_tokens: 1024,
-        system: SYSTEM,
-        output_config: { format: { type: 'json_schema', schema: VERDICT_SCHEMA } },
-        messages: [{ role: 'user', content: buildPrompt(request) }],
-      });
-      return parseVerdict(res.content);
-    } catch (e) {
-      return { pass: false, reason: `Judge call failed: ${(e as Error).message}` };
+    // The SDK already retries 429/5xx internally; this outer loop adds a last-resort
+    // retry so one transient failure doesn't fail-close a criterion.
+    let lastError = '';
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const res = await client.messages.create({
+          model,
+          max_tokens: options.maxTokens ?? 1024,
+          system,
+          output_config: { format: { type: 'json_schema', schema: VERDICT_SCHEMA } },
+          messages: [{ role: 'user', content: buildPrompt(request) }],
+        });
+        return parseVerdict(res.content, model);
+      } catch (e) {
+        lastError = (e as Error).message;
+        if (attempt < retries) await sleep(1000 * (attempt + 1));
+      }
     }
+    return { pass: false, reason: `Judge call failed after ${retries + 1} attempt(s): ${lastError}`, model };
   };
 }

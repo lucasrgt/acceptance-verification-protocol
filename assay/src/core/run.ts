@@ -30,11 +30,14 @@ export async function runVerification(
   archetype: Archetype,
   hooks: VerifyHooks,
 ): Promise<Verdict> {
+  const started = performance.now();
   const results: CriterionVerdict[] = [];
   for (const c of archetype.criteria) {
-    results.push(await runCriterion(c, hooks));
+    const t0 = performance.now();
+    const r = await runCriterion(c, hooks);
+    results.push({ ...r, durationMs: Math.round(performance.now() - t0) });
   }
-  return aggregate(subjectName, archetype.name, results);
+  return aggregate(subjectName, archetype.name, archetype.version, results, Math.round(performance.now() - started));
 }
 
 async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<CriterionVerdict> {
@@ -51,10 +54,14 @@ async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<C
         if (e instanceof AvpFail) {
           return { criterionId: c.id, status: 'fail', reason: e.message, evidence: e.evidence };
         }
+        // Not an AvpFail: an infrastructure/logic error. Still a FAIL (never abort the
+        // verdict), but keep the whole error as evidence so the cause is diagnosable.
+        const message = e instanceof Error ? e.message : String(e);
         return {
           criterionId: c.id,
           status: 'fail',
-          reason: `Unexpected error while verifying: ${(e as Error).message}`,
+          reason: `Unexpected error while verifying: ${message}`,
+          evidence: { error: message, stack: e instanceof Error ? e.stack : undefined },
         };
       }
     }
@@ -72,7 +79,9 @@ async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<C
         criterion: { id: c.id, statement: c.statement, rubric: c.oracleSpec.rubric },
         evidence,
       });
-      return { criterionId: c.id, status: v.pass ? 'pass' : 'fail', reason: v.reason, evidence };
+      // Keep the judging model on the evidence trail: a model verdict must be auditable.
+      const judged = v.model !== undefined ? { evidence, judgedBy: v.model } : evidence;
+      return { criterionId: c.id, status: v.pass ? 'pass' : 'fail', reason: v.reason, evidence: judged };
     }
 
     case 'human':

@@ -37,8 +37,13 @@ export function defineVerification(
     const verdict = await verify(archetype, subject, { judge: options.judge, hooks: options.hooks });
     // eslint-disable-next-line no-console
     console.log('\n' + formatVerdict(verdict));
+    // The threshold governs the gate: fails below it break the run, and the failure
+    // message carries the actionable reasons. threshold 1 (default) = zero fails allowed.
+    const threshold = options.threshold ?? 1;
     const fails = verdict.results.filter((r) => r.status === 'fail');
-    expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
-    expect(verdict.acceptanceScore).toBeGreaterThanOrEqual(options.threshold ?? 1);
+    expect(
+      verdict.acceptanceScore,
+      `acceptance ${Math.round(verdict.acceptanceScore * 100)}% < required ${Math.round(threshold * 100)}%\n${JSON.stringify(fails, null, 2)}`,
+    ).toBeGreaterThanOrEqual(threshold);
   });
 }

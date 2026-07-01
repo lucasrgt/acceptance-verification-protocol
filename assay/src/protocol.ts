@@ -47,8 +47,12 @@ import { iconCorrectness } from './archetypes/icon-correctness';
  * implementation (Assay.NET, a Rails adapter, …) verifies against — and the
  * drift-guard test asserts this artifact stays in lockstep with the archetypes the
  * lib actually ships (see bench/protocol-sync.test.ts + protocol/catalog.json).
+ *
+ * The version constant lives in core/types.ts (every Verdict is stamped with it);
+ * re-exported here because the protocol surface is where readers look for it.
  */
-export const PROTOCOL_VERSION = '0.1.0';
+export { PROTOCOL_VERSION } from './core/types';
+import { PROTOCOL_VERSION } from './core/types';
 
 /** Every archetype the implementation ships. Adding one here is adding it to the protocol. */
 export const ARCHETYPES: readonly Archetype[] = [

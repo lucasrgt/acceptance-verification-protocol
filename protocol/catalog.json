@@ -1,6 +1,6 @@
 {
   "protocol": "AVP",
-  "protocolVersion": "0.1.0",
+  "protocolVersion": "0.2.0",
   "conditionAxes": {
     "fault": [
       "success",
@@ -49,6 +49,7 @@
           "condition": {
             "id": "api-error"
           },
+          "requires": "input",
           "seenIn": [
             "04677bf9"
           ]
@@ -60,7 +61,8 @@
           "scope": "invariant",
           "condition": {
             "id": "api-error"
-          }
+          },
+          "requires": "input"
         },
         {
           "id": "projections-converge",
@@ -70,6 +72,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "projection",
           "seenIn": [
             "b9659b46",
             "5a0f2acb"
@@ -83,6 +86,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "contract",
           "seenIn": [
             "c1849234"
           ]
@@ -95,6 +99,7 @@
           "condition": {
             "id": "retry"
           },
+          "requires": "retryable",
           "seenIn": [
             "0188869f"
           ]
@@ -107,6 +112,7 @@
           "condition": {
             "id": "double-activate"
           },
+          "requires": "singleFlight",
           "seenIn": [
             "calcom:d7226fc3",
             "calcom:5b50a469",
@@ -121,6 +127,7 @@
           "condition": {
             "id": "token-expired"
           },
+          "requires": "refresh",
           "seenIn": [
             "b4b0fc07"
           ]
@@ -133,6 +140,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "identity",
           "seenIn": [
             "documenso:8fca029d",
             "documenso:d2976cb1"
@@ -146,6 +154,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "reconcile",
           "seenIn": [
             "documenso:eb45d1e5",
             "documenso:ed7a0011"
@@ -178,6 +187,7 @@
           "condition": {
             "id": "partial"
           },
+          "requires": "media",
           "seenIn": [
             "dfb23261"
           ]
@@ -190,6 +200,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "detail",
           "seenIn": [
             "projp:ce04d0f",
             "projp:33a0d5a"
@@ -203,6 +214,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "count",
           "seenIn": [
             "documenso:b8e08e88",
             "documenso:5f4e0ccf"
@@ -236,6 +248,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "router",
           "seenIn": [
             "documenso:2ba0f48c",
             "bitwarden:e4359f071"
@@ -255,6 +268,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "routes",
           "seenIn": [
             "287ab352",
             "2a3f9251",
@@ -269,6 +283,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "router",
           "seenIn": [
             "projp:37af286",
             "projp:039aaf2"
@@ -282,6 +297,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "router",
           "seenIn": [
             "3aa1c80a"
           ]
@@ -294,6 +310,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "router",
           "seenIn": [
             "documenso:184cbd67",
             "documenso:04b1ce1a"
@@ -307,6 +324,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "router",
           "seenIn": [
             "documenso:849885b5",
             "documenso:ef79eb3c"
@@ -345,6 +363,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "ownership",
           "seenIn": [
             "1db3c2fd",
             "bitwarden:0ad7a10c"
@@ -358,6 +377,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "role",
           "seenIn": [
             "d36af822",
             "gitea:171df0c9"
@@ -371,6 +391,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "authority",
           "seenIn": [
             "bitwarden:ae5508d14",
             "bitwarden:3b5bb7680"
@@ -405,6 +426,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "webhook",
           "seenIn": [
             "692d85af",
             "documenso:3887aa67"
@@ -418,6 +440,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "checkout",
           "seenIn": [
             "bitwarden:aa1665065",
             "bitwarden:004e3c58e"
@@ -431,6 +454,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "resolve",
           "seenIn": [
             "documenso:a99bdf5e",
             "documenso:8fbace0f"
@@ -469,6 +493,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "split",
           "seenIn": [
             "bitwarden:2e0e10307",
             "bitwarden:6d69c9bb9"
@@ -482,6 +507,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "amount-display",
           "seenIn": [
             "firefly:797064a1",
             "firefly:d55cc03e",
@@ -502,6 +528,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "transition",
           "seenIn": [
             "documenso:6e09a470",
             "bitwarden:43d14971f"
@@ -515,6 +542,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "blocked",
           "seenIn": [
             "documenso:41ed6c9a",
             "documenso:6d754acf"
@@ -534,6 +562,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "instant",
           "seenIn": [
             "documenso:22fd1b5b",
             "calcom:c1d0a6bb",
@@ -548,6 +577,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "floating-date",
           "seenIn": [
             "calcom:26e85823",
             "calcom:f7b2f276",
@@ -568,6 +598,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "paging",
           "seenIn": [
             "documenso:7d257236",
             "documenso:0488442",
@@ -588,6 +619,7 @@
           "condition": {
             "id": "success"
           },
+          "requires": "malformed",
           "seenIn": [
             "calcom:000324c0",
             "calcom:013e6143",

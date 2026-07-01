@@ -5,7 +5,20 @@ export function formatVerdict(v: Verdict): string {
   const pct = Math.round(v.acceptanceScore * 100);
   const mark = (s: string) => (s === 'pass' ? '✓' : s === 'fail' ? '✗' : '–');
   const lines = v.results.map(
-    (r) => `  ${mark(r.status)} ${r.criterionId} [${r.status}]${r.status === 'fail' ? ` — ${r.reason}` : ''}`,
+    (r) => `  ${mark(r.status)} ${r.criterionId} [${r.status}]${r.status !== 'pass' ? ` — ${r.reason}` : ''}`,
   );
-  return [`assay · ${v.subject} · ${v.archetype} — acceptance ${pct}%`, ...lines].join('\n');
+  const header =
+    v.applicable === 0
+      ? `assay · ${v.subject} · ${v.archetype} — acceptance ${pct}% (0 applicable — nothing was decided)`
+      : `assay · ${v.subject} · ${v.archetype} — acceptance ${pct}% (${v.passed}/${v.applicable})`;
+  return [header, ...lines].join('\n');
+}
+
+/**
+ * The canonical machine form of a verdict: one NDJSON line, key order fixed by the
+ * Verdict type. This is what CI artifacts and agent loops should persist/parse —
+ * `formatVerdict` is the human face, this is the wire face.
+ */
+export function verdictToJsonLine(v: Verdict): string {
+  return JSON.stringify(v);
 }

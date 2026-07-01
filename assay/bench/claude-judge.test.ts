@@ -33,7 +33,7 @@ describe('claudeJudge — the reference model-oracle judge', () => {
       evidence: { text: 'Failed to send — check your connection and retry.' },
     });
 
-    expect(verdict).toEqual({ pass: true, reason: 'names the failure and a next step' });
+    expect(verdict).toEqual({ pass: true, reason: 'names the failure and a next step', model: 'claude-opus-4-8' });
     // the request used structured output and carried the rubric + evidence
     expect((sent?.output_config as { format?: { type?: string } })?.format?.type).toBe('json_schema');
     expect(sent?.model).toBe('claude-opus-4-8');
@@ -54,6 +54,7 @@ describe('claudeJudge — the reference model-oracle judge', () => {
 
   it('fails closed when the client call throws (a judge outage flags, never passes)', async () => {
     const judge = claudeJudge({
+      retries: 0, // deterministic: no backoff sleep in the test
       client: {
         messages: {
           create: async () => {
