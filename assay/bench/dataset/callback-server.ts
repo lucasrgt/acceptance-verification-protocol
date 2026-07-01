@@ -45,6 +45,7 @@ export function startCallbackServer(variant: CallbackVariant): Promise<RunningSe
         return true;
       }
       case 'loose-gate':
+        // eslint-disable-next-line no-constant-condition -- the BAD mutant: the gate is deliberately a tautology
         return chargeId || true ? true : false;
     }
   };

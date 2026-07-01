@@ -41,7 +41,7 @@ describe('AVP — verifier accuracy (action-effect · single-flight)', () => {
   it('emits the single-flight number', async () => {
     const detected = (await flightStatus('unguarded'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await flightStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] action-effect single-flight detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -61,7 +61,7 @@ describe('AVP — mutation testing (action-effect · single-flight)', () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await flightStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await flightStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] action-effect · single-flight: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

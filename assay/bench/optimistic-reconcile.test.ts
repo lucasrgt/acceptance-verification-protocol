@@ -44,7 +44,7 @@ describe('AVP — verifier accuracy (action-effect · optimistic-reconcile)', ()
   it('emits the optimistic-reconcile number', async () => {
     const detected = (await reconcileStatus('no-reconcile'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await reconcileStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] action-effect optimistic-reconcile detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -63,7 +63,7 @@ describe('AVP — mutation testing (action-effect · optimistic-reconcile)', () 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await reconcileStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await reconcileStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] action-effect · optimistic-reconcile: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

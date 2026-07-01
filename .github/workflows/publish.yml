@@ -1,33 +1,72 @@
 name: publish
 
-# Publishes both AVP reference implementations off one version tag (e.g. `v0.1.1`): Assay.Net to nuget.org and
-# @aerofortress/assay (JS) to npm. Bump the version first (back: <Version> in assay.net/src/Assay.Net/Assay.Net.csproj;
-# front: assay/package.json), then tag. The two jobs are independent. nuget auth is Trusted Publishing (OIDC — no
-# stored key) via NuGet/login@v1, bound to a nuget.org policy (owner lucasrgt, repo acceptance-verification-protocol,
-# workflow publish.yml). npm auth is the NPM_TOKEN secret (an automation token for the @aerofortress scope).
+# Publishes both AVP reference implementations off ONE version tag (e.g. `v0.2.0`):
+# Assay.Net to nuget.org, @aerofortress/assay (+ the eslint plugin) to npm.
+# VERSION POLICY: one tag = one version everywhere — the gate job asserts the tag equals
+# assay/package.json, eslint-plugin-assay/package.json AND the csproj <Version>; nothing
+# publishes from a red tree (tests run first). nuget auth is Trusted Publishing (OIDC —
+# no stored key) via NuGet/login, bound to a nuget.org policy (owner lucasrgt, repo
+# acceptance-verification-protocol, workflow publish.yml). npm auth is the NPM_TOKEN
+# secret, with provenance attestation.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
+  gate:
+    name: tests + version assertion
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: assay/package-lock.json
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: assert tag == every package version
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          js=$(node -p "require('./assay/package.json').version")
+          plugin=$(node -p "require('./assay/eslint-plugin-assay/package.json').version")
+          net=$(grep -oP '(?<=<Version>)[^<]+' assay.net/src/Assay.Net/Assay.Net.csproj)
+          echo "tag=$tag js=$js plugin=$plugin net=$net"
+          [ "$tag" = "$js" ] && [ "$tag" = "$plugin" ] && [ "$tag" = "$net" ] || {
+            echo "::error::version mismatch — one tag publishes ONE version everywhere"; exit 1; }
+      - name: install (root workspace only)
+        working-directory: assay
+        run: npm ci --workspaces=false
+      - name: typecheck + bench
+        working-directory: assay
+        run: npx tsc --noEmit && npx vitest run
+      - name: dotnet tests
+        working-directory: assay.net
+        run: dotnet test --nologo -warnaserror
+
   nuget:
     name: pack + push Assay.Net to nuget.org
+    needs: gate
     runs-on: ubuntu-latest
     permissions:
       id-token: write # OIDC token for nuget.org Trusted Publishing
       contents: read # checkout
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
         with:
           dotnet-version: "10.0.x"
       - name: pack
         run: dotnet pack assay.net/src/Assay.Net/Assay.Net.csproj -c Release -o nupkgs
       # Trusted Publishing: exchange the GitHub OIDC token for a short-lived (1h) nuget.org key — no stored secret.
-      # `user` is the public nuget.org profile name; the bound policy lives on nuget.org. Requested right before push.
       - name: nuget login (OIDC → temp key)
-        uses: NuGet/login@v1
+        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
         id: login
         with:
           user: lucasrgt
@@ -35,21 +74,25 @@ jobs:
         run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   npm:
-    name: publish @aerofortress/assay to npm
+    name: publish @aerofortress/assay (+ eslint plugin) to npm
+    needs: gate
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # provenance attestation
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
           cache: npm
           cache-dependency-path: assay/package-lock.json
-      - name: install
+      - name: install (root workspace only — examples are not needed to build dist)
         working-directory: assay
-        run: npm ci
-      # Skip gracefully when NPM_TOKEN is unset (the nuget leg is independent and still ran) and when the version
-      # is already on npm (the npm analogue of nuget's --skip-duplicate). prepublishOnly builds dist via tsup.
+        run: npm ci --workspaces=false
+      # Skip gracefully when NPM_TOKEN is unset (the nuget leg is independent and still ran) and when the
+      # version is already on npm (the npm analogue of nuget's --skip-duplicate). prepublishOnly builds dist.
       - name: publish (skip if no token or version exists)
         working-directory: assay
         env:
@@ -63,5 +106,10 @@ jobs:
           if npm view "@aerofortress/assay@$ver" version >/dev/null 2>&1; then
             echo "@aerofortress/assay@$ver already on npm — skip"
           else
-            npm publish
+            npm publish --provenance
+          fi
+          if npm view "@aerofortress/eslint-plugin-assay@$ver" version >/dev/null 2>&1; then
+            echo "@aerofortress/eslint-plugin-assay@$ver already on npm — skip"
+          else
+            (cd eslint-plugin-assay && npm publish --provenance)
           fi

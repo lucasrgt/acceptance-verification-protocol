@@ -57,7 +57,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (truncation-integ
   it('emits the truncation-integrity number', async () => {
     const detected = (await truncStatus('spill-x'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await truncStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] truncation-integrity overflowing-text-is-truncated detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -79,7 +79,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (truncation-integr
     for (const m of MUTANTS) if ((await truncStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarms: string[] = [];
     for (const g of GOODS) if ((await truncStatus(g))?.status === 'fail') falseAlarms.push(g);
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] truncation-integrity · overflowing-text-is-truncated: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

@@ -39,7 +39,7 @@ describe('AVP Design — verifier accuracy (composition-canonical · canonical-c
   it('emits the composition-canonical number', async () => {
     const detected = (await compStatus('wrong-order'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await compStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] composition-canonical canonical-composition detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -59,7 +59,7 @@ describe('AVP Design — mutation testing (composition-canonical · canonical-co
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await compStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await compStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] composition-canonical · canonical-composition: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

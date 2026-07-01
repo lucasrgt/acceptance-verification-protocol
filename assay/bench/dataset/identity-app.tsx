@@ -52,7 +52,6 @@ function App({ variant }: { variant: IdentityVariant }) {
   const reloadKey = variant === 'no-refetch' ? 'once' : user;
   useEffect(() => {
     load(user);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadKey]);
 
   const onSwitch = () => {

@@ -62,7 +62,7 @@ export function pairAccuracy<S>(opts: {
         if (bad.results.find((r) => r.criterionId === pair.targetCriterion)?.status === 'fail') detected++;
         if (good.results.some((r) => r.status === 'fail')) falseAlarms++;
       }
-      // eslint-disable-next-line no-console
+       
       console.log(`\n[AVP] ${opts.label} detection=${detected}/${opts.pairs.length}  false-alarm=${falseAlarms}/${opts.pairs.length}\n`);
       recordAccuracy({ label: opts.label, detection: detected, total: opts.pairs.length, falseAlarms });
       expect(detected).toBe(opts.pairs.length);

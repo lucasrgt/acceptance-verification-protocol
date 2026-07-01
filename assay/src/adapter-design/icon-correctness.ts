@@ -1,6 +1,5 @@
 import { cleanup, render } from '@testing-library/react';
-import { act } from 'react';
-import { AvpFail, type Judge, type Probe } from '../core/dsl';
+import { AvpFail, type Judge } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { ReactDesignSubject } from './subject';
 import { settle } from '../adapter-react/settle';

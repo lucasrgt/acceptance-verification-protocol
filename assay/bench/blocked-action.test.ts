@@ -43,7 +43,7 @@ describe('AVP — verifier accuracy (lifecycle-gate · blocked-action-is-disable
   it('emits the blocked-action-is-disabled number', async () => {
     const detected = (await blockedStatus('enabled'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await blockedStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] lifecycle-gate blocked-action-is-disabled detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -63,7 +63,7 @@ describe('AVP — mutation testing (lifecycle-gate · blocked-action-is-disabled
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await blockedStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await blockedStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] lifecycle-gate · blocked-action-is-disabled: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

@@ -67,7 +67,7 @@ describe('AVP — verifier accuracy (integration-integrity · callback-resolves-
   it('emits the callback-resolves-entity (HTTP) number', async () => {
     const detected = (await resolveStatus('no-validation'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await resolveStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] integration-integrity · callback-resolves-entity (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -87,7 +87,7 @@ describe('AVP — mutation testing (integration-integrity · callback-resolves-e
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await resolveStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await resolveStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] integration-integrity · callback-resolves-entity: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

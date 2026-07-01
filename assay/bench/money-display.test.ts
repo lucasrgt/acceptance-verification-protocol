@@ -43,7 +43,7 @@ describe('AVP — verifier accuracy (money-integrity · amount-rendered-exact)',
   it('emits the amount-rendered-exact number', async () => {
     const detected = (await amountStatus('no-fixed'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await amountStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] money-integrity amount-rendered-exact detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -63,7 +63,7 @@ describe('AVP — mutation testing (money-integrity · amount-rendered-exact)', 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await amountStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await amountStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] money-integrity · amount-rendered-exact: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

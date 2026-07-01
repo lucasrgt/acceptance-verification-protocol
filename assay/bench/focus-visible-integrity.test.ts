@@ -56,7 +56,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (focus-visible-in
   it('emits the focus-visible-integrity number', async () => {
     const detected = (await focusStatus('no-indicator'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await focusStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] focus-visible-integrity focus-is-visible detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -75,7 +75,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (focus-visible-int
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await focusStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await focusStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] focus-visible-integrity · focus-is-visible: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

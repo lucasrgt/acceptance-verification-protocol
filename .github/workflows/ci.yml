@@ -1,0 +1,55 @@
+name: ci
+
+# The verifier verifies itself: typecheck + lint + the calibration bench (JS), the
+# eslint-plugin self-test, the example app's verification, and the .NET suite — on every
+# push and PR. The geometry benches run for real here: ubuntu runners ship Chrome, so
+# `describe.skipIf(!hasBrowser)` does not skip in CI.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  js:
+    name: assay — tsc + eslint + bench
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: assay/package-lock.json
+      - name: install
+        working-directory: assay
+        run: npm ci
+      - name: typecheck
+        working-directory: assay
+        run: npx tsc --noEmit
+      - name: lint
+        working-directory: assay
+        run: npm run lint
+      - name: bench (verifier accuracy + mutation + protocol drift)
+        working-directory: assay
+        run: npx vitest run
+      - name: eslint-plugin self-test
+        working-directory: assay
+        run: node eslint-plugin-assay/index.test.cjs
+      - name: example verification (assay CLI end-to-end)
+        working-directory: assay/examples/todo-app
+        run: node ../../bin/assay.mjs verify
+
+  dotnet:
+    name: Assay.Net — build + tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
+      - name: test
+        working-directory: assay.net
+        run: dotnet test --nologo -warnaserror

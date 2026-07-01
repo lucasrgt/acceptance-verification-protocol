@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { PaginationExpect } from '../archetypes/pagination-integrity';

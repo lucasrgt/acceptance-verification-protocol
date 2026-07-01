@@ -1,6 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react';
 import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { NavigationExpect } from '../archetypes/navigation-integrity';

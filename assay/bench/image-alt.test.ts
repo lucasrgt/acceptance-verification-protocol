@@ -39,7 +39,7 @@ describe('AVP Design — verifier accuracy (image-alt · images-have-text-altern
   it('emits the image-alt number', async () => {
     const detected = (await altStatus('logo-no-alt'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await altStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] image-alt images-have-text-alternative detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -60,7 +60,7 @@ describe('AVP Design — mutation testing (image-alt · images-have-text-alterna
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await altStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await altStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] image-alt · images-have-text-alternative: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

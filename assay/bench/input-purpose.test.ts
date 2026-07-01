@@ -38,7 +38,7 @@ describe('AVP Design — verifier accuracy (input-purpose · personal-fields-dec
   it('emits the input-purpose number', async () => {
     const detected = (await purposeStatus('email-missing'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await purposeStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] input-purpose personal-fields-declare-purpose detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -57,7 +57,7 @@ describe('AVP Design — mutation testing (input-purpose · personal-fields-decl
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await purposeStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await purposeStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] input-purpose · personal-fields-declare-purpose: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

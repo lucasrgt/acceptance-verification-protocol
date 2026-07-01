@@ -48,7 +48,7 @@ describe('AVP — verifier accuracy (action-effect · cache-cleared-on-identity)
   it('emits the cache-cleared-on-identity number', async () => {
     const detected = (await identityStatus('stale-cache'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await identityStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] action-effect cache-cleared-on-identity detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -68,7 +68,7 @@ describe('AVP — mutation testing (action-effect · cache-cleared-on-identity)'
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await identityStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await identityStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] action-effect · cache-cleared-on-identity: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

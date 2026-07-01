@@ -43,7 +43,7 @@ describe('AVP — verifier accuracy (temporal-integrity · floating-date-not-shi
   it('emits the floating-date-not-shifted number', async () => {
     const detected = (await floatingStatus('dayjs-tz'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await floatingStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] temporal-integrity floating-date-not-shifted detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -64,7 +64,7 @@ describe('AVP — mutation testing (temporal-integrity · floating-date-not-shif
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await floatingStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await floatingStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] temporal-integrity · floating-date-not-shifted: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

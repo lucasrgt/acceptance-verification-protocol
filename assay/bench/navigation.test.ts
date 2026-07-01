@@ -66,7 +66,7 @@ describe('AVP — verifier accuracy (navigation-integrity, cross-project)', () =
       if (bad.results.find((r) => r.criterionId === 'target-resolves')?.status === 'fail') detected++;
       if (good.results.some((r) => r.status === 'fail')) falseAlarms++;
     }
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] navigation-integrity (cross-project) detection=${detected}/${cases.length}  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(cases.length);
     expect(falseAlarms).toBe(0);

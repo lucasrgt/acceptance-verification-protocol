@@ -10,29 +10,31 @@ face over `vitest run` (it is a wrapper, not a runner of its own).
 
 ## Entry points
 
-| Import | What it is | Needs |
+| Import | What it is | Needs (peer) |
 |---|---|---|
-| `@aerofortress/assay` | The authoring API: the DSL, archetypes, `runVerification`, `formatVerdict`, the `claudeJudge` factory. | — (the Anthropic SDK is lazy-loaded, optional) |
-| `@aerofortress/assay/react` | The React substrate — render + probe + the MSW seam. | `react`, `react-dom`, `vitest`, a DOM env (`jsdom`) |
-| `@aerofortress/assay/react/vitest` | The Vitest binding for the React adapter. | `vitest` |
-| `@aerofortress/assay/http` | The HTTP substrate — verify against a real backend. | — |
-| `@aerofortress/assay/design` | The design substrate — jsdom + computed style (tokens, spacing rhythm, declared states). | a DOM env (`jsdom`) |
+| `@aerofortress/assay` | The authoring API: the DSL, archetypes, `runVerification`, `composeVerdicts`, `formatVerdict`. | — |
+| `@aerofortress/assay/react` | The React substrate — render + probe + the MSW seam. | `react`, `react-dom`, `@testing-library/react`, `@testing-library/user-event`, `msw`, `jsdom` |
+| `@aerofortress/assay/react/vitest` | `defineVerification` — the Vitest binding for the React adapter. | `vitest` |
+| `@aerofortress/assay/http` | The HTTP substrate — verify a real backend over the wire. | — |
+| `@aerofortress/assay/design` | The design substrate — jsdom + computed style (tokens, themes, contrast, a11y). | `jsdom` |
+| `@aerofortress/assay/design/browser` | The GEOMETRY tier — real layout in your installed Chrome/Edge (overflow, responsive, RTL, tap targets, layout shift…). | `puppeteer-core` |
+| `@aerofortress/assay/judge` | `claudeJudge` — the reference `model`-oracle judge. | `@anthropic-ai/sdk` |
 
-`@testing-library/react`, `@testing-library/user-event` and `msw` ship as dependencies — Assay owns its substrate.
-Your app's `react`/`react-dom`, the `vitest` host, `jsdom` and `@anthropic-ai/sdk` are peers (the last two
-optional, needed only by the adapters/judge that use them). The design **geometry** tier (browser-measured
-layout, via `puppeteer-core`) is not exported yet — it lands in a later minor once its public shape settles.
+Every substrate library is an **optional peer** — install only what the adapters you use
+need (the react line above for the DOM tier; nothing extra for `/http`). The package is
+**ESM-only** and needs Node ≥ 20 — it rides an ESM-first substrate (Vitest, MSW 2) by design.
 
 ```bash
-npm install -D @aerofortress/assay
+npm install -D @aerofortress/assay vitest
 ```
 
 ```ts
-// todo.assay.test.ts — a plain Vitest file
+// features/todo/todo.assay.ts — co-located with the feature, run by `npx assay verify`
 import { actionEffect } from "@aerofortress/assay";
-import { verify } from "@aerofortress/assay/react";
+import { defineVerification } from "@aerofortress/assay/react/vitest";
+import { addTodoSubject } from "./todo.subject"; // the seams: how to mount, which endpoint, which control
 
-verify(actionEffect({ /* the criteria the feature must satisfy */ }));
+defineVerification(actionEffect, addTodoSubject);
 ```
 
 ## Authoring your own criteria (off-catalog)

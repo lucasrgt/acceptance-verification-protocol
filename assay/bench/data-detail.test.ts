@@ -43,7 +43,7 @@ describe('AVP — verifier accuracy (data-honesty, flash-of-id)', () => {
     const good = await verify(dataHonesty, job(GoodJob, true));
     const detected = bad.results.find((r) => r.criterionId === 'no-raw-id-flash')?.status === 'fail' ? 1 : 0;
     const falseAlarms = good.results.some((r) => r.status === 'fail') ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] data-honesty flash-of-id detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);

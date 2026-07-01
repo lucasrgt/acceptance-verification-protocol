@@ -56,7 +56,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (responsive-integ
   it('emits the responsive-integrity number', async () => {
     const detected = (await responsiveStatus('fixed-row'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await responsiveStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] responsive-integrity holds-across-breakpoints detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -76,7 +76,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (responsive-integr
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await responsiveStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await responsiveStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] responsive-integrity · holds-across-breakpoints: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

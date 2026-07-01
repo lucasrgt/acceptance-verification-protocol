@@ -38,7 +38,7 @@ describe('AVP Design — verifier accuracy (spacing-rhythm · rhythm-holds)', ()
   it('emits the spacing-rhythm number', async () => {
     const detected = (await spacingStatus('inverted'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await spacingStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] spacing-rhythm rhythm-holds detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -58,7 +58,7 @@ describe('AVP Design — mutation testing (spacing-rhythm · rhythm-holds)', () 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await spacingStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await spacingStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] spacing-rhythm · rhythm-holds: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

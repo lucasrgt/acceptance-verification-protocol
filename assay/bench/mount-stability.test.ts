@@ -40,7 +40,7 @@ describe('AVP — verifier accuracy (mount-stability)', () => {
     const good = await verify(mountStability, boot(GoodBoot));
     const detected = bad.results.find((r) => r.criterionId === 'settles-without-storm')?.status === 'fail' ? 1 : 0;
     const falseAlarms = good.results.some((r) => r.status === 'fail') ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] mount-stability detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);

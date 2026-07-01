@@ -49,7 +49,12 @@ const server = createServer(async (req, res) => {
 
   if (method === 'PATCH' && id) {
     const body = await readJson(req);
-    todos = todos.map((t) => (t.id === id ? { ...t, ...body, id } : t));
+    // Server-authoritative even in a demo: only the fields this API owns, type-checked —
+    // never `{ ...t, ...body }` (mass assignment).
+    const patch = {};
+    if (typeof body.title === 'string' && body.title.trim()) patch.title = body.title.trim();
+    if (typeof body.done === 'boolean') patch.done = body.done;
+    todos = todos.map((t) => (t.id === id ? { ...t, ...patch } : t));
     return send(res, 200, todos.find((t) => t.id === id) ?? null);
   }
 

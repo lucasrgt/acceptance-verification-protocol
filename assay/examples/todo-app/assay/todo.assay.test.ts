@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw';
-import { defineVerification } from 'assay/react/vitest';
-import { actionEffect } from 'assay';
-import { server } from 'assay/react';
+import { defineVerification } from '@aerofortress/assay/react/vitest';
+import { actionEffect } from '@aerofortress/assay';
+import { server } from '@aerofortress/assay/react';
 import { addTodoSubject } from './todo.subject';
 import { API_BASE } from '../src/api';
 

@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react';
 import { cleanup, render } from '@testing-library/react';
-import { act } from 'react';
 import { http, HttpResponse, delay } from 'msw';
 import { server } from './msw-server';
 import { AvpFail, type Probe } from '../core/dsl';

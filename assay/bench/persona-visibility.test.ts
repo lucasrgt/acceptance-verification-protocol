@@ -56,7 +56,7 @@ describe('AVP — verifier accuracy (persona-scoped-visibility, cross-project)',
       if (bad.results.find((r) => r.criterionId === 'no-cross-persona-affordance')?.status === 'fail') detected++;
       if (good.results.some((r) => r.status === 'fail')) falseAlarms++;
     }
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] persona-visibility (cross-project) detection=${detected}/${cases.length}  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(cases.length);
     expect(falseAlarms).toBe(0);

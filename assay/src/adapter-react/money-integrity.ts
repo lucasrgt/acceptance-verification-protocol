@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react';
 import { cleanup, render } from '@testing-library/react';
-import { act } from 'react';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { VerifyHooks } from '../core/run';
 import type { MoneyExpect } from '../archetypes/money-integrity';

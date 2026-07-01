@@ -56,7 +56,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (reading-order-in
   it('emits the reading-order-integrity number', async () => {
     const detected = (await orderStatus('flex-order'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await orderStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] reading-order-integrity dom-order-matches-visual detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -75,7 +75,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (reading-order-int
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await orderStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await orderStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] reading-order-integrity · dom-order-matches-visual: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

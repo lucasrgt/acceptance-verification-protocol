@@ -40,7 +40,7 @@ describe('AVP — verifier accuracy (navigation-integrity · required-params-gua
   it('emits the required-params-guarded number', async () => {
     const detected = (await guardStatus('no-guard'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await guardStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] navigation required-params-guarded detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -60,7 +60,7 @@ describe('AVP — mutation testing (navigation-integrity · required-params-guar
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await guardStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await guardStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] navigation-integrity · required-params-guarded: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

@@ -38,7 +38,7 @@ describe('AVP Design — verifier accuracy (color-contrast · contrast-sufficien
   it('emits the color-contrast number', async () => {
     const detected = (await contrastStatus('low-muted'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await contrastStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] color-contrast contrast-sufficient detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -58,7 +58,7 @@ describe('AVP Design — mutation testing (color-contrast · contrast-sufficient
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await contrastStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await contrastStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] color-contrast · contrast-sufficient: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

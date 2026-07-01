@@ -52,7 +52,7 @@ describe('AVP — verifier accuracy (data-honesty)', () => {
       (c) => bad.results.find((r) => r.criterionId === c.criterion)?.status === 'fail',
     ).length;
     const falseAlarms = good.results.filter((r) => r.status === 'fail').length;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] data-honesty detection=${detected}/${cases.length}  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(cases.length);
     expect(falseAlarms).toBe(0);

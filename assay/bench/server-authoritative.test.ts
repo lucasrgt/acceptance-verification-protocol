@@ -68,7 +68,7 @@ describe('AVP — verifier accuracy (authorization · server-is-authoritative, H
   it('emits the server-is-authoritative (HTTP) number', async () => {
     const detected = (await authorityStatus('echo'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await authorityStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] authorization · server-is-authoritative (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -88,7 +88,7 @@ describe('AVP — mutation testing (authorization · server-is-authoritative)', 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await authorityStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await authorityStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] authorization · server-is-authoritative: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

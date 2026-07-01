@@ -1,5 +1,5 @@
-import { defineVerification } from 'assay/react/vitest';
-import { dataHonesty } from 'assay';
+import { defineVerification } from '@aerofortress/assay/react/vitest';
+import { dataHonesty } from '@aerofortress/assay';
 import { todoListSubject } from './todo-list.subject';
 
 /**

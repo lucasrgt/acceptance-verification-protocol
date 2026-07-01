@@ -1,5 +1,4 @@
 import { cleanup, render } from '@testing-library/react';
-import { act } from 'react';
 import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { PersonaExpect } from '../archetypes/persona-visibility';

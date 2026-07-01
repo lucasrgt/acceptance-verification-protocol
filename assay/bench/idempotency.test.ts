@@ -55,7 +55,7 @@ describe('AVP — verifier accuracy (request-idempotency, HTTP adapter)', () => 
   it('emits the request-idempotency (HTTP) number', async () => {
     const detected = (await idemStatus('no-idempotency'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await idemStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] request-idempotency (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -76,7 +76,7 @@ describe('AVP — mutation testing (request-idempotency · idempotency-key-honor
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await idemStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await idemStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] request-idempotency · idempotency-key-honored: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

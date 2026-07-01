@@ -141,7 +141,7 @@ describe('AVP — mutation testing (criterion robustness)', () => {
       for (const m of set.killed) if (!(await fails(set, m))) survivors.push(m.label);
       const falseAlarms: string[] = [];
       for (const b of set.benign) if (await fails(set, b)) falseAlarms.push(b.label);
-      // eslint-disable-next-line no-console
+       
       console.log(
         `\n[AVP mutation] ${set.label}: killed=${set.killed.length - survivors.length}/${set.killed.length}` +
           (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +
@@ -162,7 +162,7 @@ describe('AVP — mutation testing (criterion robustness)', () => {
         if (await fails(set, m)) killed++;
       }
     }
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] mutation score = ${killed}/${total} mutants killed\n`);
     expect(killed).toBe(total);
   });

@@ -55,7 +55,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (rtl-integrity ·
   it('emits the rtl-integrity number', async () => {
     const detected = (await rtlStatus('no-flip'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await rtlStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] rtl-integrity directional-icons-mirror detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -75,7 +75,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (rtl-integrity · 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await rtlStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await rtlStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] rtl-integrity · directional-icons-mirror: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

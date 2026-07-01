@@ -49,7 +49,7 @@ describe('AVP — verifier accuracy (integration-integrity, HTTP adapter)', () =
     const g = await verifyHttp(integrationIntegrity, webhook(good.baseUrl));
     const detected = b.results.find((r) => r.criterionId === 'webhook-signature-verified')?.status === 'fail' ? 1 : 0;
     const falseAlarms = g.results.some((r) => r.status === 'fail') ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] integration-integrity (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);

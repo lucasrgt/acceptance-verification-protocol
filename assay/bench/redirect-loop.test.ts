@@ -40,7 +40,7 @@ describe('AVP — verifier accuracy (navigation-integrity · no-redirect-loop)',
   it('emits the no-redirect-loop number', async () => {
     const detected = (await loopStatus('two-cycle'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await loopStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] navigation no-redirect-loop detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -59,7 +59,7 @@ describe('AVP — mutation testing (navigation-integrity · no-redirect-loop)', 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await loopStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await loopStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] navigation-integrity · no-redirect-loop: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

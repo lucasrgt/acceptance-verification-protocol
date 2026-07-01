@@ -73,7 +73,7 @@ describe('AVP — verifier accuracy (money-integrity, HTTP adapter)', () => {
   it('emits the money-integrity (HTTP) number', async () => {
     const detected = (await splitStatus('round-both'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await splitStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] money-integrity (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -92,7 +92,7 @@ describe('AVP — mutation testing (money-integrity · split-invariant)', () => 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await splitStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await splitStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] money-integrity · split-invariant: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

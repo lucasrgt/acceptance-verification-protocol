@@ -56,7 +56,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layout-shift-int
   it('emits the layout-shift-integrity number', async () => {
     const detected = (await shiftStatus('unsized-image'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await shiftStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] layout-shift-integrity reserved-space-stable detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -75,7 +75,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (layout-shift-inte
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await shiftStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await shiftStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] layout-shift-integrity · reserved-space-stable: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

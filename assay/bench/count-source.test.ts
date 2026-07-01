@@ -50,7 +50,7 @@ describe('AVP — verifier accuracy (data-honesty · count-matches-source)', () 
   it('emits the count-matches-source number', async () => {
     const detected = (await countStatus('drop-filter'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await countStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] data-honesty count-matches-source detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -70,7 +70,7 @@ describe('AVP — mutation testing (data-honesty · count-matches-source)', () =
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await countStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await countStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] data-honesty · count-matches-source: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

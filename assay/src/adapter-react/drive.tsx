@@ -1,6 +1,5 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { act } from 'react';
 import { http, HttpResponse, delay } from 'msw';
 import { server } from './msw-server';
 import type { ActionEffectSubject } from './subject';

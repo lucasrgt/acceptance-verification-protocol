@@ -55,7 +55,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layer-integrity 
   it('emits the layer-integrity number', async () => {
     const detected = (await layerStatus('absolute-overlap'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await layerStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] layer-integrity no-unintended-overlap detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -74,7 +74,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (layer-integrity �
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await layerStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await layerStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] layer-integrity · no-unintended-overlap: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

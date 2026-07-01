@@ -63,7 +63,7 @@ describe('AVP — verifier accuracy (integration-integrity · redirect-urls-boun
   it('emits the redirect-urls-bound (HTTP) number', async () => {
     const detected = (await redirectStatus('missing'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await redirectStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] integration-integrity · redirect-urls-bound (HTTP adapter) detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -82,7 +82,7 @@ describe('AVP — mutation testing (integration-integrity · redirect-urls-bound
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await redirectStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await redirectStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] integration-integrity · redirect-urls-bound: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

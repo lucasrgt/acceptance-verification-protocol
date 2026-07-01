@@ -40,7 +40,7 @@ describe('AVP Design — verifier accuracy (state-coverage · states-visually-di
   it('emits the state-coverage number', async () => {
     const detected = (await stateStatus('disabled-not-dimmed'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await stateStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] state-coverage states-visually-distinct detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -60,7 +60,7 @@ describe('AVP Design — mutation testing (state-coverage · states-visually-dis
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await stateStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await stateStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] state-coverage · states-visually-distinct: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

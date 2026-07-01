@@ -42,7 +42,7 @@ describe('AVP — verifier accuracy (pagination-integrity · pages-cover-the-set
   it('emits the pages-cover-the-set number', async () => {
     const detected = (await pagingStatus('off-by-one'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await pagingStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] pagination-integrity pages-cover-the-set detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -63,7 +63,7 @@ describe('AVP — mutation testing (pagination-integrity · pages-cover-the-set)
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await pagingStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await pagingStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] pagination-integrity · pages-cover-the-set: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

@@ -81,7 +81,7 @@ describe('AVP Design — verifier accuracy (icon-correctness · icon-fits-meanin
   it('emits the icon-correctness number', async () => {
     const detected = (await iconStatus('wrong-forks', ruleJudge))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await iconStatus('good', ruleJudge))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] icon-correctness icon-fits-meaning detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -101,7 +101,7 @@ describe('AVP Design — mutation testing (icon-correctness · icon-fits-meaning
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await iconStatus(m, ruleJudge))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await iconStatus('good', ruleJudge))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] icon-correctness · icon-fits-meaning: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

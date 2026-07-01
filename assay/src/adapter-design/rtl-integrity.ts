@@ -10,14 +10,6 @@ interface IconTransform {
   readonly transform: string;
 }
 
-/** Read each directional icon (`data-dir-icon`) and its computed transform — runs INSIDE the page. */
-function measureDirectionalIcons(): IconTransform[] {
-  return Array.from(document.querySelectorAll('[data-dir-icon]')).map((el) => ({
-    label: (el as HTMLElement).dataset.dirIcon ?? '',
-    transform: getComputedStyle(el).transform,
-  }));
-}
-
 /** Horizontal scale of a computed transform: `none` → 1, else the first matrix coefficient (negative = mirrored). */
 function horizontalScale(transform: string): number {
   if (!transform || transform === 'none') return 1;

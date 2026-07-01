@@ -38,7 +38,7 @@ describe('AVP Design — verifier accuracy (token-adherence · uses-tokens-only)
   it('emits the token-adherence number', async () => {
     const detected = (await tokenStatus('raw-hex-color'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await tokenStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] token-adherence uses-tokens-only detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -57,7 +57,7 @@ describe('AVP Design — mutation testing (token-adherence · uses-tokens-only)'
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await tokenStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await tokenStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] token-adherence · uses-tokens-only: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

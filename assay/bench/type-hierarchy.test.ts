@@ -39,7 +39,7 @@ describe('AVP Design — verifier accuracy (type-hierarchy · hierarchy-holds)',
   it('emits the type-hierarchy number', async () => {
     const detected = (await typeStatus('inverted'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await typeStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] type-hierarchy hierarchy-holds detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -59,7 +59,7 @@ describe('AVP Design — mutation testing (type-hierarchy · hierarchy-holds)', 
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await typeStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await typeStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] type-hierarchy · hierarchy-holds: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

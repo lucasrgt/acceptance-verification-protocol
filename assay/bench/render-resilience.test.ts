@@ -40,7 +40,7 @@ describe('AVP — verifier accuracy (render-resilience · survives-malformed-dat
   it('emits the survives-malformed-data number', async () => {
     const detected = (await resilienceStatus('null-user'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await resilienceStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] render-resilience survives-malformed-data detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -60,7 +60,7 @@ describe('AVP — mutation testing (render-resilience · survives-malformed-data
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await resilienceStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await resilienceStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] render-resilience · survives-malformed-data: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

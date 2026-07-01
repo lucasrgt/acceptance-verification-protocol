@@ -34,7 +34,7 @@ describe('AVP — verifier accuracy (navigation-integrity, back-has-fallback)', 
     const good = await verify(navigationIntegrity, deepBack(GoodBack));
     const detected = bad.results.find((r) => r.criterionId === 'back-has-fallback')?.status === 'fail' ? 1 : 0;
     const falseAlarms = good.results.some((r) => r.status === 'fail') ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] navigation back-has-fallback detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);

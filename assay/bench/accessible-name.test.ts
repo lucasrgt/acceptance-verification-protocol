@@ -39,7 +39,7 @@ describe('AVP Design — verifier accuracy (accessible-name · controls-have-acc
   it('emits the accessible-name number', async () => {
     const detected = (await nameStatus('icon-button-bare'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await nameStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] accessible-name controls-have-accessible-name detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -60,7 +60,7 @@ describe('AVP Design — mutation testing (accessible-name · controls-have-acce
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await nameStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await nameStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] accessible-name · controls-have-accessible-name: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

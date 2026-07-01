@@ -42,7 +42,7 @@ describe('AVP — verifier accuracy (temporal-integrity · zoned-to-user)', () =
   it('emits the zoned-to-user number', async () => {
     const detected = (await zonedStatus('utc'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await zonedStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP] temporal-integrity zoned-to-user detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -63,7 +63,7 @@ describe('AVP — mutation testing (temporal-integrity · zoned-to-user)', () =>
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await zonedStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await zonedStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP mutation] temporal-integrity · zoned-to-user: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

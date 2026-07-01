@@ -39,7 +39,7 @@ describe('AVP Design — verifier accuracy (theme-parity · flips-with-theme)', 
   it('emits the theme-parity number', async () => {
     const detected = (await themeStatus('hardcoded-light'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await themeStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] theme-parity flips-with-theme detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -59,7 +59,7 @@ describe('AVP Design — mutation testing (theme-parity · flips-with-theme)', (
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await themeStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await themeStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] theme-parity · flips-with-theme: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +

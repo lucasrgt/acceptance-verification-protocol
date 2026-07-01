@@ -56,7 +56,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (tap-target-integ
   it('emits the tap-target-integrity number', async () => {
     const detected = (await tapStatus('tiny-icon'))?.status === 'fail' ? 1 : 0;
     const falseAlarms = (await tapStatus('good'))?.status === 'fail' ? 1 : 0;
-    // eslint-disable-next-line no-console
+     
     console.log(`\n[AVP Design] tap-target-integrity targets-meet-minimum-size detection=${detected}/1  false-alarm=${falseAlarms}\n`);
     expect(detected).toBe(1);
     expect(falseAlarms).toBe(0);
@@ -75,7 +75,7 @@ describe.skipIf(!hasBrowser)('AVP Design — mutation testing (tap-target-integr
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await tapStatus(m))?.status !== 'fail') survivors.push(m);
     const falseAlarm = (await tapStatus('good'))?.status === 'fail';
-    // eslint-disable-next-line no-console
+     
     console.log(
       `\n[AVP Design mutation] tap-target-integrity · targets-meet-minimum-size: killed=${MUTANTS.length - survivors.length}/${MUTANTS.length}` +
         (survivors.length ? `  SURVIVORS=[${survivors.join(', ')}]` : '') +
