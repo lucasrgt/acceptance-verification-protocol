@@ -8,14 +8,30 @@ import puppeteer, { type Browser } from 'puppeteer-core';
  * substrate, the same philosophy as the React (RTL) and HTTP (fetch) adapters. Set
  * CHROME_PATH to override the auto-detected executable.
  */
+const local = process.env.LOCALAPPDATA ?? '';
 const CANDIDATES = [
   process.env.CHROME_PATH,
+  // Windows — machine-wide and per-user installs, Chrome/Edge/Brave/Chromium
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
+  local && `${local}/Google/Chrome/Application/chrome.exe`,
   'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+  'C:/Program Files/Microsoft/Edge/Application/msedge.exe',
+  'C:/Program Files/BraveSoftware/Brave-Browser/Application/brave.exe',
+  local && `${local}/BraveSoftware/Brave-Browser/Application/brave.exe`,
+  local && `${local}/Chromium/Application/chrome.exe`,
+  // Linux
   '/usr/bin/google-chrome',
+  '/usr/bin/google-chrome-stable',
   '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/usr/bin/brave-browser',
+  '/usr/bin/microsoft-edge',
+  // macOS
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/Applications/Chromium.app/Contents/MacOS/Chromium',
+  '/Applications/Brave Browser.app/Contents/MacOS/Brave Browser',
+  '/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge',
 ];
 
 /** The first installed Chrome/Edge executable, or null if none is found. */

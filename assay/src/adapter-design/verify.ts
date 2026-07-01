@@ -15,9 +15,31 @@ import { iconHooks } from './icon-correctness';
 
 type NamedSubject = { readonly name: string };
 
+import type { ContrastLevel } from '../design/contrast';
+import type { ThemeSource, TokenSource } from '../design/tokens';
+
+// The ground-truth surface a consumer needs to bring their own design system.
+export { buildTokenScale, themeColorScale, tokens, themes, normColor } from '../design/tokens';
+export type { TokenSource, ThemeSource, TokenScale, DesignTheme } from '../design/tokens';
+export { contrastRatio, aaThreshold } from '../design/contrast';
+export type { ContrastLevel } from '../design/contrast';
+export type { ReactDesignSubject } from './subject';
+
 /** Options for a design run — the judge is needed only by `model`-oracle archetypes (icon-correctness). */
 export interface DesignOptions {
   readonly judge?: Judge;
+  /** YOUR design system's token export — replaces the demo ground truth for token-adherence. */
+  readonly tokens?: TokenSource;
+  /** YOUR theme scales — replaces the demo ground truth for theme-parity. */
+  readonly themes?: ThemeSource;
+  /** WCAG level for color-contrast (default 'AA'). */
+  readonly contrastLevel?: ContrastLevel;
+  /**
+   * Also check COMPUTED styles (class/stylesheet-styled surfaces), not only inline styles.
+   * Opt-in: only values that differ from the browser default are considered authored, so
+   * inherited defaults never flood the verdict.
+   */
+  readonly checkComputed?: boolean;
   /**
    * Escape hatch for an OFF-CATALOG design archetype (ADR 0002) — hooks binding a domain
    * design criterion you authored to the style substrate. Per-call, never a global

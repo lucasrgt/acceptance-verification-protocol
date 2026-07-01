@@ -1,9 +1,15 @@
+import { parseColor } from './color';
+
 /**
  * The design system AS DATA — the ground truth a design verifier checks against.
  * `token-adherence` asks one thing: every colour/space/radius/font a surface renders
  * is a value from THIS scale, never a raw hex or an off-scale literal. Without the
  * scale codified there is nothing to verify against; codifying it is the prerequisite
- * (see docs/design-acceptance.md). A real product swaps this for its own token export.
+ * (see docs/design-acceptance.md).
+ *
+ * A real product brings its OWN export: pass `tokens`/`themes` in the DesignOptions of
+ * verifyDesign() (see buildTokenScale/buildThemeScale) — the values below are the demo
+ * system the bench calibrates against, not a requirement.
  */
 export const tokens = {
   color: {
@@ -19,32 +25,47 @@ export const tokens = {
   font: { sm: '14px', md: '16px', lg: '20px', xl: '28px' },
 } as const;
 
-/** Normalise any CSS colour (hex / rgb / named) to a canonical `r,g,b` (or the name) so jsdom's rgb output and an authored hex compare equal. */
+/** The shape a product's token export must provide to swap the ground truth. */
+export interface TokenSource {
+  readonly color: Readonly<Record<string, string>>;
+  readonly space: Readonly<Record<string, string>>;
+  readonly radius: Readonly<Record<string, string>>;
+  readonly font: Readonly<Record<string, string>>;
+}
+
+/**
+ * Normalise any CSS colour (hex / rgb[a] / hsl[a] / oklch / named) to a canonical
+ * `r,g,b` string so jsdom's rgb output and an authored value compare equal. Alpha is
+ * dropped here on purpose — token membership is about the hue, compositing is the
+ * contrast checker's job. Unrecognized notations compare as-is.
+ */
 export function normColor(value: string): string | null {
   const s = value.trim().toLowerCase();
   if (!s) return null;
-  const rgb = s.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
-  if (rgb) return `${+rgb[1]},${+rgb[2]},${+rgb[3]}`;
-  const short = s.match(/^#([0-9a-f]{3})$/);
-  if (short) {
-    const x = short[1];
-    return [0, 1, 2].map((i) => parseInt(x[i] + x[i], 16)).join(',');
-  }
-  const long = s.match(/^#([0-9a-f]{6})$/);
-  if (long) {
-    const x = long[1];
-    return [0, 2, 4].map((i) => parseInt(x.slice(i, i + 2), 16)).join(',');
-  }
-  return s; // named colours etc. — compared as-is
+  const parsed = parseColor(s);
+  if (parsed) return `${parsed.r},${parsed.g},${parsed.b}`;
+  return s; // unknown notation — compared as-is
 }
 
-/** The legal-value sets, by category, for membership checks. Colours are normalised. */
-export const tokenScale = {
-  color: new Set(Object.values(tokens.color).map((c) => normColor(c)!)),
-  space: new Set<string>(Object.values(tokens.space)),
-  radius: new Set<string>(Object.values(tokens.radius)),
-  font: new Set<string>(Object.values(tokens.font)),
-} as const;
+export interface TokenScale {
+  readonly color: ReadonlySet<string>;
+  readonly space: ReadonlySet<string>;
+  readonly radius: ReadonlySet<string>;
+  readonly font: ReadonlySet<string>;
+}
+
+/** Builds the legal-value sets for membership checks from any token export (colours normalised). */
+export function buildTokenScale(source: TokenSource): TokenScale {
+  return {
+    color: new Set(Object.values(source.color).map((c) => normColor(c)!)),
+    space: new Set<string>(Object.values(source.space)),
+    radius: new Set<string>(Object.values(source.radius)),
+    font: new Set<string>(Object.values(source.font)),
+  };
+}
+
+/** The legal-value sets for the demo system — the default when DesignOptions carries no tokens. */
+export const tokenScale: TokenScale = buildTokenScale(tokens);
 
 /**
  * Theme-aware colours — the ground truth for `theme-parity`. A semantic colour resolves
@@ -54,12 +75,14 @@ export const tokenScale = {
  */
 export type DesignTheme = 'light' | 'dark';
 
-export const themes: Record<DesignTheme, { color: Record<string, string> }> = {
+export type ThemeSource = Record<DesignTheme, { readonly color: Readonly<Record<string, string>> }>;
+
+export const themes: ThemeSource = {
   light: { color: { surface: '#ffffff', text: '#1a1a1a', primary: '#2563eb', secondary: '#6b7280', danger: '#dc2626' } },
   dark: { color: { surface: '#111827', text: '#f9fafb', primary: '#60a5fa', secondary: '#9ca3af', danger: '#f87171' } },
 };
 
 /** The legal colour set for a given theme (normalised), for theme-parity membership checks. */
-export function themeColorScale(theme: DesignTheme): ReadonlySet<string> {
-  return new Set(Object.values(themes[theme].color).map((c) => normColor(c)!));
+export function themeColorScale(theme: DesignTheme, source: ThemeSource = themes): ReadonlySet<string> {
+  return new Set(Object.values(source[theme].color).map((c) => normColor(c)!));
 }

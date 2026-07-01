@@ -25,8 +25,8 @@ interface Fail {
   readonly need: number;
 }
 
-/** Every text-bearing element whose colour fails WCAG AA against its effective background. */
-function contrastFailures(): Fail[] {
+/** Every text-bearing element whose colour fails the WCAG level against its effective background. */
+function contrastFailures(level: 'AA' | 'AAA'): Fail[] {
   const out: Fail[] = [];
   for (const el of Array.from(document.body.querySelectorAll<HTMLElement>('*'))) {
     const fg = el.style.color;
@@ -43,14 +43,15 @@ function contrastFailures(): Fail[] {
     if (ratio === null) continue;
     const size = parseFloat(el.style.fontSize) || 16;
     const bold = el.style.fontWeight === 'bold' || Number(el.style.fontWeight) >= 700;
-    const need = aaThreshold(size, bold);
+    const need = aaThreshold(size, bold, level);
     if (ratio < need) out.push({ text: ownText.slice(0, 24), fg, bg, ratio: Math.round(ratio * 100) / 100, need });
   }
   return out;
 }
 
-/** The design adapter's `color-contrast` probe — checks every text/background pair against WCAG AA. */
-export function colorContrastProbe(subject: ReactDesignSubject): Probe<ColorContrastExpect> {
+/** The design adapter's `color-contrast` probe — checks every text/background pair against the WCAG level (default AA). */
+export function colorContrastProbe(subject: ReactDesignSubject, opts: { contrastLevel?: 'AA' | 'AAA' } = {}): Probe<ColorContrastExpect> {
+  const level = opts.contrastLevel ?? 'AA';
   let failures: Fail[] = [];
   let acted = false;
   return {
@@ -59,7 +60,7 @@ export function colorContrastProbe(subject: ReactDesignSubject): Probe<ColorCont
       cleanup();
       render(subject.render());
       await settle();
-      failures = contrastFailures();
+      failures = contrastFailures(level);
       acted = true;
     },
     expect: {
@@ -68,7 +69,7 @@ export function colorContrastProbe(subject: ReactDesignSubject): Probe<ColorCont
         if (failures.length === 0) return;
         const list = failures.map((f) => `"${f.text}" ${f.fg} on ${f.bg} = ${f.ratio}:1 (need ${f.need}:1)`).join('; ');
         throw new AvpFail(
-          `Text fails WCAG AA contrast: ${list}. The pairing is hard or impossible to read — darken/lighten the text or its surface so the ratio clears the threshold.`,
+          `Text fails WCAG ${level} contrast: ${list}. The pairing is hard or impossible to read — darken/lighten the text or its surface so the ratio clears the threshold.`,
           { failures },
         );
       },
@@ -77,6 +78,6 @@ export function colorContrastProbe(subject: ReactDesignSubject): Probe<ColorCont
 }
 
 /** The design adapter's hooks for `color-contrast`. */
-export function colorContrastHooks(subject: ReactDesignSubject): VerifyHooks {
-  return { probe: () => colorContrastProbe(subject) };
+export function colorContrastHooks(subject: ReactDesignSubject, opts: { contrastLevel?: 'AA' | 'AAA' } = {}): VerifyHooks {
+  return { probe: () => colorContrastProbe(subject, opts) };
 }

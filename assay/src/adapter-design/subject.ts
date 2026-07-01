@@ -32,4 +32,8 @@ export interface ReactDesignSubject {
   readonly renderState?: (state: string) => ReactElement;
   /** Viewport widths to sweep (responsive-integrity); defaults to mobile/tablet/desktop if omitted. The adapter renders `render()` at each and asserts no horizontal overflow. */
   readonly breakpoints?: readonly number[];
+  /** Stylesheet injected when the geometry tier renders `render()` — lets class-styled surfaces measure with their real rules. */
+  readonly css?: string;
+  /** Navigation deadline for the `url` seam (default 30000ms) — raise it for a slow dev server. */
+  readonly gotoTimeoutMs?: number;
 }

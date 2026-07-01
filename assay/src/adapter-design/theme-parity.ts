@@ -32,7 +32,7 @@ function colorsOffScale(scale: ReadonlySet<string>): Array<{ prop: string; value
 }
 
 /** The design adapter's `theme-parity` probe — renders under each theme, checks colours against THAT theme's scale. */
-export function themeParityProbe(subject: ReactDesignSubject): Probe<ThemeParityExpect> {
+export function themeParityProbe(subject: ReactDesignSubject, opts: { themes?: import('../design/tokens').ThemeSource } = {}): Probe<ThemeParityExpect> {
   const off: Off[] = [];
   let acted = false;
   return {
@@ -42,7 +42,7 @@ export function themeParityProbe(subject: ReactDesignSubject): Probe<ThemeParity
         cleanup();
         render(subject.renderTheme(theme));
         await settle();
-        for (const v of colorsOffScale(themeColorScale(theme))) off.push({ theme, ...v });
+        for (const v of colorsOffScale(themeColorScale(theme, opts.themes))) off.push({ theme, ...v });
       }
       acted = true;
     },

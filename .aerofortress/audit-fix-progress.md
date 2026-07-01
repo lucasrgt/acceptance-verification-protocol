@@ -45,16 +45,16 @@ Loop condition: ALL points checked. Numbers match the audit list delivered in ch
 - [x] 28 double-activate synced on state, not delay race
 
 ## Block 5 — Adapter HTTP (D)
-- [ ] 29 single http helper module (kill 7 duplicates)
-- [ ] 30 timeout/AbortSignal on all fetches
-- [ ] 31 JSON parse failure surfaces as evidence
-- [ ] 32 serverIsAuthoritative structural compare
-- [ ] 33 random idempotency keys per run
-- [ ] 34 second-order asserts trigger success
-- [ ] 35 second-order before/after inbox delta
-- [ ] 36 money: empty totals explicit error
-- [ ] 37 judge/gatherEvidence plumbed through http hooks options
-- [ ] 38 refusal = rejectWith list (default 401/403/404); 5xx never a refusal
+- [x] 29 single http helper module (kill 7 duplicates)
+- [x] 30 timeout/AbortSignal on all fetches
+- [x] 31 JSON parse failure surfaces as evidence
+- [x] 32 serverIsAuthoritative structural compare
+- [x] 33 random idempotency keys per run
+- [x] 34 second-order asserts trigger success
+- [x] 35 second-order before/after inbox delta
+- [x] 36 money: empty totals explicit error
+- [x] 37 judge/gatherEvidence plumbed through http hooks options
+- [x] 38 refusal = rejectWith list (default 401/403/404); 5xx never a refusal
 
 ## Block 6 — Adapter Design (E)
 - [ ] 39 computed-style fallback for token checks
