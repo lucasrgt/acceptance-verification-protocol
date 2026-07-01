@@ -19,6 +19,8 @@ public class SubmissionGateTests
 
     // The well-formed submission both transitions carry — enough for a ready resource to accept it.
     private static readonly object Body = new { items = new[] { new { itemId = "i1", unitValueInCents = 1500 } } };
+    private static readonly object ReadyBody = new { targetId = "ready", items = new[] { new { itemId = "i1", unitValueInCents = 1500 } } };
+    private static readonly object UnmetBody = new { targetId = "expired", items = new[] { new { itemId = "i1", unitValueInCents = 1500 } } };
 
     private static VerdictStatus Of(Verdict v, string criterionId) =>
         v.Results.First(r => r.CriterionId == criterionId).Status;
@@ -46,6 +48,28 @@ public class SubmissionGateTests
             if (!body.Contains("items"))
                 return Results.UnprocessableEntity(new { error = "a submission must carry items" });
             return Results.Ok(new { id, status = "recorded" }); // never checks the precondition
+        }));
+
+    // GOOD: the target lives in the body, and the server still resolves and gates it before recording.
+    private static Task<WebApplication> BodyTargetGood() => Repro.Start(app =>
+        app.MapPost("/submit", async (HttpRequest req) =>
+        {
+            var body = await Repro.Body(req);
+            if (!body.Contains("items"))
+                return Results.UnprocessableEntity(new { error = "a submission must carry items" });
+            return body.Contains("\"targetId\":\"ready\"")
+                ? Results.Ok(new { id = "ready", status = "recorded" })
+                : Results.NotFound(new { error = "this target is no longer answerable" });
+        }));
+
+    // BAD: the server trusts the client-visible form gate and records any body target.
+    private static Task<WebApplication> BodyTargetBad() => Repro.Start(app =>
+        app.MapPost("/submit", async (HttpRequest req) =>
+        {
+            var body = await Repro.Body(req);
+            if (!body.Contains("items"))
+                return Results.UnprocessableEntity(new { error = "a submission must carry items" });
+            return Results.Ok(new { status = "recorded" }); // never checks the body target's precondition
         }));
 
     [Fact]
@@ -81,5 +105,27 @@ public class SubmissionGateTests
         var v = await Runner.Run(Catalog, new LifecycleGate(), "submit-good-bodyless", subject);
 
         Assert.Equal(VerdictStatus.Fail, Of(v, "gate-enforced-server-side"));
+    }
+
+    [Fact]
+    public async Task body_target_submission_gate_passes_the_server_side_guard()
+    {
+        await using var app = await BodyTargetGood();
+        var subject = new SubmissionGateBodyTargetSubject(app.BaseUrl(), "/submit", ReadyBody, UnmetBody);
+
+        var v = await Runner.Run(Catalog, new SubmissionGateBodyTarget(), "body-target-good", subject);
+
+        Assert.Equal(VerdictStatus.Pass, Of(v, "gate-enforced-on-body-target"));
+    }
+
+    [Fact]
+    public async Task body_target_submission_gate_fails_the_fe_only_gate()
+    {
+        await using var app = await BodyTargetBad();
+        var subject = new SubmissionGateBodyTargetSubject(app.BaseUrl(), "/submit", ReadyBody, UnmetBody);
+
+        var v = await Runner.Run(Catalog, new SubmissionGateBodyTarget(), "body-target-bad", subject);
+
+        Assert.Equal(VerdictStatus.Fail, Of(v, "gate-enforced-on-body-target"));
     }
 }

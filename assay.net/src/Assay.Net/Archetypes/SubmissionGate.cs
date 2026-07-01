@@ -53,3 +53,53 @@ public sealed class SubmissionGate : Archetype<SubmissionGateSubject>
     // A fresh HttpContent per request: an HttpContent is consumed when sent, so the two submissions cannot share one.
     private static HttpContent Payload(SubmissionGateSubject s) => JsonContent.Create(s.Body, s.Body.GetType());
 }
+
+/// <summary>
+/// Seam for the gate-enforced-on-body-target criterion: two submissions to the SAME endpoint carrying bodies
+/// of the same shape but targeting different resource ids — <paramref name="ReadyBody"/> whose target resource's
+/// precondition is met, <paramref name="UnmetBody"/> whose target resource's precondition is unmet. The URL is
+/// fixed; the discriminant lives inside the body (e.g. a transactionId or serviceId field). This is the
+/// URL-uniform sibling of <see cref="SubmissionGateSubject"/>: where that seam varies the path, this one
+/// varies the body-carried target id while keeping the path constant.
+/// </summary>
+public sealed record SubmissionGateBodyTargetSubject(
+    string BaseUrl,
+    string Path,
+    object ReadyBody,
+    object UnmetBody);
+
+/// <summary>
+/// submission-gate (body-target variant) — the server enforces the precondition of a mutation whose
+/// discriminating resource id is carried in the body, not the URL. The same endpoint receives two same-shape
+/// submissions: one targeting a resource whose precondition is met (accepted, 2xx), one targeting a resource
+/// whose precondition is unmet (refused, 4xx). The gate fires on the body-carried id. Covers patterns such as
+/// POST /charges (transactionId in body) or POST /request (serviceId in body) where there is no per-resource
+/// URL path.
+/// </summary>
+public sealed class SubmissionGateBodyTarget : Archetype<SubmissionGateBodyTargetSubject>
+{
+    /// <inheritdoc/>
+    public override string Name => "submission-gate";
+
+    /// <inheritdoc/>
+    public override IReadOnlyDictionary<string, Func<SubmissionGateBodyTargetSubject, Task>> Oracles { get; } =
+        new Dictionary<string, Func<SubmissionGateBodyTargetSubject, Task>>
+        {
+            ["gate-enforced-on-body-target"] = async s =>
+            {
+                using var http = Http.Client(s.BaseUrl);
+
+                // SAME path, body that targets a ready resource: the server must accept. This proves the body
+                // shape is valid for the endpoint — any subsequent refusal is the gate, not a malformed payload.
+                var ready = await http.SendAsync(Http.Request(HttpMethod.Post, s.Path,
+                    body: JsonContent.Create(s.ReadyBody, s.ReadyBody.GetType())));
+                Http.Accepted(ready, "a well-formed submission targeting a resource whose precondition is met (body-carried id, ready)");
+
+                // SAME path, body that targets an unmet resource: the server must resolve the body-carried id and
+                // refuse the operation — the FE hiding the form is a courtesy, not the guard.
+                var unmet = await http.SendAsync(Http.Request(HttpMethod.Post, s.Path,
+                    body: JsonContent.Create(s.UnmetBody, s.UnmetBody.GetType())));
+                Http.Rejected(unmet, "the same-shape submission targeting a resource whose precondition is unmet (body-carried id, unmet) — the server must refuse (4xx), not trust the FE gate");
+            },
+        };
+}

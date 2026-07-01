@@ -42,6 +42,12 @@ public class ConformanceTests
         AssertOraclesExist(new TokenRotation().Name, new TokenRotation().Oracles.Keys);
         AssertOraclesExist(new ResourceUniqueness().Name, new ResourceUniqueness().Oracles.Keys);
         AssertOraclesExist(new AccessControl().Name, new AccessControl().Oracles.Keys);
+        AssertOraclesExist(new LifecycleGate().Name, new LifecycleGate().Oracles.Keys);
+        AssertOraclesExist(new MoneyIntegrity().Name, new MoneyIntegrity().Oracles.Keys);
+        AssertOraclesExist(new PaginationIntegrity().Name, new PaginationIntegrity().Oracles.Keys);
+        AssertOraclesExist(new RequestIdempotency().Name, new RequestIdempotency().Oracles.Keys);
+        AssertOraclesExist(new SubmissionGate().Name, new SubmissionGate().Oracles.Keys);
+        AssertOraclesExist(new SubmissionGateBodyTarget().Name, new SubmissionGateBodyTarget().Oracles.Keys);
     }
 
     private static void AssertOraclesExist(string archetype, IEnumerable<string> oracleIds)

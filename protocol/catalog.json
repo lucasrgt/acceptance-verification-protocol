@@ -698,6 +698,16 @@
             "id": "success"
           },
           "seenIn": []
+        },
+        {
+          "id": "gate-enforced-on-body-target",
+          "statement": "The server enforces the precondition of a body-bearing mutation where the discriminating resource id is carried in the body, not the URL. Two submissions to the same endpoint carry bodies of the same shape but targeting different resource ids: one whose precondition is met (ready), one whose precondition is unmet. The ready submission is accepted (2xx); the unmet submission is refused (4xx). The gate fires on the body-carried id — FE form-gating is a courtesy; the server is the guard. Covers patterns like POST /charges or POST /request where the target resource is identified by a body field such as transactionId or serviceId.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": []
         }
       ]
     }
