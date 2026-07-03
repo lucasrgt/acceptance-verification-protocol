@@ -6,8 +6,9 @@
 > implementations, not designed top-down — v0.1 is extracted from what is proven
 > across **five substrates** sharing one core: the behaviour tier (`dom` + `http`)
 > and the design tier (`style` on jsdom, `geometry` on a headless browser, `model`
-> on an LLM judge). The .NET extraction will refine it; until then this artifact
-> LEADS the lib, it does not lag it (see "Staying in lockstep").
+> on an LLM judge). The .NET extraction refined it and, since the authority handover
+> (2026-07-02), **leads it**: the artifact is emitted from the .NET source and both
+> implementations are guarded against it (see "Staying in lockstep").
 
 ## The shape
 
@@ -99,8 +100,9 @@ through one runner is the proof the core is not framework-shaped.
 The archetypes + criteria are the contribution (the dictionary). Forms:
 
 - **`protocol/catalog.json`** — the BEHAVIOUR catalog (the `dom`/`http` archetypes),
-  machine-readable, the portable source. Generated from the shipped archetypes; any
-  implementation reads it to know what to cover.
+  machine-readable, the portable source. Emitted from the .NET-led source
+  (`assay.net/src/Assay.Net/CatalogSource.cs`); any implementation reads it to know
+  what to cover.
 - **`protocol/design-catalog.json`** — the DESIGN catalog: the same protocol, a sibling
   archetype catalog on the design substrates (`style`/`geometry`/`model`). Each criterion
   carries its `substrate`, so a design adapter in any language (Assay.NET, a Rails adapter)
@@ -124,25 +126,33 @@ The `substrate` axis decides who covers what: `dom` archetypes → a frontend ad
 archetypes (authorization, integration-integrity, second-order-effects) → an HTTP or
 in-process backend adapter; `static` → the host's linter/doctor; and the design substrates →
 a design adapter — `style` on jsdom (computed style), `geometry` on a headless browser, `model`
-on an injected LLM judge. Assay (this repo) is the reference implementation of `dom`, `http`,
-and all three design substrates; the design tier's `geometry` probes share one loader
+on an injected LLM judge. The roles since the authority handover: **Assay.Net** emits the
+catalog and is the backend (`http`) adapter; **Assay (JS)** is the conformant FRONT adapter —
+the executor of `dom` and the three design substrates, guarded against the committed artifact
+by `bench/protocol-sync.test.ts`. The design tier's `geometry` probes share one loader
 (`adapter-design/surface.ts`) and can drive either a synthetic React surface or a live app URL.
 
 ## Staying in lockstep (why the protocol can't fall behind)
 
-`protocol/catalog.json` is **generated from the archetypes**, and
-`bench/protocol-sync.test.ts` asserts the committed artifact equals the freshly
-built one. Add a criterion to the lib without updating the protocol artifact and
-the suite goes **red**. So the protocol is structurally incapable of lagging the
-implementation by even one criterion — it is a derived source of truth, guarded.
+The catalogs are **emitted from the .NET source**
+(`assay.net/src/Assay.Net/CatalogSource.cs` — the authority since the 2026-07-02
+handover), and two guards hold the lockstep from both sides:
 
-Regenerate after any archetype/criterion change:
-`ASSAY_WRITE_PROTOCOL=1 npx vitest run protocol-sync`.
+- **.NET, the emitter** — `CatalogSyncTests` asserts the committed artifact equals the
+  canonical emission byte for byte, and that the data model round-trips it losslessly.
+  Change the source without regenerating and the suite goes **red**.
+- **JS, the mirror** — `bench/protocol-sync.test.ts` asserts the shipped JS archetypes
+  build the SAME content as the committed artifact. The JS side has **no write path**.
+
+So the protocol is structurally incapable of diverging from either implementation.
+To evolve the contract: edit `CatalogSource.cs`, regenerate with
+`ASSAY_WRITE_PROTOCOL=1 dotnet test --filter CatalogSync` (from `assay.net/`), then
+bring the JS archetypes into lockstep.
 
 ## Versioning
 
-`protocolVersion` (currently `0.1.0`) bumps when the data model or the condition/
+`protocolVersion` (currently `0.2.0`) bumps when the data model or the condition/
 oracle/substrate vocabularies change; archetype `version`s bump independently as their
-criteria evolve. v0.1 is the first extraction (5 substrates, 1 language); the
-Assay.NET extraction is expected to refine the Subject-descriptor and adapter
-contract into their final cross-language form.
+criteria evolve. v0.1 was the first extraction (5 substrates, 1 language); the
+Assay.NET extraction refined the model into its cross-language form (0.2.0) and the
+catalog is now emitted from the .NET side — the contract's final custody.

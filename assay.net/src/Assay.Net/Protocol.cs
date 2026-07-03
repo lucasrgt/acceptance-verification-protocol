@@ -1,15 +1,22 @@
+using System.Text.Json.Serialization;
+
 namespace Assay.Net;
 
-// The AVP data model — the portable shapes from docs/PROTOCOL.md, deserialized from the
-// neutral catalog (protocol/catalog.json). Assay.Net CONSUMES this contract; it does not own it.
+// The AVP data model — the portable shapes from docs/PROTOCOL.md. Since the authority
+// handover (2026-07-02) the .NET side OWNS the contract: the neutral catalogs are emitted
+// from CatalogSource via CatalogEmitter; this model is the schema they are emitted through.
 
-/// <summary>The machine-readable AVP catalog: the neutral, language-agnostic source of truth.</summary>
+/// <summary>The machine-readable AVP catalog: the neutral, language-agnostic source of truth.
+/// <paramref name="CatalogName"/> + <paramref name="Substrates"/> are the DESIGN catalog's
+/// root fields (absent on the behaviour catalog) — carried so the model is lossless.</summary>
 public sealed record ProtocolCatalog(
     string Protocol,
     string ProtocolVersion,
     IReadOnlyList<string> OracleKinds,
     IReadOnlyList<ArchetypeSpec> Archetypes,
-    IReadOnlyDictionary<string, IReadOnlyList<string>>? ConditionAxes = null);
+    IReadOnlyDictionary<string, IReadOnlyList<string>>? ConditionAxes = null,
+    [property: JsonPropertyName("catalog")] string? CatalogName = null,
+    IReadOnlyList<string>? Substrates = null);
 
 /// <summary>A reusable feature class with its versioned set of criteria.</summary>
 public sealed record ArchetypeSpec(

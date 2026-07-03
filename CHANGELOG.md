@@ -1,5 +1,22 @@
 # Changelog
 
+## Unreleased
+
+### Protocol — the authority handover (Phase 1b closed)
+
+- **The catalog is now .NET-led.** Criteria are born in
+  `assay.net/src/Assay.Net/CatalogSource.cs`; the committed `protocol/*.json` artifacts
+  are emitted from it by `CatalogEmitter` (canonical bytes: 2-space indent, stable field
+  order, LF). Regenerate: `ASSAY_WRITE_PROTOCOL=1 dotnet test --filter CatalogSync`.
+  The handover was byte-lossless — zero diff to the committed artifacts.
+- **Two-sided lockstep.** .NET: `CatalogSyncTests` (committed == canonical emission +
+  lossless model round-trip over the embedded copies). JS: `bench/protocol-sync.test.ts`
+  flipped to a CONFORMANCE guard — parsed-content equality, **no write path** — so Assay
+  (JS) is now formally the conformant front adapter (`dom`/`style`/`geometry`/`model`),
+  mirroring the contract it no longer writes.
+- `ProtocolCatalog` (.NET) is lossless at the root too: gained the design catalog's
+  `catalog` + `substrates` fields.
+
 ## 0.2.0 — 2026-07-01
 
 The audit release: 125 improvement points closed across the whole repo.

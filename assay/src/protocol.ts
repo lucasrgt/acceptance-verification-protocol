@@ -41,12 +41,12 @@ import { truncationIntegrity } from './archetypes/truncation-integrity';
 import { iconCorrectness } from './archetypes/icon-correctness';
 
 /**
- * The PROTOCOL surface — the language-neutral truth, emitted FROM the archetypes so
- * it can never lag the implementation. AVP is the protocol; Assay is one
- * implementation. The catalog below is the portable contract any other
- * implementation (Assay.NET, a Rails adapter, …) verifies against — and the
- * drift-guard test asserts this artifact stays in lockstep with the archetypes the
- * lib actually ships (see bench/protocol-sync.test.ts + protocol/catalog.json).
+ * The JS model of the PROTOCOL surface. AVP is the protocol; Assay is one implementation.
+ * Since the authority handover (2026-07-02) the neutral catalog is .NET-LED: criteria are
+ * born in assay.net/src/Assay.Net/CatalogSource.cs, which emits the committed
+ * protocol/*.json artifacts. The builders below express what THIS implementation ships,
+ * and the conformance guard (bench/protocol-sync.test.ts) asserts it matches the
+ * committed artifact — this side mirrors the contract, it no longer writes it.
  *
  * The version constant lives in core/types.ts (every Verdict is stamped with it);
  * re-exported here because the protocol surface is where readers look for it.
@@ -54,7 +54,8 @@ import { iconCorrectness } from './archetypes/icon-correctness';
 export { PROTOCOL_VERSION } from './core/types';
 import { PROTOCOL_VERSION } from './core/types';
 
-/** Every archetype the implementation ships. Adding one here is adding it to the protocol. */
+/** Every archetype the implementation ships. To grow the PROTOCOL, add it to the .NET-led
+ * source (CatalogSource.cs) first — then ship it here; the conformance guard holds the lockstep. */
 export const ARCHETYPES: readonly Archetype[] = [
   actionEffect,
   dataHonesty,
@@ -80,8 +81,8 @@ export const ARCHETYPES: readonly Archetype[] = [
 /**
  * Every DESIGN archetype the implementation ships — the design tier of AVP (same protocol,
  * a sibling archetype catalog). Verified through the SAME neutral core as the behaviour
- * archetypes, on the design substrates (style/geometry/model). Adding one here adds it to the
- * design catalog.
+ * archetypes, on the design substrates (style/geometry/model). Like the behaviour registry,
+ * growing the design CATALOG starts in CatalogSource.cs (.NET-led); this list mirrors it.
  */
 export const DESIGN_ARCHETYPES: readonly Archetype[] = [
   tokenAdherence,

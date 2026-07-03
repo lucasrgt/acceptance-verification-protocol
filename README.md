@@ -14,8 +14,9 @@ implementations:
 | [`Assay.Net`](assay.net/) (NuGet) | backend — HTTP / in-process (`WebApplicationFactory`) | [`assay.net/`](assay.net/) |
 
 Both consume the same neutral contract — [`protocol/catalog.json`](protocol/catalog.json) +
-[`protocol/design-catalog.json`](protocol/design-catalog.json) — generated from the shipped
-archetypes and drift-guarded by the test suite. See [docs/PROTOCOL.md](docs/PROTOCOL.md) for
+[`protocol/design-catalog.json`](protocol/design-catalog.json) — emitted from the .NET-led
+source (`CatalogSource.cs`) and drift-guarded from both sides: the .NET suite owns the bytes,
+the JS suite conforms on content. See [docs/PROTOCOL.md](docs/PROTOCOL.md) for
 the contract, [CONTEXT.md](CONTEXT.md) for the vocabulary, and
 [docs/adr/0001](docs/adr/0001-thin-layer-not-a-framework.md) for why everything stays thin.
 

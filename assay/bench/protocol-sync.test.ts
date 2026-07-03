@@ -1,15 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildCatalog, buildDesignCatalog, CONDITION_AXES, ORACLE_KINDS, SUBSTRATES } from '../src/protocol';
 
 /**
- * The drift guard — the reason the protocol can never fall behind the lib. It
- * rebuilds each protocol catalog from the shipped archetypes and asserts it equals
- * the committed artifact. Add a criterion to the lib without updating the artifact →
- * this test goes RED. Regenerate both with:
- *   ASSAY_WRITE_PROTOCOL=1 npx vitest run protocol-sync
+ * The conformance guard — the catalog is .NET-LED since the authority handover
+ * (assay.net/src/Assay.Net/CatalogSource.cs is where criteria are born; its CatalogSync
+ * guard owns the artifact's bytes). This side has NO write path by design: the shipped JS
+ * archetypes must CONFORM to the committed artifact. Red here means the implementations
+ * disagree — evolve the contract in CatalogSource.cs first, regenerate with
+ *   ASSAY_WRITE_PROTOCOL=1 dotnet test --filter CatalogSync   (from assay.net/),
+ * then bring the JS archetypes into lockstep.
  */
 // Anchored to THIS file (never process.cwd()) so the guard holds from any runner cwd.
 const here = dirname(fileURLToPath(import.meta.url));
@@ -20,15 +22,16 @@ const CATALOGS = [
   { file: resolve(here, '../../protocol/design-catalog.json'), build: buildDesignCatalog },
 ] as const;
 
-describe('AVP protocol — drift guard', () => {
-  it.each(CATALOGS)('$file is in lockstep with the shipped archetypes', ({ file, build }) => {
-    const built = JSON.stringify(build(), null, 2) + '\n';
-    if (process.env.ASSAY_WRITE_PROTOCOL) writeFileSync(file, built);
-    const onDisk = readFileSync(file, 'utf8');
+describe('AVP protocol — conformance to the .NET-led catalog', () => {
+  it.each(CATALOGS)('the shipped archetypes conform to $file', ({ file, build }) => {
+    // Parsed (content) equality, not byte equality: the .NET emitter owns the bytes; the
+    // mirror conforms on content — and stays green under any checkout EOL policy.
+    const committed = JSON.parse(readFileSync(file, 'utf8'));
+    const built = JSON.parse(JSON.stringify(build()));
     expect(
-      onDisk,
-      `${file} is behind the lib — regenerate: ASSAY_WRITE_PROTOCOL=1 npx vitest run protocol-sync`,
-    ).toBe(built);
+      built,
+      `${file} and the JS archetypes disagree — the catalog is .NET-led: evolve CatalogSource.cs, regenerate (ASSAY_WRITE_PROTOCOL=1 dotnet test --filter CatalogSync), then match the JS archetypes to it.`,
+    ).toEqual(committed);
   });
 
   it('docs/PROTOCOL.md names every vocabulary token the lib ships (prose drift guard)', () => {
