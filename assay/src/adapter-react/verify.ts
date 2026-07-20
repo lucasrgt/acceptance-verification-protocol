@@ -49,7 +49,7 @@ function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, optio
     probe: (condition) => reactProbe(s, condition),
     applies: (c) => {
       if (c.id === 'cache-cleared-on-identity') return 'Action subject — identity criterion not applicable.';
-      if (c.requires === 'input' && !s.input) {
+      if (c.requires === 'input' && !s.input && !s.inputs?.length) {
         return 'Subject has no input — criterion not applicable.';
       }
       if (c.requires === 'projection' && !s.projection) {
@@ -75,7 +75,7 @@ function actionEffectHooks(subject: ActionEffectSubject | IdentitySubject, optio
     gatherEvidence: async (condition) => {
       const driven = await drive(s, condition);
       const text = (document.body.textContent ?? '').replace(/\s+/g, ' ').trim();
-      return { text, draft: driven.inputValue(), requests: driven.requests };
+      return { text, drafts: driven.inputValues(), requests: driven.requests };
     },
     judge: options.judge,
   };

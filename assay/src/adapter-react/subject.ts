@@ -1,5 +1,12 @@
 import type { ReactElement } from 'react';
 
+/** One user-editable draft that Assay fills and verifies survives a failed action. */
+export interface ActionDraft {
+  readonly role: string;
+  readonly name?: string | RegExp;
+  readonly value: string;
+}
+
 /**
  * Descriptor of an `action-effect` subject: the SEAMS AVP needs to observe
  * behavior. It is not invasive — it declares what already exists (how to mount,
@@ -16,8 +23,14 @@ export interface ActionEffectSubject {
   readonly action: { readonly role: string; readonly name: string | RegExp };
   /** Optional input whose draft must survive a failed action. */
   readonly input?: { readonly role: string; readonly name?: string | RegExp };
-  /** Text typed into the input before acting. */
+  /** Text typed into the legacy single `input` before acting. */
   readonly draftSample?: string;
+  /**
+   * Every draft a real form needs before the action can reach its effect. On failure,
+   * Assay verifies that all declared values survive. Prefer this for multi-field forms;
+   * `input` + `draftSample` remains supported for existing single-field subjects.
+   */
+  readonly inputs?: readonly ActionDraft[];
   /** Body returned by the endpoint under the `success` condition (default `{ ok: true }`). Lets the real component consume a realistic response. */
   readonly successResponse?: unknown;
   /** A sibling projection of the mutated data (a list/badge/count) that must reflect a successful mutation. */

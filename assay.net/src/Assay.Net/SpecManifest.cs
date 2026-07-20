@@ -1,5 +1,10 @@
 namespace Assay.Net;
 
+/// <summary>One acceptance obligation: a production subject must prove one criterion.</summary>
+/// <param name="Subject">The slice or feature name declared by the manifest.</param>
+/// <param name="CriterionId">The stable acceptance criterion id.</param>
+public sealed record SpecObligation(string Subject, string CriterionId);
+
 /// <summary>
 /// The Clockwork acceptance manifest for a module (<c>&lt;Module&gt;.spec.toml</c>) — the neutral declaration BOTH
 /// ends of the bridge read. The static doctor reads it to enforce a proof exists for every declared criterion;
@@ -10,6 +15,10 @@ namespace Assay.Net;
 /// <param name="Slices">Each declared slice mapped to the criterion ids it must prove.</param>
 public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IReadOnlyList<string>> Slices)
 {
+    /// <summary>Every subject × criterion obligation the manifest declares, in manifest order.</summary>
+    public IReadOnlyList<SpecObligation> DeclaredObligations =>
+        Slices.SelectMany(slice => slice.Value.Select(criterion => new SpecObligation(slice.Key, criterion))).ToArray();
+
     /// <summary>Every criterion id the manifest declares, across all slices (deduplicated, order-preserving).</summary>
     public IReadOnlyList<string> DeclaredCriteria =>
         Slices.Values.SelectMany(c => c).Distinct().ToArray();
@@ -27,6 +36,24 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
             .Select(r => r.CriterionId)
             .ToHashSet();
         return DeclaredCriteria.Where(id => !decided.Contains(id)).ToArray();
+    }
+
+    /// <summary>
+    /// Declared subject × criterion obligations with no decided verdict. Unlike <see cref="MissingFrom"/>,
+    /// a verdict for one subject never pays another subject's debt, even when both use the same criterion id.
+    /// Subject matching is case-insensitive because runner subjects are human-facing identifiers.
+    /// </summary>
+    /// <param name="verdicts">The verdicts emitted by the proof run.</param>
+    public IReadOnlyList<SpecObligation> MissingObligationsFrom(IEnumerable<Verdict> verdicts)
+    {
+        var decided = verdicts
+            .SelectMany(verdict => verdict.Results
+                .Where(result => result.Status != VerdictStatus.Skipped)
+                .Select(result => (verdict.Subject, result.CriterionId)))
+            .ToHashSet(SubjectCriterionComparer.Instance);
+        return DeclaredObligations
+            .Where(obligation => !decided.Contains((obligation.Subject, obligation.CriterionId)))
+            .ToArray();
     }
 
     /// <summary>Reads and parses a <c>&lt;Module&gt;.spec.toml</c> from disk.</summary>
@@ -106,5 +133,19 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
             .Select(Unquote)
             .Where(s => s.Length > 0)
             .ToArray();
+    }
+
+    private sealed class SubjectCriterionComparer : IEqualityComparer<(string Subject, string CriterionId)>
+    {
+        public static SubjectCriterionComparer Instance { get; } = new();
+
+        public bool Equals((string Subject, string CriterionId) x, (string Subject, string CriterionId) y) =>
+            StringComparer.OrdinalIgnoreCase.Equals(x.Subject, y.Subject)
+            && StringComparer.Ordinal.Equals(x.CriterionId, y.CriterionId);
+
+        public int GetHashCode((string Subject, string CriterionId) value) =>
+            HashCode.Combine(
+                StringComparer.OrdinalIgnoreCase.GetHashCode(value.Subject),
+                StringComparer.Ordinal.GetHashCode(value.CriterionId));
     }
 }

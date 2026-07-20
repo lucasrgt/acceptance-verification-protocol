@@ -5,7 +5,8 @@ verification for AI-built web features. You declare what a feature must *do* (th
 runs it against a real substrate (rendered React, an HTTP backend, the laid-out DOM) and returns an actionable
 **verdict** + acceptance score. The runtime sibling of the static doctor; standalone, like a test runner.
 
-It runs **inside your existing Vitest suite** — `*.assay.*` files are plain tests. The `assay` bin is a thin
+It runs **inside your existing Vitest suite** — the canonical `*.assay.test.*` suffix is both
+Assay-filterable and Vitest-discoverable. The `assay` bin is a thin
 face over `vitest run` (it is a wrapper, not a runner of its own).
 
 ## Entry points
@@ -29,7 +30,7 @@ npm install -D @aerofortress/assay vitest
 ```
 
 ```ts
-// features/todo/todo.assay.ts — co-located with the feature, run by `npx assay verify`
+// features/todo/todo.assay.test.ts — co-located with the feature, run by `npx assay verify`
 import { actionEffect } from "@aerofortress/assay";
 import { defineVerification } from "@aerofortress/assay/react/vitest";
 import { addTodoSubject } from "./todo.subject"; // the seams: how to mount, which endpoint, which control

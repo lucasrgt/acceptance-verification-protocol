@@ -27,8 +27,20 @@ export const sendMessage: ActionEffectSubject = {
 };
 ```
 
+For a form that needs more than one field before submit, declare every draft instead of weakening the subject:
+
 ```ts
-// features/send/send.assay.ts
+inputs: [
+  { role: 'textbox', name: /wallet/i, value: '11111111-1111-4111-8111-111111111111' },
+  { role: 'spinbutton', name: /amount/i, value: '50' },
+]
+```
+
+Assay fills the complete form and, under failure, requires every declared draft to survive. The single-field
+`input` + `draftSample` shape remains supported.
+
+```ts
+// features/send/send.assay.test.ts
 import { actionEffect } from '@aerofortress/assay';
 import { defineVerification } from '@aerofortress/assay/react/vitest';
 import { sendMessage } from './send.subject';
@@ -37,7 +49,7 @@ defineVerification(actionEffect, sendMessage);
 ```
 
 ```bash
-npx assay verify          # every *.assay.* file; --json for machine output; --help for more
+npx assay verify          # every *.assay.test.* file; --json for machine output; --help for more
 ```
 
 Assay mounts the component, forces each criterion's condition through MSW (`success`,
@@ -104,6 +116,6 @@ benchmark. Worked example: [`assay/test/custom-criterion.test.ts`](../assay/test
 ## 5. The static half
 
 `@aerofortress/eslint-plugin-assay` fails the lint when a feature file lacks a co-located
-`*.assay.*` covering the archetypes its type demands — "did you even write a
+`*.assay.test.*` covering the archetypes its type demands — "did you even write a
 verification?" is a static question. See
 [`assay/eslint-plugin-assay/README.md`](../assay/eslint-plugin-assay/README.md).

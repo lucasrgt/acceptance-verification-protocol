@@ -1,6 +1,6 @@
 {
   "name": "@aerofortress/assay",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
   "license": "MIT",
   "author": "Lucas Tinoco",
@@ -18,6 +18,9 @@
   "bugs": "https://github.com/lucasrgt/acceptance-verification-protocol/issues",
   "keywords": ["avp", "assay", "acceptance", "verification", "testing", "react", "archetypes"],
   "workspaces": ["examples/*"],
+  "overrides": {
+    "esbuild": "^0.28.1"
+  },
   "bin": {
     "assay": "bin/assay.mjs"
   },
@@ -107,6 +110,6 @@
     "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.19.0",
-    "vitest": "^2.1.8"
+    "vitest": "^4.1.10"
   }
 }

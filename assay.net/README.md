@@ -10,8 +10,8 @@ neutral catalog that runs catalog-driven acceptance **archetypes** over a real s
 backend) and emits an actionable `Verdict` + `AcceptanceScore`.
 
 It is **standalone**: it knows nothing of any framework. `AeroFortress.Framework` depends on AVP,
-never the reverse — the static doctor recognizes the `[AVP("id")]` attribute by name to enforce that
-every `[Verify]`/`[Critical]`/`[Journey]` production element has a matching proof.
+never the reverse — the static doctor recognizes the `[AVP(typeof(Subject), "id")]` attribute by name to
+enforce that every declared production subject has its own matching proof.
 
 ## Install
 
@@ -37,11 +37,12 @@ foreach (var r in verdict.Results)
 Console.WriteLine($"acceptanceScore = {verdict.AcceptanceScore}");
 ```
 
-Mark a verification method as the proof of a catalog criterion with `[AVP("id")]` — the `[Fact]` of
-AVP, and the AVP half of the cross-layer bridge:
+Mark a verification method as the proof of a catalog criterion with
+`[AVP(typeof(Subject), "id")]` — the `[Fact]` of AVP, and the AVP half of the cross-layer bridge.
+The subject is mandatory for coverage: sharing a criterion never lets one feature borrow another's proof.
 
 ```csharp
-[AVP("split-invariant")]
+[AVP(typeof(CreateSplit), "split-invariant")]
 [Fact]
 public async Task split_is_exact_to_the_cent() { /* PASS good ∧ FAIL the escape */ }
 ```

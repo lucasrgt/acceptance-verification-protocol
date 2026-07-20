@@ -35,10 +35,12 @@ export function reactProbe(subject: ActionEffectSubject, condition: Condition): 
       },
       draftSurvived() {
         const d = seen();
-        if (d.inputValue() !== subject.draftSample) {
+        const drafts = d.inputValues();
+        const lost = drafts.filter((draft) => draft.actual !== draft.expected);
+        if (lost.length > 0) {
           throw new AvpFail(
-            'The input was cleared even though the action failed (phantom success) — only clear the draft on the success path.',
-            { draft: d.inputValue() },
+            `${lost.length} input draft(s) changed or cleared even though the action failed (phantom success) — only clear drafts on the success path.`,
+            { drafts },
           );
         }
       },

@@ -20,6 +20,7 @@ export interface ReqRecord {
 export interface Driven {
   readonly requests: ReadonlyArray<ReqRecord>;
   inputValue(): string | null;
+  inputValues(): ReadonlyArray<{ readonly expected: string; readonly actual: string | null }>;
   hasVisibleError(): boolean;
   /** The projection's text snapshotted BEFORE the action. */
   readonly projectionBefore: string | null;
@@ -117,8 +118,9 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
   const user = userEvent.setup();
   render(subject.render());
 
-  if (subject.input && subject.draftSample != null) {
-    await user.type(screen.getByRole(subject.input.role, nameOpt(subject.input.name)), subject.draftSample);
+  const drafts = declaredDrafts(subject);
+  for (const draft of drafts) {
+    await user.type(screen.getByRole(draft.role, nameOpt(draft.name)), draft.value);
   }
 
   const projectionBefore = projectionText();
@@ -154,12 +156,10 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
   return {
     requests,
     inputValue() {
-      if (!subject.input) return null;
-      const field = screen.queryByRole(subject.input.role, nameOpt(subject.input.name)) as
-        | HTMLInputElement
-        | HTMLTextAreaElement
-        | null;
-      return field ? field.value : null;
+      return readDraft(drafts[0]);
+    },
+    inputValues() {
+      return drafts.map((draft) => ({ expected: draft.value, actual: readDraft(draft) }));
     },
     hasVisibleError() {
       return screen.queryAllByRole('alert').some((el) => (el.textContent ?? '').trim().length > 0);
@@ -168,6 +168,19 @@ export async function drive(subject: ActionEffectSubject, condition: Condition):
     projectionText,
     refreshCount: () => refreshCount,
   };
+}
+
+function declaredDrafts(subject: ActionEffectSubject) {
+  if (subject.inputs && subject.inputs.length > 0) return subject.inputs;
+  return subject.input && subject.draftSample !== undefined
+    ? [{ ...subject.input, value: subject.draftSample }]
+    : [];
+}
+
+function readDraft(draft: { readonly role: string; readonly name?: string | RegExp } | undefined): string | null {
+  if (!draft) return null;
+  const field = screen.queryByRole(draft.role, nameOpt(draft.name)) as HTMLInputElement | HTMLTextAreaElement | null;
+  return field ? field.value : null;
 }
 
 function nameOpt(name?: string | RegExp) {

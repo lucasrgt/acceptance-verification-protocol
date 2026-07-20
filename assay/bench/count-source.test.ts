@@ -24,6 +24,7 @@ const countSubject = (variant: CountVariant): DataHonestySubject => ({
   items: { role: 'article' },
   emptyResponse: [],
   countResponse: ROWS,
+  expectedCount: ROWS.length,
   fabricationMarkers: [],
 });
 

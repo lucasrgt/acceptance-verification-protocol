@@ -11,7 +11,7 @@ export { identityProbe, isIdentitySubject } from './identity';
 export { server } from './msw-server';
 export { settle, settleUntil } from './settle';
 // Every subject type a consumer needs to declare its seams, one per archetype family.
-export type { ActionEffectSubject } from './subject';
+export type { ActionDraft, ActionEffectSubject } from './subject';
 export type { IdentitySubject } from './identity';
 export type { DataHonestySubject } from './data-honesty';
 export type { DetailHonestySubject } from './data-detail';

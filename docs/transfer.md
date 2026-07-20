@@ -116,7 +116,7 @@ Transfer is now an operational loop, not a bespoke experiment:
 
 1. In the TARGET repo, install the verifier: `npm i -D @aerofortress/assay vitest` (+ the
    react peers if verifying DOM criteria).
-2. Author the subjects — one `*.assay.*` file per feature, declaring the seams that
+2. Author the subjects — one `*.assay.test.*` file per feature, declaring the seams that
    already exist (see `docs/getting-started.md`).
 3. Run **`npx assay verify`** — every criterion the archetypes can observe in that project
    executes; criteria whose seams the subject lacks are skipped honestly.

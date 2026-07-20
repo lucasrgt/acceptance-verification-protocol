@@ -28,8 +28,10 @@ export interface DataHonestySubject {
   readonly mediaResponse?: unknown;
   /** Hosts/patterns that betray fabricated media if they surface as an `<img src>`. */
   readonly fabricationMarkers: readonly (string | RegExp)[];
-  /** A populated response with a known row count (drives the `success` condition). Enables `count-matches-source`. */
-  readonly countResponse?: readonly unknown[];
+  /** A populated endpoint response (array or wrapped DTO) that drives the `success` condition. */
+  readonly countResponse?: unknown;
+  /** The number of domain rows inside `countResponse`. Optional when the response itself is an array. */
+  readonly expectedCount?: number;
 }
 
 interface DrivenData {
@@ -105,7 +107,7 @@ export function dataProbe(subject: DataHonestySubject, condition: Condition): Pr
         throw new AvpFail('noRawIdFlash needs a detail subject (declare `rawId`); not applicable to a list subject.');
       },
       countMatchesSource() {
-        const expected = subject.countResponse?.length ?? 0;
+        const expected = expectedCount(subject) ?? 0;
         const rendered = seen().itemCount();
         if (rendered !== expected) {
           throw new AvpFail(
@@ -135,10 +137,15 @@ export function dataHonestyHooks(subject: DataHonestySubject | DetailHonestySubj
       if (c.requires === 'media' && (subject as DataHonestySubject).mediaResponse === undefined) {
         return 'Subject declares no mediaResponse — criterion not applicable.';
       }
-      if (c.requires === 'count' && (subject as DataHonestySubject).countResponse === undefined) {
-        return 'Subject declares no countResponse — count-matches-source not applicable.';
+      if (c.requires === 'count' && expectedCount(subject as DataHonestySubject) === undefined) {
+        return 'Subject declares no countResponse/expectedCount — count-matches-source not applicable.';
       }
       return null;
     },
   };
+}
+
+function expectedCount(subject: DataHonestySubject): number | undefined {
+  if (subject.expectedCount !== undefined) return subject.expectedCount;
+  return Array.isArray(subject.countResponse) ? subject.countResponse.length : undefined;
 }

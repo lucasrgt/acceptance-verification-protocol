@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-// Thin face: `assay verify` runs your co-located *.assay.* verifications on the host
+// Thin face: `assay verify` runs your co-located *.assay.test.* verifications on the host
 // runner (Vitest) — a wrapper over the host, not a runner of its own (ADR 0001).
 //
-//   assay verify                 # every *.assay.* file in the project
+//   assay verify                 # every *.assay.test.* file in the project
 //   assay verify src/features    # scoped to paths you pass
 //   assay verify --json          # vitest's JSON reporter (machine-readable results)
 //   assay verify -- --coverage   # anything after -- goes to vitest untouched
@@ -20,7 +20,7 @@ const USAGE = `assay ${version} — the AVP reference verifier (thin wrapper ove
 usage:
   assay verify [paths...] [--json] [-- <vitest args>]
 
-  Runs the *.assay.* verification files (authored with defineVerification) through
+  Runs the *.assay.test.* verification files (authored with defineVerification) through
   your project's Vitest. Paths scope the run; --json switches to Vitest's JSON
   reporter; everything after -- is handed to Vitest verbatim.
 
@@ -59,7 +59,7 @@ try {
 }
 
 // Vitest filters files by positional substring match. Default: the co-location
-// convention (any path containing ".assay."). Explicit paths replace the default —
+// convention (Vitest-discoverable test files containing ".assay."). Explicit paths replace the default —
 // they are the caller's scope, verbatim.
 const filters = paths.length > 0 ? paths : ['.assay.'];
 const args = [

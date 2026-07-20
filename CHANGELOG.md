@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### 0.3.0 — subject-bound proofs
+
+- `AVPAttribute` now accepts `[AVP(typeof(Subject), "criterion-id")]`, making a proof an explicit
+  subject × criterion claim. The legacy criterion-only constructor remains source-compatible but is
+  intentionally insufficient for framework coverage gates.
+- `SpecManifest.DeclaredObligations` and `MissingObligationsFrom` preserve subject identity, so a verdict
+  for one slice cannot satisfy another slice that happens to declare the same criterion.
+- The canonical JS proof suffix is now `*.assay.test.*`: it is both selected by `assay verify` and
+  discovered by Vitest. The ESLint coverage rule rejects the old non-discoverable `*.assay.tsx` shape.
+- React data-honesty subjects can verify wrapped collection DTOs through `countResponse` + `expectedCount`;
+  array responses remain source-compatible and infer their count.
+- React action-effect subjects can declare all required form drafts through `inputs`; Assay fills the complete
+  form and verifies every draft survives a failed action. The legacy `input` + `draftSample` shape remains compatible.
+
 ### Protocol — the authority handover (Phase 1b closed)
 
 - **The catalog is now .NET-led.** Criteria are born in
@@ -43,7 +57,7 @@ The audit release: 125 improvement points closed across the whole repo.
   crash-is-not-a-refusal semantics (5xx never passes an authorization criterion).
 - Design tier: rgba/hsl/oklch/named-color parsing, alpha-composited contrast, AA/AAA
   levels, injectable token/theme ground truth, opt-in computed-style checking.
-- `assay verify` is a real CLI: filters `*.assay.*` files, `--json`, `--help`, no shell.
+- `assay verify` is a real CLI: filters Assay verification files, `--json`, `--help`, no shell.
 
 ### Assay.Net (0.1.9 → 0.2.0)
 

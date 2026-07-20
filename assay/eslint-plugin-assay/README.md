@@ -11,7 +11,7 @@ lives here, in your lint step.
 
 ## Rule: `assay/require-verification`
 
-For each file matching a `files` glob, require a co-located `*.assay.*` that calls
+For each file matching a `files` glob, require a co-located `*.assay.test.*` that calls
 `defineVerification(<archetype>, …)` for each listed archetype. The `archetypes`
 you configure are the **archetype binding identifiers** as imported (e.g.
 `actionEffect`, `dataHonesty`), matched against the first argument of each

@@ -50,7 +50,7 @@ console.log(`\n[assay coverage] ${path.basename(target)} — ${suffix} features`
 // eslint-disable-next-line no-console
 console.log(`  total:     ${views.length}`);
 // eslint-disable-next-line no-console
-console.log(`  covered:   ${covered.length}  (have a co-located *.assay.*)`);
+console.log(`  covered:   ${covered.length}  (have a co-located *.assay.test.*)`);
 // eslint-disable-next-line no-console
 console.log(`  uncovered: ${uncovered.length}`);
 for (const v of uncovered.slice(0, 12)) {

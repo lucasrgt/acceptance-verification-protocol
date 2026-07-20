@@ -13,7 +13,7 @@ const path = require("path");
  * enables + configures it (mapping its slice/view types to archetypes).
  *
  * The rule keys off Assay's stable, statically-matchable convention:
- *   - verification files are co-located `*.assay.ts(x)` / `*.assay.js(x)`
+ *   - verification files are co-located `*.assay.test.ts(x)` / `*.assay.test.js(x)`
  *   - they call `defineVerification(<archetype>, <subject>, <opts?>)` at top level
  * A feature "covers archetype A" iff a co-located verification calls
  * `defineVerification(A, …)`, where A is the archetype binding's identifier.
@@ -22,7 +22,7 @@ const path = require("path");
  * runtime → Assay, and convergent → escape accrual).
  */
 
-const ASSAY_FILE = /\.assay\.[jt]sx?$/;
+const ASSAY_FILE = /\.assay\.test\.[cm]?[jt]sx?$/;
 const DEFINE_CALL = /defineVerification\s*\(\s*([A-Za-z_$][\w$]*)/g;
 
 /**
@@ -42,7 +42,7 @@ function stripComments(src) {
 // its whole directory.
 const dirCache = new Map();
 
-/** The archetype identifiers a co-located `*.assay.*` covers (the 1st arg of each defineVerification call). */
+/** The archetype identifiers a co-located `*.assay.test.*` covers (the 1st arg of each defineVerification call). */
 function coveredArchetypes(dir) {
   let entries;
   try {
@@ -143,7 +143,7 @@ const requireVerification = {
       },
     ],
     messages: {
-      missing: "{{file}} has no Assay verification for: {{archetypes}}. Add a co-located *.assay.* calling defineVerification({{archetypes}}, …).",
+      missing: "{{file}} has no Assay verification for: {{archetypes}}. Add a co-located *.assay.test.* calling defineVerification({{archetypes}}, …).",
     },
   },
   create(context) {

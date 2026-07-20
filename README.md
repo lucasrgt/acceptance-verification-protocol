@@ -49,7 +49,7 @@ npm i -D @aerofortress/assay vitest @testing-library/react @testing-library/user
 ```
 
 ```ts
-// features/send-message/send.assay.ts — co-located with the feature it verifies
+// features/send-message/send.assay.test.ts — co-located with the feature it verifies
 import { actionEffect } from '@aerofortress/assay';
 import { defineVerification } from '@aerofortress/assay/react/vitest';
 import { composer } from './send.subject'; // how to mount + which seams exist
@@ -58,7 +58,7 @@ defineVerification(actionEffect, composer);
 ```
 
 ```bash
-npx assay verify        # runs every *.assay.* file through your Vitest
+npx assay verify        # runs every *.assay.test.* file through your Vitest
 ```
 
 A **subject** declares the seams that already exist (how to mount, which endpoint, which

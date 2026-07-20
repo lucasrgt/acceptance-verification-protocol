@@ -50,4 +50,24 @@ public class SpecManifestTests
     {
         Assert.Throws<FormatException>(() => SpecManifest.Parse("[slices.X]\ncriteria = [\"a\"]"));
     }
+
+    [Fact]
+    public void obligations_preserve_the_subject_when_criteria_are_shared()
+    {
+        var manifest = SpecManifest.Parse("""
+            module = "Files"
+            [slices.Upload]
+            criteria = ["requires-authentication"]
+            [slices.Delete]
+            criteria = ["requires-authentication"]
+            """);
+        var uploadVerdict = new Verdict(
+            "upload",
+            "authorization",
+            [new CriterionVerdict("requires-authentication", VerdictStatus.Pass, "held")]);
+
+        var missing = manifest.MissingObligationsFrom([uploadVerdict]);
+
+        Assert.Equal([new SpecObligation("Delete", "requires-authentication")], missing);
+    }
 }

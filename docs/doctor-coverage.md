@@ -17,7 +17,7 @@ ESLint/AFFE layer).
 
 ## The convention the rule keys off
 
-- Verification files: `*.assay.ts` / `*.assay.tsx`, co-located with the feature/view.
+- Verification files: `*.assay.test.ts` / `*.assay.test.tsx`, co-located with the feature/view and discoverable by Vitest.
 - Top-level call: `defineVerification(<archetype>, <subject>, <opts?>)`.
 - A feature **covers archetype A** iff a co-located verification calls `defineVerification(A, …)`.
 
@@ -40,14 +40,14 @@ Static (ESLint). Config maps a file/view selector → the archetypes that type m
 }
 ```
 
-For each file matching `files`, require a co-located `*.assay.*` that calls `defineVerification`
+For each file matching `files`, require a co-located `*.assay.test.*` that calls `defineVerification`
 with each listed archetype. Missing → report on the feature file.
 
 ### Examples
 
-- **bad** — `src/checkout/Pay.view.tsx` exists, no `Pay.assay.tsx`
+- **bad** — `src/checkout/Pay.view.tsx` exists, no `Pay.assay.test.tsx`
   → `checkout view has no Assay verification for: payment`.
-- **good** — `Pay.assay.tsx` with `defineVerification(payment, paySubject)` → passes.
+- **good** — `Pay.assay.test.tsx` with `defineVerification(payment, paySubject)` → passes.
 
 ## Implementation options
 
