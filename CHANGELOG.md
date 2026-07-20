@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### 0.3.1 — consumer-safe React entrypoint
+
+- TanStack Router is now a lazy optional peer. Importing `@aerofortress/assay/react` no longer bundles its CommonJS
+  transitive graph or throws `Dynamic require of "react" is not supported` in an ESM consumer that does not use a router.
+- CI imports the built package entrypoints after `tsup`; source-only tests can no longer hide a broken published bundle.
+
 ### 0.3.0 — subject-bound proofs
 
 - `AVPAttribute` now accepts `[AVP(typeof(Subject), "criterion-id")]`, making a proof an explicit

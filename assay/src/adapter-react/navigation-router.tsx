@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
+import type { AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { NavigationExpect } from '../archetypes/navigation-integrity';
 import { settle } from './settle';
@@ -56,6 +56,7 @@ export function routerProbe(subject: RouterNavSubject): Probe<NavigationExpect> 
       cleanup();
       const user = userEvent.setup();
       const router = subject.router();
+      const { RouterProvider } = await import('@tanstack/react-router');
       let unsub: (() => void) | undefined;
       if (subject.redirectLoop) {
         // Count each route-load attempt; a redirect storm fires it until the router

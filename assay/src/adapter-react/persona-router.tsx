@@ -1,5 +1,5 @@
 import { cleanup, render } from '@testing-library/react';
-import { RouterProvider, type AnyRouter } from '@tanstack/react-router';
+import type { AnyRouter } from '@tanstack/react-router';
 import { AvpFail, type Probe } from '../core/dsl';
 import type { PersonaExpect } from '../archetypes/persona-visibility';
 import { settle } from './settle';
@@ -34,6 +34,7 @@ export function personaRouterProbe(subject: PersonaRouteSubject): Probe<PersonaE
   return {
     async act() {
       cleanup();
+      const { RouterProvider } = await import('@tanstack/react-router');
       render(<RouterProvider router={subject.router()} />);
       await settle(80);
       acted = true;

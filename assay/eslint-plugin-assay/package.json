@@ -1,6 +1,6 @@
 {
   "name": "@aerofortress/eslint-plugin-assay",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Static coverage rule for Assay (AVP) — require a co-located verification for the archetypes a feature must cover.",
   "license": "MIT",
   "author": "Lucas Tinoco",

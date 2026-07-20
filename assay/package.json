@@ -1,6 +1,6 @@
 {
   "name": "@aerofortress/assay",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
   "license": "MIT",
   "author": "Lucas Tinoco",
@@ -68,12 +68,14 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test:package": "npm run build && node test/package-entrypoints.mjs"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.40.0",
     "@testing-library/react": ">=16",
     "@testing-library/user-event": ">=14",
+    "@tanstack/react-router": ">=1",
     "jsdom": ">=25",
     "msw": ">=2.6",
     "puppeteer-core": ">=23",
@@ -85,6 +87,7 @@
     "@anthropic-ai/sdk": { "optional": true },
     "@testing-library/react": { "optional": true },
     "@testing-library/user-event": { "optional": true },
+    "@tanstack/react-router": { "optional": true },
     "jsdom": { "optional": true },
     "msw": { "optional": true },
     "puppeteer-core": { "optional": true },

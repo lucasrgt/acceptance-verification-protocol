@@ -35,6 +35,9 @@ jobs:
       - name: bench (verifier accuracy + mutation + protocol drift)
         working-directory: assay
         run: npx vitest run
+      - name: packaged entrypoints smoke test
+        working-directory: assay
+        run: npm run test:package
       - name: eslint-plugin self-test
         working-directory: assay
         run: node eslint-plugin-assay/index.test.cjs

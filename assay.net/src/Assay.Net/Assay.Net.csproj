@@ -12,7 +12,7 @@
     <PackageId>Assay.Net</PackageId>
     <!-- One version, both implementations: a vX.Y.Z tag publishes JS and .NET at the SAME version
          (the publish workflow asserts tag == this == assay/package.json). -->
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <Authors>lucasrgt</Authors>
     <Description>The .NET reference implementation of the Acceptance Verification Protocol (AVP): runs catalog-driven acceptance archetypes over a real HTTP backend and emits an actionable verdict + acceptance score. The runtime sibling of the static doctor; standalone, like xUnit.</Description>
     <PackageTags>avp;acceptance;verification;testing;archetypes;assay;http</PackageTags>

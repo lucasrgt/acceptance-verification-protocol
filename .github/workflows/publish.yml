@@ -45,7 +45,7 @@ jobs:
         run: npm ci --workspaces=false
       - name: typecheck + bench
         working-directory: assay
-        run: npx tsc --noEmit && npx vitest run
+        run: npx tsc --noEmit && npx vitest run && npm run test:package
       - name: dotnet tests
         working-directory: assay.net
         run: dotnet test --nologo -warnaserror
