@@ -54,8 +54,10 @@ npx assay verify          # every *.assay.test.* file; --json for machine output
 
 Assay mounts the component, forces each criterion's condition through MSW (`success`,
 `api-error`, `offline`, `double-activate`, …), and emits a verdict per criterion.
-Criteria whose seam the subject doesn't declare are **skipped honestly** — declare more
-seams (`projection`, `retryable`, `successMarker`, …) to arm more criteria.
+Criteria that genuinely do not apply to the declared subject are reported as
+`not-applicable`; a missing judge or unavailable required proof is `unresolved` and
+fails the host gate as inconclusive. Declare the full subject seams (`projection`,
+`retryable`, `successMarker`, …) so every invariant the feature needs is armed.
 
 ## 2. HTTP — "the server actually enforces it"
 

@@ -12,4 +12,11 @@ import { API_BASE } from '../src/api';
 defineVerification(actionEffect, addTodoSubject, {
   // baseline so the initial list load succeeds; the verifier forces POST on top.
   setup: () => server.use(http.get(`${API_BASE}/todos`, () => HttpResponse.json([]))),
+  // CI stays deterministic: this project-owned judge encodes the product's concrete
+  // error contract. A production suite may inject claudeJudge for broader semantics.
+  judge: (request) => {
+    const text = (request.evidence as { text: string }).text.toLowerCase();
+    const pass = text.includes('could not add the todo') && text.includes('try again');
+    return { pass, reason: pass ? 'names the failed action and a retry step' : 'error lacks the add/retry contract' };
+  },
 });

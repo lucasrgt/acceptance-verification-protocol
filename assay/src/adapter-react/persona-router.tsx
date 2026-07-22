@@ -16,7 +16,9 @@ export interface PersonaRouteSubject {
   /** The actor the session is signed in as. */
   readonly actor: string;
   /** A freshly-configured router (memory history already pointed at the foreign-actor route). */
-  readonly router: () => AnyRouter;
+  readonly router: (foreignRoute?: string) => AnyRouter;
+  /** Every foreign-persona route to sweep. Omit only for a single preconfigured route. */
+  readonly foreignRoutes?: readonly string[];
   /** A marker proving the actor landed on its OWN area (the guard redirected). */
   readonly guardMarker: string | RegExp;
   /** The foreign actor's screen content that must NOT render for this actor. */
@@ -31,12 +33,19 @@ const present = (marker: string | RegExp): boolean => {
 /** The React adapter's router-mounted `persona-scoped-visibility` probe. */
 export function personaRouterProbe(subject: PersonaRouteSubject): Probe<PersonaExpect> {
   let acted = false;
+  const leakedRoutes: string[] = [];
+  const unguardedRoutes: string[] = [];
   return {
     async act() {
-      cleanup();
       const { RouterProvider } = await import('@tanstack/react-router');
-      render(<RouterProvider router={subject.router()} />);
-      await settle(80);
+      for (const route of subject.foreignRoutes?.length ? subject.foreignRoutes : [undefined]) {
+        cleanup();
+        render(<RouterProvider router={subject.router(route)} />);
+        await settle(80);
+        const label = route ?? '(preconfigured route)';
+        if (present(subject.foreignMarker)) leakedRoutes.push(label);
+        if (!present(subject.guardMarker)) unguardedRoutes.push(label);
+      }
       acted = true;
     },
     expect: {
@@ -45,16 +54,16 @@ export function personaRouterProbe(subject: PersonaRouteSubject): Probe<PersonaE
       },
       noCrossPersonaRoute() {
         if (!acted) throw new AvpFail('probe used before act() — call `await act()` first.');
-        if (present(subject.foreignMarker)) {
+        if (leakedRoutes.length > 0) {
           throw new AvpFail(
-            `Signed in as "${subject.actor}", an actor-scoped route rendered the foreign actor's screen ("${String(subject.foreignMarker)}") — a cross-persona route leak on a deep link. Guard the route server-confirmed: refuse the wrong actor and redirect to its own area, don't render.`,
-            { actor: subject.actor },
+            `Signed in as "${subject.actor}", foreign route(s) rendered the opposite persona: ${leakedRoutes.join(', ')}. Guard every route in the persona-fixed build, not only one representative path.`,
+            { actor: subject.actor, leakedRoutes },
           );
         }
-        if (!present(subject.guardMarker)) {
+        if (unguardedRoutes.length > 0) {
           throw new AvpFail(
-            `Signed in as "${subject.actor}", the foreign-actor route did not redirect to this actor's own area ("${String(subject.guardMarker)}") — the guard sent it somewhere other than home. Redirect a refused actor to its own area.`,
-            { actor: subject.actor },
+            `Signed in as "${subject.actor}", foreign route(s) did not redirect to this actor's own area: ${unguardedRoutes.join(', ')}.`,
+            { actor: subject.actor, unguardedRoutes },
           );
         }
       },

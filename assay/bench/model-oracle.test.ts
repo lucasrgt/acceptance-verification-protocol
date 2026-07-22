@@ -9,10 +9,11 @@ import { pairs } from './pairs';
 const composer = pairs[0].good;
 
 describe('model oracle wiring', () => {
-  it('is skipped when no judge is provided', async () => {
+  it('is unresolved when no judge is provided', async () => {
     const verdict = await verify(actionEffect, composer);
     const m = verdict.results.find((r) => r.criterionId === 'error-is-specific');
-    expect(m?.status).toBe('skipped');
+    expect(m?.status).toBe('unresolved');
+    expect(verdict.outcome).toBe('inconclusive');
   });
 
   it('routes the rubric + evidence to the judge and uses its verdict (pass)', async () => {

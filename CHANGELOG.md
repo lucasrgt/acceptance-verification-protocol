@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### 0.4.0 — fail-closed verdicts
+
+- Protocol verdicts now distinguish `not-applicable` from `unresolved` and carry an
+  aggregate `pass`, `fail`, or `inconclusive` outcome. Zero applicable criteria yields
+  no score and is inconclusive instead of a vacuous perfect score.
+- The Vitest and .NET hosts reject inconclusive verdicts regardless of a configured
+  score. Acceptance thresholds were removed: any failed criterion is mandatory and
+  cannot be waived by lowering a number. Missing model/human oracles are unresolved;
+  domain non-applicability remains visible without manufacturing a pass.
+- Browser calibration concurrency and teardown are bounded for deterministic CI, and
+  expected jsdom limitations no longer bury useful gate output.
+- Criterion-only `[AVP("id")]` and criterion-only manifest scoring were removed. Every
+  proof and every coverage decision is subject × criterion, so one feature can never pay
+  another feature's acceptance debt.
+- Manifest obligations are satisfied only by `Pass`; failed, unresolved, not-applicable,
+  empty, duplicate, or redeclared obligations all remain red or fail parsing.
+
 ### 0.3.1 — consumer-safe React entrypoint
 
 - TanStack Router is now a lazy optional peer. Importing `@aerofortress/assay/react` no longer bundles its CommonJS

@@ -1,10 +1,11 @@
 name: ci
 
-# The verifier verifies itself: typecheck + lint + the calibration bench (JS), the
-# eslint-plugin self-test, the example app's verification, and the .NET suite — on every
-# push and PR. The geometry benches run for real here: ubuntu runners ship Chrome, so
-# `describe.skipIf(!hasBrowser)` does not skip in CI.
+# The verifier verifies itself: typecheck + lint + the unified JS/.NET measurement,
+# packaged entrypoints, eslint-plugin self-test, and the example app's verification — on
+# every push and PR. The geometry benches run for real here: ubuntu runners ship Chrome,
+# so `describe.skipIf(!hasBrowser)` does not skip in CI.
 on:
+  workflow_call:
   push:
     branches: [main]
   pull_request:
@@ -23,6 +24,9 @@ jobs:
           node-version: "22"
           cache: npm
           cache-dependency-path: assay/package-lock.json
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
+        with:
+          dotnet-version: "10.0.x"
       - name: install
         working-directory: assay
         run: npm ci
@@ -32,9 +36,9 @@ jobs:
       - name: lint
         working-directory: assay
         run: npm run lint
-      - name: bench (verifier accuracy + mutation + protocol drift)
+      - name: unified measurement (JS + .NET + catalog evidence)
         working-directory: assay
-        run: npx vitest run
+        run: npm run measure:check
       - name: packaged entrypoints smoke test
         working-directory: assay
         run: npm run test:package
@@ -44,15 +48,3 @@ jobs:
       - name: example verification (assay CLI end-to-end)
         working-directory: assay/examples/todo-app
         run: node ../../bin/assay.mjs verify
-
-  dotnet:
-    name: Assay.Net — build + tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
-      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4
-        with:
-          dotnet-version: "10.0.x"
-      - name: test
-        working-directory: assay.net
-        run: dotnet test --nologo -warnaserror

@@ -16,6 +16,7 @@ export {
 export { formatVerdict, verdictToJsonLine } from './core/format';
 export { composeVerdicts, type FeatureVerdict } from './core/compose';
 export { actionEffect, type ActionEffectExpect } from './archetypes/action-effect';
+export { failureHonesty, type FailureHonestyExpect } from './archetypes/failure-honesty';
 export { dataHonesty, type DataHonestyExpect } from './archetypes/data-honesty';
 export { personaVisibility, type PersonaExpect } from './archetypes/persona-visibility';
 export { navigationIntegrity, type NavigationExpect } from './archetypes/navigation-integrity';
@@ -29,6 +30,7 @@ export { temporalIntegrity, type TemporalExpect } from './archetypes/temporal-in
 export { paginationIntegrity, type PaginationExpect } from './archetypes/pagination-integrity';
 export { renderResilience, type RenderResilienceExpect } from './archetypes/render-resilience';
 export { requestIdempotency, type IdempotencyExpect } from './archetypes/request-idempotency';
+export { mutationAtomicity, type MutationAtomicityExpect } from './archetypes/mutation-atomicity';
 export { accessControl, type AccessControlExpect } from './archetypes/access-control';
 export { credentialAuthority, type CredentialAuthorityExpect } from './archetypes/credential-authority';
 export { resourceUniqueness, type ResourceUniquenessExpect } from './archetypes/resource-uniqueness';

@@ -14,7 +14,7 @@ export interface AccessControlExpect {
 export const accessControl = archetype('access-control', '0.1.0', () => {
   criterion(
     'requires-authentication',
-    'A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every [Critical] authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.',
+    'A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.',
     { under: 'api-error', scope: 'invariant' },
     mechanical<AccessControlExpect>(async ({ act, expect }) => {
       await act();

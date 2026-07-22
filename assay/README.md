@@ -3,7 +3,8 @@
 The reference **JS/React implementation of AVP** (the Acceptance Verification Protocol) — deterministic behavior
 verification for AI-built web features. You declare what a feature must *do* (the archetype + criteria); Assay
 runs it against a real substrate (rendered React, an HTTP backend, the laid-out DOM) and returns an actionable
-**verdict** + acceptance score. The runtime sibling of the static doctor; standalone, like a test runner.
+**verdict** + fail-closed aggregate outcome. Empty or unresolved proof is inconclusive,
+not green. The runtime sibling of the static doctor; standalone, like a test runner.
 
 It runs **inside your existing Vitest suite** — the canonical `*.assay.test.*` suffix is both
 Assay-filterable and Vitest-discoverable. The `assay` bin is a thin

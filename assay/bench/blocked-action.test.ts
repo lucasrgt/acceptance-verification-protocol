@@ -32,12 +32,12 @@ describe('AVP — verifier accuracy (lifecycle-gate · blocked-action-is-disable
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD screen with no false alarm (backend criterion skipped by adapter)', async () => {
+  it('passes the GOOD screen with no false alarm (backend criterion is not applicable to the adapter)', async () => {
     const v = await verify(lifecycleGate, blocked('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'gate-enforced-server-side')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'gate-enforced-server-side')?.status).toBe('not-applicable');
   });
 
   it('emits the blocked-action-is-disabled number', async () => {

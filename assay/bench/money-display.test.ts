@@ -32,12 +32,12 @@ describe('AVP — verifier accuracy (money-integrity · amount-rendered-exact)',
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD amount with no false alarm (split criterion skipped on the React adapter)', async () => {
+  it('passes the GOOD amount with no false alarm (split criterion is not applicable on the React adapter)', async () => {
     const v = await verify(moneyIntegrity, subject('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'split-invariant')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'split-invariant')?.status).toBe('not-applicable');
   });
 
   it('emits the amount-rendered-exact number', async () => {

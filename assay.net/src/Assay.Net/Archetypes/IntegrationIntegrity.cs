@@ -17,7 +17,9 @@ public sealed record WebhookSubject(
     string CallbackPath = "",
     string KnownRef = "",
     string UnknownRef = "",
-    string CheckoutPath = "");
+    string CheckoutPath = "",
+    string StatePath = "",
+    Func<string, IReadOnlyList<string>>? ReadAppliedEventIds = null);
 
 /// <summary>integration-integrity — only an authentically-signed inbound callback may mutate state.</summary>
 public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
@@ -43,10 +45,38 @@ public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
                 Http.Rejected(await http.SendAsync(forged), "forged-signature webhook");
             },
 
+            ["webhook-effects-state"] = async s =>
+            {
+                if (string.IsNullOrEmpty(s.StatePath))
+                    throw new AvpNotApplicableException("webhook-effects-state: this subject provides no observable state seam.");
+                using var http = Http.Client(s.BaseUrl);
+                const string validId = "avp-valid-event";
+                const string forgedId = "avp-forged-event";
+                var before = await AppliedEvents(http, s);
+
+                var validBody = $$"""{"event":"invoice.paid","id":"{{validId}}"}""";
+                var valid = Http.Request(HttpMethod.Post, s.WebhookPath, body: new StringContent(validBody));
+                valid.Headers.Add("X-Signature", Hmac(validBody, s.Secret));
+                await http.SendAsync(valid);
+
+                var forgedBody = $$"""{"event":"invoice.paid","id":"{{forgedId}}"}""";
+                var forged = Http.Request(HttpMethod.Post, s.WebhookPath, body: new StringContent(forgedBody));
+                forged.Headers.Add("X-Signature", "forged-signature");
+                await http.SendAsync(forged);
+
+                var after = await AppliedEvents(http, s);
+                var validDelta = after.Count(id => id == validId) - before.Count(id => id == validId);
+                var forgedDelta = after.Count(id => id == forgedId) - before.Count(id => id == forgedId);
+                if (validDelta != 1 || forgedDelta != 0)
+                    throw new AvpFailException(
+                        $"webhook state is not authentic-only: valid event delta={validDelta} (expected 1), " +
+                        $"forged event delta={forgedDelta} (expected 0). Observe effects, not only response codes.");
+            },
+
             ["callback-resolves-entity"] = async s =>
             {
                 if (string.IsNullOrEmpty(s.CallbackPath))
-                    throw new AvpSkipException("callback-resolves-entity: this subject provides no callback seam.");
+                    throw new AvpNotApplicableException("callback-resolves-entity: this subject provides no callback seam.");
                 using var http = Http.Client(s.BaseUrl);
 
                 // A callback whose reference resolves to a real domain entity must be accepted.
@@ -64,7 +94,7 @@ public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
             ["redirect-urls-bound"] = async s =>
             {
                 if (string.IsNullOrEmpty(s.CheckoutPath))
-                    throw new AvpSkipException("redirect-urls-bound: this subject provides no checkout seam.");
+                    throw new AvpNotApplicableException("redirect-urls-bound: this subject provides no checkout seam.");
                 using var http = Http.Client(s.BaseUrl);
 
                 // A checkout/OAuth flow must bind its return URLs to the real environment: each required
@@ -78,6 +108,16 @@ public sealed class IntegrationIntegrity : Archetype<WebhookSubject>
                 BindsReturnUrl(doc.RootElement, "failureUrl", "failure");
             },
         };
+
+    private static async Task<IReadOnlyList<string>> AppliedEvents(HttpClient http, WebhookSubject subject)
+    {
+        var response = await http.GetAsync(subject.StatePath);
+        Http.Accepted(response, $"reading webhook effects at {subject.StatePath}");
+        var raw = await response.Content.ReadAsStringAsync();
+        return subject.ReadAppliedEventIds?.Invoke(raw)
+               ?? JsonSerializer.Deserialize<string[]>(raw)
+               ?? [];
+    }
 
     /// <summary>A required return URL must be present, an absolute http(s) URL, and never a placeholder,
     /// relative path, or dev host. Throws <see cref="AvpFailException"/> otherwise.</summary>

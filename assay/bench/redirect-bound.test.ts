@@ -11,7 +11,7 @@ import { startCheckoutServer, APP_ORIGIN, type CheckoutVariant } from './dataset
  * headline escape is missing back_urls; confirmed cross-stack in .NET by bitwarden's
  * missing-RedirectUris fixes. This criterion shares the integration-integrity
  * archetype with webhook-signature-verified, gated by seam (the subject here
- * declares only a checkout, so the webhook criterion is skipped, not failed).
+ * declares only a checkout, so the webhook criterion is not applicable, not failed).
  */
 const servers: Partial<Record<CheckoutVariant, Awaited<ReturnType<typeof startCheckoutServer>>>> = {};
 const VARIANTS: readonly CheckoutVariant[] = [
@@ -51,13 +51,13 @@ describe('AVP — verifier accuracy (integration-integrity · redirect-urls-boun
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD backend with no false alarm (webhook criterion skipped by seam)', async () => {
+  it('passes the GOOD backend with no false alarm (webhook criterion is not applicable by seam)', async () => {
     const v = await verifyHttp(integrationIntegrity, checkoutSubject(servers.good!.baseUrl));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    // the unrelated seam is honestly skipped, never silently passed
-    expect(v.results.find((r) => r.criterionId === 'webhook-signature-verified')?.status).toBe('skipped');
+    // the unrelated seam is explicitly not applicable, never silently passed
+    expect(v.results.find((r) => r.criterionId === 'webhook-signature-verified')?.status).toBe('not-applicable');
   });
 
   it('emits the redirect-urls-bound (HTTP) number', async () => {

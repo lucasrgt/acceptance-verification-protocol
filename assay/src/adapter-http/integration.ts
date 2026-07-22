@@ -42,11 +42,21 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
   let returnUrls: Partial<Record<ReturnTransition, string | null | undefined>> | null = null;
   let unresolvable: number | null = null;
   let resolvable: number | null = null;
+  let beforeEvents: readonly string[] | null = null;
+  let afterEvents: readonly string[] | null = null;
 
   return {
     async act() {
       if (subject.forged) forged = await sendStatus(subject.forged);
       if (subject.valid) valid = await sendStatus(subject.valid);
+      if (subject.state && subject.readAppliedEventIds) {
+        beforeEvents = subject.readAppliedEventIds((await sendJson(subject.state)).body);
+      }
+      if (subject.stateValid) await sendStatus(subject.stateValid);
+      if (subject.stateForged) await sendStatus(subject.stateForged);
+      if (subject.state && subject.readAppliedEventIds) {
+        afterEvents = subject.readAppliedEventIds((await sendJson(subject.state)).body);
+      }
       if (subject.checkout) {
         const reply = await sendJson(subject.checkout);
         if (reply.parseError) {
@@ -73,6 +83,20 @@ export function integrationProbe(subject: HttpIntegrationSubject): Probe<Integra
           throw new AvpFail(
             `A correctly-signed webhook was rejected (${valid}) — the endpoint refuses everything, not only forgeries. Accept authentic callbacks.`,
             { valid },
+          );
+        }
+      },
+      webhookEffectsState() {
+        if (!beforeEvents || !afterEvents || !subject.validEventId || !subject.forgedEventId) {
+          throw new AvpFail('probe used without a complete webhook state seam.');
+        }
+        const count = (events: readonly string[], id: string) => events.filter((event) => event === id).length;
+        const validDelta = count(afterEvents, subject.validEventId) - count(beforeEvents, subject.validEventId);
+        const forgedDelta = count(afterEvents, subject.forgedEventId) - count(beforeEvents, subject.forgedEventId);
+        if (validDelta !== 1 || forgedDelta !== 0) {
+          throw new AvpFail(
+            `Webhook state is not authentic-only: valid event delta=${validDelta} (expected 1), forged event delta=${forgedDelta} (expected 0). Observe effects, not only response codes.`,
+            { beforeEvents, afterEvents, validEventId: subject.validEventId, forgedEventId: subject.forgedEventId },
           );
         }
       },
@@ -115,6 +139,9 @@ export function webhookHooks(subject: HttpIntegrationSubject): VerifyHooks {
     probe: () => integrationProbe(subject),
     applies: (c) => {
       if (c.requires === 'webhook' && !subject.forged) return 'Subject declares no webhook — not applicable.';
+      if (c.requires === 'webhook-state' && (!subject.stateValid || !subject.stateForged || !subject.state || !subject.readAppliedEventIds)) {
+        return 'Subject declares no observable webhook state seam — not applicable.';
+      }
       if (c.requires === 'checkout' && !subject.checkout) return 'Subject declares no checkout request — not applicable.';
       if (c.requires === 'resolve' && !subject.unresolvable) return 'Subject declares no unresolvable callback — not applicable.';
       return null;

@@ -31,16 +31,16 @@ verifier**: it turns *"is the feature done?"* (subjective) into *"did the criter
 
 ## What ships today
 
-- **19 behaviour archetypes** (~50 criteria): action-effect, data-honesty, navigation,
+- **21 behaviour archetypes** (50 criteria): action-effect, failure honesty, data honesty, navigation,
   authorization, integration (webhooks/checkout), money, lifecycle gates, idempotency,
-  temporal correctness, pagination, render resilience, credentials, and more.
+  temporal correctness, pagination, render resilience, mutation atomicity, credentials, and more.
 - **20 design archetypes** (~20 criteria): design-token adherence, theme parity, WCAG
   contrast, accessible names, real-layout geometry (overflow, overlap, responsive, RTL,
   tap targets, layout shift, focus visibility, truncation), model-judged icon fit.
 - Every criterion carries `seenIn` — the real fix commits it was mined from — and a
-  **calibration bench**: the verifier must FAIL the pre-fix repro and PASS the post-fix one
-  (current status: full detection, zero false alarms — see [docs/catalog.md](docs/catalog.md)
-  and [docs/measurements.md](docs/measurements.md) when generated).
+  **calibration bench**: the verifier must FAIL the pre-fix repro and PASS the post-fix one.
+  The automated measurement distinguishes structured accuracy pairs from broader mutation
+  and regression tests; see [docs/measurements.md](docs/measurements.md).
 
 ## Quickstart (JS/React)
 
@@ -63,8 +63,9 @@ npx assay verify        # runs every *.assay.test.* file through your Vitest
 
 A **subject** declares the seams that already exist (how to mount, which endpoint, which
 control); Assay drives the action, forces conditions (`success`, `api-error`, `offline`,
-`double-activate`, …) and emits a per-criterion verdict + acceptance score — actionable red/
-green for an agent loop, a report for a human. Backend criteria run over real HTTP via
+`double-activate`, …) and emits a per-criterion verdict + aggregate outcome. Empty or
+unresolved proof is inconclusive and every bundled host fails closed; only decided evidence
+can be green. Backend criteria run over real HTTP via
 `@aerofortress/assay/http`, design criteria via `/design` (jsdom) and `/design/browser`
 (your installed Chrome — no browser download). See
 [docs/getting-started.md](docs/getting-started.md) for all three adapters and
@@ -90,7 +91,8 @@ Console.WriteLine(Format.Verdict(verdict));
   installed Chrome, `HttpClient`/`WebApplicationFactory`, an LLM judge.
 - **L1 core** (framework-neutral): the DSL, the oracle router, the aggregate verdict.
 - **L2 adapters**: mount / force condition / observe, one per substrate.
-- **L3 verdict**: pass/fail + evidence + score, stamped with archetype+protocol versions.
+- **L3 verdict**: pass/fail/not-applicable/unresolved + evidence + outcome and nullable
+  score, stamped with archetype+protocol versions.
 
 No config file, no runner, no plugin system (ADR 0001) — a library you import, ESM-only on
 Node ≥ 20. Custom, off-catalog criteria are first-class via a per-call escape hatch
@@ -102,8 +104,11 @@ contaminate the shipped catalog's benchmark.
 Two measurable claims are baked in: the criteria set **converges** from failures (escape
 accrual — every escape becomes a criterion), and archetypes **transfer** across projects
 ([docs/transfer.md](docs/transfer.md)). `node tools/measure/measure.mjs` (from `assay/`)
-re-runs the calibration bench and appends the convergence table. Long-term goal: a
-SWE-bench-style benchmark for web-feature acceptance.
+re-runs both implementations, records the executed good/bad calibration groups, audits
+catalog-to-test reach, and derives JSON + Markdown evidence. The current evidence proves
+the verifier legs; it does **not** yet claim a held-out external corpus or measured LLM
+repair rate. Those remain research milestones toward a SWE-bench-style benchmark for
+web-feature acceptance.
 
 ## Development
 

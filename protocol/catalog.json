@@ -1,6 +1,6 @@
 {
   "protocol": "AVP",
-  "protocolVersion": "0.2.0",
+  "protocolVersion": "0.4.0",
   "conditionAxes": {
     "fault": [
       "success",
@@ -164,6 +164,28 @@
       "description": "An action produces its real effect — no visible control is a no-op, failures tell the truth."
     },
     {
+      "archetype": "failure-honesty",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "dependency-failure-is-admitted",
+          "statement": "When a required dependency is forced to fail, the operation admits failure through a non-success response or its declared error envelope — it never returns a bare success while the effect was lost.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "dependency-failure",
+          "seenIn": [
+            "pauta:381187c",
+            "pauta:b831091",
+            "hostpoint:4b5f4230"
+          ]
+        }
+      ],
+      "description": "A failed dependency can never be reported as a successful operation."
+    },
+    {
       "archetype": "data-honesty",
       "version": "0.1.0",
       "criteria": [
@@ -226,7 +248,7 @@
     },
     {
       "archetype": "persona-scoped-visibility",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "criteria": [
         {
           "id": "no-cross-persona-affordance",
@@ -244,7 +266,7 @@
         },
         {
           "id": "no-cross-persona-route",
-          "statement": "A route scoped to one actor refuses another actor at the guard: opened as actor X, an actor-Y route redirects X to its own area — it never renders Y's screen.",
+          "statement": "Every declared route scoped to one actor refuses another actor at the guard: with the build/session fixed as actor X, sweeping actor-Y routes redirects X to its own area — no foreign shell mounts through an unguarded sibling route.",
           "oracle": "mechanical",
           "scope": "invariant",
           "condition": {
@@ -253,7 +275,8 @@
           "requires": "router",
           "seenIn": [
             "documenso:2ba0f48c",
-            "bitwarden:e4359f071"
+            "bitwarden:e4359f071",
+            "hostpoint:28670a98"
           ]
         }
       ],
@@ -411,7 +434,7 @@
       "criteria": [
         {
           "id": "requires-authentication",
-          "statement": "A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every [Critical] authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.",
+          "statement": "A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.",
           "oracle": "mechanical",
           "scope": "invariant",
           "condition": {
@@ -423,7 +446,7 @@
     },
     {
       "archetype": "integration-integrity",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "criteria": [
         {
           "id": "webhook-signature-verified",
@@ -437,6 +460,20 @@
           "seenIn": [
             "692d85af",
             "documenso:3887aa67"
+          ]
+        },
+        {
+          "id": "webhook-effects-state",
+          "statement": "After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "webhook-state",
+          "seenIn": [
+            "hostpoint:53fcf804",
+            "avp:8d6169d0"
           ]
         },
         {
@@ -662,6 +699,41 @@
         }
       ],
       "description": "A mutation with an idempotency key applies at most once."
+    },
+    {
+      "archetype": "mutation-atomicity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "concurrent-conflict-surfaces",
+          "statement": "Two conflicting updates carrying the same concurrency token cannot both succeed: exactly one wins and the loser receives an explicit conflict response (409/412), never silent last-write-wins.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "requires": "conflict",
+          "seenIn": [
+            "pauta:f85820f",
+            "fluxoterra:1b479706"
+          ]
+        },
+        {
+          "id": "multi-write-is-atomic",
+          "statement": "When a fault is forced after one write in a multi-write mutation, the request fails and the observable state is identical to its baseline — no partial write escapes the transaction.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "fault-state",
+          "seenIn": [
+            "pauta:b00c9c4",
+            "hostpoint:c0a0c63c"
+          ]
+        }
+      ],
+      "description": "Concurrent and multi-write mutations surface conflicts and never expose partial state."
     },
     {
       "archetype": "credential-authority",

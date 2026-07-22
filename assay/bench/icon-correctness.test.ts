@@ -48,9 +48,11 @@ const iconStatus = async (variant: IconVariant, judge?: Judge) => {
 };
 
 describe('AVP Design — verifier accuracy (icon-correctness · icon-fits-meaning)', () => {
-  it('is skipped honestly when no judge is provided (never inflates the score)', async () => {
-    const m = await iconStatus('good');
-    expect(m?.status).toBe('skipped');
+  it('is unresolved when no judge is provided and cannot produce a green verdict', async () => {
+    const v = await verifyDesign(iconCorrectness, subject('good'));
+    const m = v.results.find((r) => r.criterionId === 'icon-fits-meaning');
+    expect(m?.status).toBe('unresolved');
+    expect(v.outcome).toBe('inconclusive');
   });
 
   it('gathers each icon paired with its control’s accessible label as evidence', async () => {

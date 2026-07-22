@@ -47,12 +47,12 @@ describe('AVP — verifier accuracy (authorization · server-is-authoritative, H
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD backend with no false alarm (ownership/role criteria skipped by seam)', async () => {
+  it('passes the GOOD backend with no false alarm (ownership/role criteria are not applicable by seam)', async () => {
     const v = await verifyHttp(authorization, tamperedWrites(servers.good!.baseUrl));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'own-resource-only')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'own-resource-only')?.status).toBe('not-applicable');
   });
 
   it('sanity: the GOOD server records the catalog price regardless of the client price', async () => {

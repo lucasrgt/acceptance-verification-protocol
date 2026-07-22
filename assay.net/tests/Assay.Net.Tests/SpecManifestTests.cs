@@ -35,20 +35,25 @@ public class SpecManifestTests
     }
 
     [Fact]
-    public void declared_criteria_dedupes_across_slices()
+    public void declared_obligations_preserve_every_subject_criterion_pair()
     {
         var m = SpecManifest.Parse(Sample);
 
-        // rejects-duplicate appears once even if multiple slices declared it; all five ids are present.
-        Assert.Contains("rejects-invalid-credentials", m.DeclaredCriteria);
-        Assert.Contains("rejects-duplicate", m.DeclaredCriteria);
-        Assert.Equal(5, m.DeclaredCriteria.Count);
+        Assert.Contains(new SpecObligation("Login", "rejects-invalid-credentials"), m.DeclaredObligations);
+        Assert.Contains(new SpecObligation("Register", "rejects-duplicate"), m.DeclaredObligations);
+        Assert.Equal(5, m.DeclaredObligations.Count);
     }
 
     [Fact]
     public void a_manifest_without_a_module_key_is_a_format_error()
     {
         Assert.Throws<FormatException>(() => SpecManifest.Parse("[slices.X]\ncriteria = [\"a\"]"));
+    }
+
+    [Fact]
+    public void a_manifest_without_slices_is_a_format_error()
+    {
+        Assert.Throws<FormatException>(() => SpecManifest.Parse("module = \"Empty\""));
     }
 
     [Fact]
@@ -66,8 +71,31 @@ public class SpecManifestTests
             "authorization",
             [new CriterionVerdict("requires-authentication", VerdictStatus.Pass, "held")]);
 
-        var missing = manifest.MissingObligationsFrom([uploadVerdict]);
+        var missing = manifest.UnsatisfiedObligationsFrom([uploadVerdict]);
 
         Assert.Equal([new SpecObligation("Delete", "requires-authentication")], missing);
+    }
+
+    [Fact]
+    public void a_failed_verdict_does_not_satisfy_an_obligation()
+    {
+        var manifest = SpecManifest.Parse("""
+            module = "Files"
+            [slices.Upload]
+            criteria = ["requires-authentication"]
+            """);
+        var failed = new Verdict("Upload", "access-control",
+            [new CriterionVerdict("requires-authentication", VerdictStatus.Fail, "public")]);
+
+        Assert.Equal(manifest.DeclaredObligations, manifest.UnsatisfiedObligationsFrom([failed]));
+    }
+
+    [Theory]
+    [InlineData("[slices.X]\ncriteria = []")]
+    [InlineData("[slices.X]\ncriteria = [\"a\", \"a\"]")]
+    [InlineData("[slices.X]\ncriteria = [\"a\"]\n[slices.X]\ncriteria = [\"a\"]")]
+    public void empty_duplicate_or_redeclared_slice_obligations_are_rejected(string slices)
+    {
+        Assert.Throws<FormatException>(() => SpecManifest.Parse($"module = \"M\"\n{slices}"));
     }
 }

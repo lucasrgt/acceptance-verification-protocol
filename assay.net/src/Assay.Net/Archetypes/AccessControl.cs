@@ -15,7 +15,7 @@ public sealed record AccessControlSubject(
 
 /// <summary>
 /// access-control — a protected endpoint is the gate to whatever it guards: an unauthenticated request is
-/// refused (401/403), never silently served. This is the baseline acceptance property every <c>[Critical]</c>
+/// refused (401/403), never silently served. This is the baseline acceptance property every
 /// authenticated slice must hold; richer rules (own-resource-only, role-required) layer on via the
 /// <see cref="Authorization"/> archetype.
 /// </summary>

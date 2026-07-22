@@ -22,16 +22,22 @@ export function composeVerdicts(subject: string, verdicts: readonly Verdict[]): 
   const results: CriterionVerdict[] = verdicts.flatMap((v) =>
     v.results.map((r) => ({ ...r, criterionId: `${v.archetype}/${r.criterionId}` })),
   );
-  const applicable = results.filter((r) => r.status !== 'skipped').length;
+  const applicable = results.filter((r) => r.status === 'pass' || r.status === 'fail').length;
   const passed = results.filter((r) => r.status === 'pass').length;
+  const failed = results.some((r) => r.status === 'fail');
+  const unresolved = results.filter((r) => r.status === 'unresolved').length;
+  const notApplicable = results.filter((r) => r.status === 'not-applicable').length;
   return {
     subject,
     archetypes: verdicts.map((v) => v.archetype),
     protocolVersion: PROTOCOL_VERSION,
     results,
+    outcome: failed ? 'fail' : applicable === 0 || unresolved > 0 ? 'inconclusive' : 'pass',
     applicable,
     passed,
-    acceptanceScore: applicable === 0 ? 1 : passed / applicable,
+    unresolved,
+    notApplicable,
+    acceptanceScore: applicable === 0 ? null : passed / applicable,
     durationMs: verdicts.reduce((total, v) => total + v.durationMs, 0),
   };
 }

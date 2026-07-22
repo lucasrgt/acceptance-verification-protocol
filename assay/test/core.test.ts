@@ -45,12 +45,13 @@ describe('core — verdict shape', () => {
     expect(typeof r.durationMs).toBe('number');
   });
 
-  it('a vacuous run scores 1 but is flagged by applicable: 0', async () => {
+  it('a vacuous run is inconclusive and has no numerical score', async () => {
     const v = await runVerification('s', passing, {
       probe: hooks.probe,
       applies: () => 'nothing applies here',
     });
-    expect(v.acceptanceScore).toBe(1);
+    expect(v.outcome).toBe('inconclusive');
+    expect(v.acceptanceScore).toBeNull();
     expect(v.applicable).toBe(0);
     expect(formatVerdict(v)).toContain('0 applicable');
     expect(formatVerdict(v)).toContain('nothing applies here'); // skip reasons are shown
@@ -78,5 +79,22 @@ describe('core — composeVerdicts (feature verdict)', () => {
 
   it('refuses an empty composition', () => {
     expect(() => composeVerdicts('s', [])).toThrow();
+  });
+
+  it('an unresolved criterion makes an otherwise passing composition inconclusive', async () => {
+    const decided = await runVerification('feature-x', passing, hooks);
+    const unresolved = await runVerification(
+      'feature-x',
+      archetype('human-ruler', '1.0.0', () => {
+        criterion('review', 'is reviewed', {}, { kind: 'human', note: 'review required' });
+      }),
+      hooks,
+    );
+
+    const feature = composeVerdicts('feature-x', [decided, unresolved]);
+
+    expect(feature.outcome).toBe('inconclusive');
+    expect(feature.acceptanceScore).toBe(1);
+    expect(feature.unresolved).toBe(1);
   });
 });

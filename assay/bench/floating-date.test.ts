@@ -32,12 +32,12 @@ describe('AVP — verifier accuracy (temporal-integrity · floating-date-not-shi
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD readout with no false alarm (date shown as authored; instant criterion skipped)', async () => {
+  it('passes the GOOD readout with no false alarm (instant criterion is not applicable)', async () => {
     const v = await verify(temporalIntegrity, subject('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'zoned-to-user')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'zoned-to-user')?.status).toBe('not-applicable');
   });
 
   it('emits the floating-date-not-shifted number', async () => {

@@ -1,7 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { appendFileSync, mkdirSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import type { Verdict } from '../src/core/types';
 
 /**
@@ -64,22 +61,8 @@ export function pairAccuracy<S>(opts: {
       }
        
       console.log(`\n[AVP] ${opts.label} detection=${detected}/${opts.pairs.length}  false-alarm=${falseAlarms}/${opts.pairs.length}\n`);
-      recordAccuracy({ label: opts.label, detection: detected, total: opts.pairs.length, falseAlarms });
       expect(detected).toBe(opts.pairs.length);
       expect(falseAlarms).toBe(0);
     });
   });
-}
-
-/**
- * Persists one accuracy datapoint as NDJSON when ASSAY_RECORD=1 — the raw feed the
- * convergence table (tools/measure.mjs) aggregates. Console numbers evaporate; this
- * is the artifact the scientific claim plots.
- */
-export function recordAccuracy(entry: { label: string; detection: number; total: number; falseAlarms: number }): void {
-  if (!process.env.ASSAY_RECORD) return;
-  const here = dirname(fileURLToPath(import.meta.url));
-  const dir = resolve(here, 'results');
-  mkdirSync(dir, { recursive: true });
-  appendFileSync(resolve(dir, 'latest.jsonl'), JSON.stringify({ ts: new Date().toISOString(), ...entry }) + '\n');
 }

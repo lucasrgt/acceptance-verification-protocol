@@ -41,12 +41,12 @@ describe('AVP — verifier accuracy (integration-integrity · callback-resolves-
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD backend with no false alarm (webhook/checkout criteria skipped by seam)', async () => {
+  it('passes the GOOD backend with no false alarm (webhook/checkout criteria are not applicable by seam)', async () => {
     const v = await verifyHttp(integrationIntegrity, callback(servers.good!.baseUrl));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'webhook-signature-verified')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'webhook-signature-verified')?.status).toBe('not-applicable');
   });
 
   it('sanity: the GOOD server refuses the no-chargeId callback (422) but accepts ch_1', async () => {

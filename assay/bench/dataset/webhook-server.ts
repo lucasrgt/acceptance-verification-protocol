@@ -17,24 +17,33 @@ interface RunningServer {
   close(): Promise<void>;
 }
 
-export function startWebhookServer(variant: 'good' | 'bad'): Promise<RunningServer> {
+export function startWebhookServer(variant: 'good' | 'bad' | 'state-good-200' | 'state-bad-200'): Promise<RunningServer> {
+  const appliedEvents: string[] = [];
   const server = http.createServer((req, res) => {
     if (req.method === 'POST' && req.url === '/webhooks/payment') {
       let body = '';
       req.on('data', (c) => (body += c));
       req.on('end', () => {
-        if (variant === 'good') {
-          const sig = req.headers['x-signature'];
-          if (typeof sig !== 'string' || sig !== sign(body)) {
+        const sig = req.headers['x-signature'];
+        const authentic = typeof sig === 'string' && sig === sign(body);
+        if (variant === 'good' && !authentic) {
             res.statusCode = 401;
             return res.end('{}');
-          }
         }
-        // BAD: process (approve the charge) without verifying the signature.
+        const shouldApply = variant === 'bad' || variant === 'state-bad-200' || authentic;
+        if (shouldApply) {
+          const parsed = JSON.parse(body) as { id?: string; chargeId?: string };
+          appliedEvents.push(parsed.id ?? parsed.chargeId ?? 'unknown');
+        }
+        // State variants deliberately answer 200 even for invalid events. The state is the oracle.
         res.statusCode = 200;
         return res.end('{"ok":true}');
       });
       return;
+    }
+    if (req.method === 'GET' && req.url === '/events') {
+      res.setHeader('content-type', 'application/json');
+      return res.end(JSON.stringify(appliedEvents));
     }
     res.statusCode = 404;
     res.end('{}');

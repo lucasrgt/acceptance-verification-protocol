@@ -7,7 +7,8 @@
 **AVP** is the protocol — the language-neutral concepts (`subject`, `criterion`, `oracle`,
 `condition`, `verdict`). **Assay.Net** is this package: AVP for .NET backends, a thin layer over the
 neutral catalog that runs catalog-driven acceptance **archetypes** over a real subject (an HTTP
-backend) and emits an actionable `Verdict` + `AcceptanceScore`.
+backend) and emits an actionable `Verdict` with an `Outcome` plus a nullable
+`AcceptanceScore`. Empty or unresolved proof is `Inconclusive`, never green.
 
 It is **standalone**: it knows nothing of any framework. `AeroFortress.Framework` depends on AVP,
 never the reverse — the static doctor recognizes the `[AVP(typeof(Subject), "id")]` attribute by name to
@@ -35,6 +36,7 @@ var verdict = await Runner.Run(catalog, new MoneyIntegrity(), "booking-split", s
 foreach (var r in verdict.Results)
     Console.WriteLine($"{r.CriterionId}: {r.Status} — {r.Reason}");
 Console.WriteLine($"acceptanceScore = {verdict.AcceptanceScore}");
+verdict.RequireAccepted(); // fail closed on fail, unresolved, or empty evidence
 ```
 
 Mark a verification method as the proof of a catalog criterion with

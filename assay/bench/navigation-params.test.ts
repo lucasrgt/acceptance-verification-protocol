@@ -29,12 +29,12 @@ describe('AVP — verifier accuracy (navigation-integrity · required-params-gua
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD router with no false alarm (other nav criteria skipped by seam)', async () => {
+  it('passes the GOOD router with no false alarm (other nav criteria are not applicable by seam)', async () => {
     const v = await verify(navigationIntegrity, paramGuard('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'target-resolves')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'target-resolves')?.status).toBe('not-applicable');
   });
 
   it('emits the required-params-guarded number', async () => {

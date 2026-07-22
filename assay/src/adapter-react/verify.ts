@@ -16,7 +16,7 @@ import { resilienceHooks } from './render-resilience';
 import { moneyDisplayHooks } from './money-integrity';
 
 export interface VerifyOptions {
-  /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
+  /** Judge for `model` oracles. Without it, model criteria are unresolved and the gate is inconclusive. */
   readonly judge?: Judge;
   /**
    * Escape hatch for an OFF-CATALOG archetype — a domain criterion you authored that the

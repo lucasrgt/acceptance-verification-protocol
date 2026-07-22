@@ -1,6 +1,6 @@
 {
   "protocol": "AVP",
-  "protocolVersion": "0.2.0",
+  "protocolVersion": "0.4.0",
   "catalog": "design",
   "substrates": [
     "static",

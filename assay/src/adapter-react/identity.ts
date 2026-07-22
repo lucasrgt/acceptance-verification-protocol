@@ -34,7 +34,7 @@ const present = (marker: string | RegExp): boolean => {
   return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 };
 
-/** Builds the whole not-applicable half of an Expect vocabulary in one line (defensive: applies() should have skipped these). */
+/** Builds the whole not-applicable half of an Expect vocabulary in one line (defensive: applies() should have excluded these). */
 const notApplicable = <K extends string>(keys: readonly K[], why: string): Record<K, () => never> =>
   Object.fromEntries(keys.map((k) => [k, () => { throw new AvpFail(`${k} ${why}`); }])) as Record<K, () => never>;
 

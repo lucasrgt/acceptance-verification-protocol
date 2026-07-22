@@ -55,18 +55,20 @@ archetype's bench. Split bench files by sub-concern (e.g. `navigation-nested`,
 `navigation-back`), never by line count. Never shape a repro to trip a criterion;
 the GOOD must pass with no false alarm.
 
-## 6. Honest skip over silent pass
+## 6. Non-applicable is not unresolved
 
-A criterion whose oracle or seam is unavailable is `skipped`, never silently
-passed. A false green is the catastrophic error. (Carried in the runner + every
-adapter's `applies`.)
+A criterion that genuinely does not belong to a subject is `not-applicable`. A
+criterion that belongs but lacks an oracle or evidence is `unresolved`, making the
+aggregate inconclusive. Neither is silently passed, and an empty run is inconclusive.
+A false green is the catastrophic error. (Carried in the runner + every host gate.)
 
 ## The guards that enforce this (red, not hope)
 
 - `bench/source-size.test.ts` — ≤500 LOC per file.
 - `bench/protocol-sync.test.ts` — `protocol/catalog.json` in lockstep with the
   shipped archetypes (the protocol can't lag the lib).
-- `bench/mutation.test.ts` — every criterion kills its mutant family (robustness).
+- good/bad calibration benches — every bound criterion must catch its vulnerable repro
+  and accept its corrected one; mutation families deepen high-risk probes.
 - the per-archetype benchmarks — BAD fails the target criterion, GOOD no false alarm.
 
 Together they make the structural rules executable: the tree goes red the moment a

@@ -254,7 +254,7 @@ hierarchy discrepancy that motivated the idea.)
      control (Back→left-chevron, Forks→fork, Search→magnifier) — distinct from
      composition-canonical's presence check. Oracle is `model(rubric)`: the adapter gathers
      each `[data-icon]` + its control's accessible label as evidence and an injected judge
-     (`claudeJudge` in prod; deterministic stub in the bench) decides fit; `skipped` honestly
+     (`claudeJudge` in prod; deterministic stub in the bench) decides fit; `unresolved`
      without a judge. `verifyDesign(archetype, subject, { judge })` threads the judge. The
      bench's real value: the evidence is rich enough (icon + label) for a judge to catch each
      mismatch. Mutation 3/3 (trash-on-Back, file-on-Forks, bell-on-Search), false-alarm 0.
@@ -318,5 +318,5 @@ hierarchy discrepancy that motivated the idea.)
    `requires: 'geometry'` (a non-existent seam) to mean substrate — moved to the proper field.
 
 Built cheapest-substrate-first, each criterion closed *chaos → green* with a faithful
-repro and a 100%-kill mutation family — the same loop that took the behaviour catalog to
-39/39.
+repro and a 100%-kill mutation family — the same calibration loop used by the behaviour
+catalog. Current generated totals live in `docs/measurements.md`.

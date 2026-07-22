@@ -1,0 +1,351 @@
+[
+  {
+    "date": "2026-07-01",
+    "commit": "270d557",
+    "archetypes": 39,
+    "criteria": 66,
+    "criteriaReferencedByTests": null,
+    "calibrationGroups": 2,
+    "pairs": 6,
+    "detected": 6,
+    "falseAlarms": 0,
+    "calibrations": []
+  },
+  {
+    "date": "2026-07-22",
+    "commit": "1d4cde8+worktree",
+    "archetypes": 41,
+    "criteria": 70,
+    "criteriaReferencedByTests": 70,
+    "calibrationGroups": 54,
+    "pairs": 62,
+    "detected": 62,
+    "falseAlarms": 0,
+    "calibrations": [
+      {
+        "label": "accessible-name controls-have-accessible-name",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "action-effect",
+        "detection": 3,
+        "total": 3,
+        "falseAlarms": 0
+      },
+      {
+        "label": "action-effect cache-cleared-on-identity",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "action-effect optimistic-reconcile",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "action-effect single-flight",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "action-effect tail",
+        "detection": 3,
+        "total": 3,
+        "falseAlarms": 0
+      },
+      {
+        "label": "authorization · server-is-authoritative (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "authorization (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "color-contrast contrast-sufficient",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "composition-canonical canonical-composition",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "data-honesty",
+        "detection": 2,
+        "total": 2,
+        "falseAlarms": 0
+      },
+      {
+        "label": "data-honesty count-matches-source",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "data-honesty flash-of-id",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "failure-honesty",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "focus-visible-integrity focus-is-visible",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "icon-correctness icon-fits-meaning",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "image-alt images-have-text-alternative",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "input-purpose personal-fields-declare-purpose",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "integration-integrity · callback-resolves-entity (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "integration-integrity · redirect-urls-bound (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "integration-integrity (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "integration-integrity webhook-effects-state",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "layer-integrity no-unintended-overlap",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "layout-integrity content-fits",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "layout-shift-integrity reserved-space-stable",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "lifecycle-gate · gate-enforced-server-side (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "lifecycle-gate blocked-action-is-disabled",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "money-integrity (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "money-integrity amount-rendered-exact",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "mount-stability",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "mutation-atomicity",
+        "detection": 2,
+        "total": 2,
+        "falseAlarms": 0
+      },
+      {
+        "label": "navigation back-has-fallback",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "navigation nested-renders",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "navigation no-redirect-loop",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "navigation required-params-guarded",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "navigation-integrity (cross-project)",
+        "detection": 2,
+        "total": 2,
+        "falseAlarms": 0
+      },
+      {
+        "label": "pagination-integrity pages-cover-the-set",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "persona no-cross-persona-route",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "persona-visibility (cross-project)",
+        "detection": 2,
+        "total": 2,
+        "falseAlarms": 0
+      },
+      {
+        "label": "reading-order-integrity dom-order-matches-visual",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "render-resilience survives-malformed-data",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "request-idempotency (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "responsive-integrity holds-across-breakpoints",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "rtl-integrity directional-icons-mirror",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "second-order-effects (HTTP adapter)",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "spacing-rhythm rhythm-holds",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "state-coverage states-visually-distinct",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "tap-target-integrity targets-meet-minimum-size",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "temporal-integrity floating-date-not-shifted",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "temporal-integrity zoned-to-user",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "theme-parity flips-with-theme",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "token-adherence uses-tokens-only",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "truncation-integrity overflowing-text-is-truncated",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      },
+      {
+        "label": "type-hierarchy hierarchy-holds",
+        "detection": 1,
+        "total": 1,
+        "falseAlarms": 0
+      }
+    ]
+  }
+]

@@ -55,7 +55,7 @@ public sealed class Authorization : Archetype<AuthorizationSubject>
             ["server-is-authoritative"] = async s =>
             {
                 if (string.IsNullOrEmpty(s.WritePath) || string.IsNullOrEmpty(s.ReadPath))
-                    throw new AvpSkipException("server-is-authoritative: this subject provides no write/read seam.");
+                    throw new AvpNotApplicableException("server-is-authoritative: this subject provides no write/read seam.");
                 using var http = Http.Client(s.BaseUrl);
 
                 // Write the item but tamper with a privileged field (price): claim it costs 1, not the

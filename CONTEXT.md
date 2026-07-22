@@ -31,12 +31,15 @@ _Avoid:_ "injection", "mock", "scenario".
 **observation** — the signal measured to decide (a network request, DOM state, timing, screenshot).
 _Avoid:_ "result".
 
-**verdict** — the per-criterion output: `pass` / `fail` / `skipped` + an **actionable** reason
-(written for the agent to fix) + evidence. `skipped` = no applicable oracle; it does not count
-toward the score.
+**verdict** — the per-criterion output: `pass` / `fail` / `not-applicable` /
+`unresolved` + an **actionable** reason (written for the agent to fix) + evidence.
+`not-applicable` is a proved domain mismatch; `unresolved` is missing required proof and
+makes the aggregate inconclusive.
 _Avoid:_ "test result", "report" (a report is the presentation of the verdict).
 
-**acceptanceScore** — the aggregate of applicable verdicts, in [0,1]. The "% done".
+**acceptanceScore** — passed / decided verdicts, in [0,1], or null when nothing was
+decided. It is diagnostic; hosts accept only the aggregate all-pass outcome, never a
+lowered score threshold.
 _Avoid:_ "coverage" (coverage is about code — a different concept).
 
 **adapter** — the per-ecosystem implementation of the *mount / inject condition / observe*
@@ -53,7 +56,8 @@ _Avoid:_ "platform", "environment".
 
 **seam** — a hook the subject already has that the adapter drives or observes (how to mount,
 which endpoint, which control). A criterion's **`requires`** names the seam that must be
-declared for it to apply; without it the adapter skips honestly.
+declared for it to apply. Genuine subject-shape mismatch is `not-applicable`; a seam
+required by the declared obligation but unavailable at execution is `unresolved`.
 _Avoid:_ "config", "option".
 
 **probe** — the adapter-built observation surface a mechanical oracle speaks through:
@@ -62,7 +66,8 @@ vocabulary). The probe hides the substrate plumbing; archetypes read in acceptan
 _Avoid:_ "driver", "fixture".
 
 **judge** — the injectable decider for `model` oracles (an LLM behind a rubric). Fail-closed:
-no parseable verdict = fail, never a silent pass. Absent judge = the criterion is `skipped`.
+no parseable verdict = fail, never a silent pass. Absent judge = `unresolved`, so the
+aggregate cannot be green.
 _Avoid:_ "AI", "grader".
 
 **version (archetype / protocol)** — archetypes version independently as their criteria

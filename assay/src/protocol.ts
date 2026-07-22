@@ -1,6 +1,7 @@
 import type { Archetype } from './core/dsl';
 import type { Specification, Substrate } from './core/types';
 import { actionEffect } from './archetypes/action-effect';
+import { failureHonesty } from './archetypes/failure-honesty';
 import { dataHonesty } from './archetypes/data-honesty';
 import { personaVisibility } from './archetypes/persona-visibility';
 import { navigationIntegrity } from './archetypes/navigation-integrity';
@@ -14,6 +15,7 @@ import { temporalIntegrity } from './archetypes/temporal-integrity';
 import { paginationIntegrity } from './archetypes/pagination-integrity';
 import { renderResilience } from './archetypes/render-resilience';
 import { requestIdempotency } from './archetypes/request-idempotency';
+import { mutationAtomicity } from './archetypes/mutation-atomicity';
 import { accessControl } from './archetypes/access-control';
 import { credentialAuthority } from './archetypes/credential-authority';
 import { resourceUniqueness } from './archetypes/resource-uniqueness';
@@ -58,6 +60,7 @@ import { PROTOCOL_VERSION } from './core/types';
  * source (CatalogSource.cs) first — then ship it here; the conformance guard holds the lockstep. */
 export const ARCHETYPES: readonly Archetype[] = [
   actionEffect,
+  failureHonesty,
   dataHonesty,
   personaVisibility,
   navigationIntegrity,
@@ -72,6 +75,7 @@ export const ARCHETYPES: readonly Archetype[] = [
   paginationIntegrity,
   renderResilience,
   requestIdempotency,
+  mutationAtomicity,
   credentialAuthority,
   tokenRotation,
   resourceUniqueness,
@@ -141,6 +145,7 @@ export interface ProtocolCatalog {
  */
 const DESCRIPTIONS: Record<string, string> = {
   'action-effect': 'An action produces its real effect — no visible control is a no-op, failures tell the truth.',
+  'failure-honesty': 'A failed dependency can never be reported as a successful operation.',
   'data-honesty': 'Rendered data traces to a real source — never fixtures, stock media, or invented rows.',
   'persona-scoped-visibility': 'An actor sees and reaches only the affordances/routes of its role.',
   'navigation-integrity': 'Every affordance leads somewhere real — no dead ends, loops, or ghost params.',
@@ -155,6 +160,7 @@ const DESCRIPTIONS: Record<string, string> = {
   'pagination-integrity': 'Paging the whole list yields every item exactly once.',
   'render-resilience': 'A surface degrades gracefully on bad data — it never white-screens.',
   'request-idempotency': 'A mutation with an idempotency key applies at most once.',
+  'mutation-atomicity': 'Concurrent and multi-write mutations surface conflicts and never expose partial state.',
   'credential-authority': 'An auth endpoint denies invalid credentials and issues tokens only on valid ones.',
   'token-rotation': 'Session tokens rotate and expire the way the flow promises.',
   'resource-uniqueness': 'A uniqueness rule holds server-side — duplicates are refused.',

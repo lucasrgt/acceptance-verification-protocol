@@ -6,9 +6,17 @@ export interface HttpRequestSpec {
   readonly body?: unknown;
 }
 
+/** A mutation executed while one required downstream dependency is forced to fail. */
+export interface HttpFailureHonestySubject {
+  readonly name: string;
+  readonly request: HttpRequestSpec;
+  /** Optional error-envelope policy for APIs that intentionally return a 2xx transport status. */
+  readonly admitsFailure?: (status: number, body: unknown) => boolean;
+}
+
 /**
  * `authorization` subject — three independent seams, each gating its own criterion
- * (skipped when absent):
+ * (not applicable when absent):
  *  - ownership (`own-resource-only`): a cross-account request that must be refused.
  *  - role (`role-required`): a privileged op called as a lesser role, must be refused.
  *  - authority (`server-is-authoritative`): several writes to the SAME resource that
@@ -52,7 +60,7 @@ export type ReturnTransition = 'success' | 'failure' | 'pending';
 
 /**
  * `integration-integrity` subject — two independent seams, each gating its own
- * criterion (skipped when absent):
+ * criterion (not applicable when absent):
  *  - webhook seam (`webhook-signature-verified`): a forged/absent-signature webhook
  *    (must be refused) + a correctly-signed one (must be accepted).
  *  - checkout seam (`redirect-urls-bound`): a checkout/OAuth-create request whose
@@ -65,6 +73,18 @@ export interface HttpIntegrationSubject {
   readonly forged?: HttpRequestSpec;
   /** Webhook seam: a correctly-signed callback that must be accepted. */
   readonly valid?: HttpRequestSpec;
+  /** State seam: an authentic event with an id distinct from the forged event. */
+  readonly stateValid?: HttpRequestSpec;
+  /** State seam: a forged event that must leave no observable trace, even if answered 2xx. */
+  readonly stateForged?: HttpRequestSpec;
+  /** State seam: reads the domain effects after webhook delivery. */
+  readonly state?: HttpRequestSpec;
+  /** Extracts applied event ids from the state response. */
+  readonly readAppliedEventIds?: (body: unknown) => readonly string[];
+  /** Event id carried by stateValid. */
+  readonly validEventId?: string;
+  /** Event id carried by stateForged. */
+  readonly forgedEventId?: string;
   /** Checkout seam: the checkout/OAuth-create request whose response binds the return URLs. */
   readonly checkout?: HttpRequestSpec;
   /** Checkout seam: reads the return URLs (by transition) out of the checkout response. */
@@ -77,6 +97,21 @@ export interface HttpIntegrationSubject {
   readonly unresolvable?: HttpRequestSpec;
   /** Resolve seam: a callback that resolves to a real entity — must be accepted. */
   readonly resolvable?: HttpRequestSpec;
+}
+
+/** HTTP seams for conflict visibility and rollback of a forced multi-write fault. */
+export interface HttpMutationAtomicitySubject {
+  readonly name: string;
+  /** Two requests carrying the same concurrency token and conflicting payloads. */
+  readonly conflictingUpdates?: readonly [HttpRequestSpec, HttpRequestSpec];
+  /** Explicit conflict statuses accepted for the losing request (default 409/412). */
+  readonly conflictWith?: readonly number[];
+  /** Mutation configured to fail after its first internal write. */
+  readonly faultingMutation?: HttpRequestSpec;
+  /** Reads the complete state that must be unchanged around the fault. */
+  readonly state?: HttpRequestSpec;
+  /** Projects the state response to the invariant the subject needs compared. */
+  readonly readState?: (body: unknown) => unknown;
 }
 
 /**

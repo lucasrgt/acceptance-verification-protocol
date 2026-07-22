@@ -6,7 +6,7 @@ namespace Assay.Net;
 /// An AVP archetype implementation for a substrate: a name + a mechanical oracle per criterion id,
 /// each driving a subject of type <typeparamref name="TSubject"/>. The archetype/criteria
 /// DEFINITIONS live in the neutral catalog; this binds executable oracles to them — the adapter
-/// contract from docs/PROTOCOL.md. A criterion with no oracle here is honestly <c>Skipped</c>.
+/// contract from docs/PROTOCOL.md. A criterion with no oracle here is <c>Unresolved</c>.
 /// </summary>
 public abstract class Archetype<TSubject>
 {
@@ -21,14 +21,14 @@ public abstract class Archetype<TSubject>
 /// The substrate-neutral core runner: it loops the catalog's criteria for an archetype, runs each
 /// bound oracle, and aggregates a <see cref="Verdict"/>. Faithful to the protocol's execution model —
 /// mechanical → run the body, pass unless it throws <see cref="AvpFailException"/>; an UNEXPECTED
-/// exception is a FAIL with the error as evidence (never an aborted run); no oracle → skip.
+/// exception is a FAIL with the error as evidence (never an aborted run); no oracle → unresolved.
 /// </summary>
 public static class Runner
 {
     /// <summary>
     /// Runs every criterion the catalog lists for <paramref name="archetype"/> against
     /// <paramref name="subject"/> and aggregates the <see cref="Verdict"/>. A criterion with no bound
-    /// mechanical oracle is <c>Skipped</c> (never a false pass). Throws if the archetype is absent from
+    /// mechanical oracle is <c>Unresolved</c> (never a false pass). Throws if the archetype is absent from
     /// the catalog (protocol drift).
     ///
     /// Pass <paramref name="transport"/> to run the oracles over an in-memory test host instead of a real
@@ -61,12 +61,12 @@ public static class Runner
 
             if (c.Oracle != "mechanical" || !archetype.Oracles.TryGetValue(c.Id, out var oracle))
             {
-                var skipped = new CriterionVerdict(c.Id, VerdictStatus.Skipped,
+                var unresolved = new CriterionVerdict(c.Id, VerdictStatus.Unresolved,
                     c.Oracle == "mechanical"
                         ? "no .NET oracle bound yet"
                         : $"oracle '{c.Oracle}' is not run by this adapter");
-                results.Add(skipped);
-                onCriterion?.Invoke(skipped);
+                results.Add(unresolved);
+                onCriterion?.Invoke(unresolved);
                 continue;
             }
 
@@ -77,9 +77,13 @@ public static class Runner
                 await oracle(subject);
                 verdict = new CriterionVerdict(c.Id, VerdictStatus.Pass, c.Statement, DurationMs: sw.Elapsed.TotalMilliseconds);
             }
-            catch (AvpSkipException ex)
+            catch (AvpNotApplicableException ex)
             {
-                verdict = new CriterionVerdict(c.Id, VerdictStatus.Skipped, ex.Message, DurationMs: sw.Elapsed.TotalMilliseconds);
+                verdict = new CriterionVerdict(c.Id, VerdictStatus.NotApplicable, ex.Message, DurationMs: sw.Elapsed.TotalMilliseconds);
+            }
+            catch (AvpUnresolvedException ex)
+            {
+                verdict = new CriterionVerdict(c.Id, VerdictStatus.Unresolved, ex.Message, DurationMs: sw.Elapsed.TotalMilliseconds);
             }
             catch (AvpFailException ex)
             {
@@ -105,6 +109,11 @@ public static class Runner
             onCriterion?.Invoke(verdict);
         }
 
-        return new Verdict(subjectName, archetype.Name, results) { DurationMs = total.Elapsed.TotalMilliseconds };
+        return new Verdict(subjectName, archetype.Name, results)
+        {
+            ArchetypeVersion = spec.Version,
+            ProtocolVersion = catalog.ProtocolVersion,
+            DurationMs = total.Elapsed.TotalMilliseconds,
+        };
     }
 }

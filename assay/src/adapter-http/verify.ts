@@ -7,6 +7,8 @@ import { notifyHooks } from './second-order';
 import { moneyHooks } from './money';
 import { lifecycleHooks } from './lifecycle';
 import { idempotencyHooks } from './idempotency';
+import { mutationAtomicityHooks } from './mutation-atomicity';
+import { failureHonestyHooks } from './failure-honesty';
 
 import type { Judge } from '../core/dsl';
 
@@ -42,6 +44,8 @@ const REGISTRY: Record<string, AnySubjectHooks> = {
   'money-integrity': moneyHooks,
   'lifecycle-gate': lifecycleHooks,
   'request-idempotency': idempotencyHooks,
+  'mutation-atomicity': mutationAtomicityHooks,
+  'failure-honesty': failureHonestyHooks,
 };
 
 /**

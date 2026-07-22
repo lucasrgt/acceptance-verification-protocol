@@ -18,6 +18,7 @@ const crossRoute = (variant: PersonaRouteVariant): PersonaRouteSubject => ({
   router: buildPersonaRouter(variant),
   guardMarker: /Traveler home/i,
   foreignMarker: /Host (dashboard|listings)/i,
+  foreignRoutes: ['/host/dashboard', '/host/list'],
 });
 
 const routeStatus = async (variant: PersonaRouteVariant) => {
@@ -32,12 +33,12 @@ describe('AVP — verifier accuracy (persona-scoped-visibility · no-cross-perso
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD router with no false alarm (affordance criterion skipped by shape)', async () => {
+  it('passes the GOOD router with no false alarm (affordance criterion is not applicable by shape)', async () => {
     const v = await verify(personaVisibility, crossRoute('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'no-cross-persona-affordance')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'no-cross-persona-affordance')?.status).toBe('not-applicable');
   });
 
   it('emits the no-cross-persona-route number', async () => {
@@ -56,7 +57,7 @@ describe('AVP — verifier accuracy (persona-scoped-visibility · no-cross-perso
  * guard that lives on the splash not the route). A robust criterion kills every one
  * while leaving the guarded GOOD router green.
  */
-const MUTANTS: readonly PersonaRouteVariant[] = ['no-guard', 'wrong-actor-check', 'redirect-wrong', 'splash-only'];
+const MUTANTS: readonly PersonaRouteVariant[] = ['no-guard', 'wrong-actor-check', 'redirect-wrong', 'splash-only', 'one-route-only'];
 
 describe('AVP — mutation testing (persona-scoped-visibility · no-cross-persona-route)', () => {
   it('kills every cross-persona-route mutant + no false alarm', async () => {

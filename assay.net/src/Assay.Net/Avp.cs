@@ -13,16 +13,6 @@ namespace Assay.Net;
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = true, Inherited = false)]
 public sealed class AVPAttribute : Attribute
 {
-    /// <summary>
-    /// Creates a legacy criterion-only proof marker. New integrations should use
-    /// <see cref="AVPAttribute(Type, string)"/> so one proof cannot accidentally satisfy another subject.
-    /// </summary>
-    /// <param name="criterionId">The stable catalog criterion id.</param>
-    public AVPAttribute(string criterionId)
-    {
-        CriterionId = criterionId;
-    }
-
     /// <summary>Creates a proof marker bound to one production subject and one catalog criterion.</summary>
     /// <param name="subjectType">The production type whose behaviour is being proven.</param>
     /// <param name="criterionId">The stable catalog criterion id.</param>
@@ -32,8 +22,8 @@ public sealed class AVPAttribute : Attribute
         CriterionId = criterionId;
     }
 
-    /// <summary>The production subject this verification proves, or <c>null</c> for a legacy marker.</summary>
-    public Type? SubjectType { get; }
+    /// <summary>The production subject this verification proves.</summary>
+    public Type SubjectType { get; }
 
     /// <summary>The stable criterion id this verification proves (e.g. "own-resource-only").</summary>
     public string CriterionId { get; }

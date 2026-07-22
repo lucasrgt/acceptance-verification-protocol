@@ -34,38 +34,23 @@ public class CoreSurfaceTests
         var a = new Verdict("s", "submission-gate",
         [
             new CriterionVerdict("gate-enforced-on-submission", VerdictStatus.Pass, "ok"),
-            new CriterionVerdict("gate-enforced-on-body-target", VerdictStatus.Skipped, "no oracle"),
+            new CriterionVerdict("gate-enforced-on-body-target", VerdictStatus.Unresolved, "no oracle"),
         ]);
         var b = new Verdict("s", "submission-gate",
         [
-            new CriterionVerdict("gate-enforced-on-submission", VerdictStatus.Skipped, "no oracle"),
+            new CriterionVerdict("gate-enforced-on-submission", VerdictStatus.Unresolved, "no oracle"),
             new CriterionVerdict("gate-enforced-on-body-target", VerdictStatus.Pass, "ok"),
         ]);
 
         var merged = Verdict.Merge(a, b);
         Assert.Equal(2, merged.Applicable);
         Assert.Equal(2, merged.Passed);
+        Assert.Equal(VerdictOutcome.Pass, merged.Outcome);
         Assert.Equal(1.0, merged.AcceptanceScore);
 
         var conflict = new Verdict("s", "submission-gate",
             [new CriterionVerdict("gate-enforced-on-submission", VerdictStatus.Fail, "no")]);
         Assert.Throws<InvalidOperationException>(() => Verdict.Merge(a, conflict));
-    }
-
-    [Fact]
-    public void missing_from_reports_declared_criteria_without_a_decided_verdict()
-    {
-        var manifest = SpecManifest.Parse("""
-            module = "Quotes"
-            [slices.Submit]
-            criteria = ["gate-enforced-on-submission", "own-resource-only"]
-            """);
-        var verdicts = new[]
-        {
-            new Verdict("s", "submission-gate",
-                [new CriterionVerdict("gate-enforced-on-submission", VerdictStatus.Pass, "ok")]),
-        };
-        Assert.Equal(["own-resource-only"], manifest.MissingFrom(verdicts));
     }
 
     [Fact]
@@ -79,7 +64,7 @@ public class CoreSurfaceTests
             criteria = ["yes"]
             """);
         Assert.Equal("Right", manifest.Module);
-        Assert.Equal(["yes"], manifest.DeclaredCriteria);
+        Assert.Equal([new SpecObligation("S", "yes")], manifest.DeclaredObligations);
     }
 
     [Fact]
@@ -89,12 +74,44 @@ public class CoreSurfaceTests
         [
             new CriterionVerdict("own-resource-only", VerdictStatus.Pass, "held"),
             new CriterionVerdict("role-required", VerdictStatus.Fail, "let it through"),
-            new CriterionVerdict("server-is-authoritative", VerdictStatus.Skipped, "no seam"),
+            new CriterionVerdict("server-is-authoritative", VerdictStatus.NotApplicable, "no seam"),
         ]);
         var text = Format.Verdict(v);
-        Assert.Contains("subject-x · authorization — acceptance 50% (1/2)", text);
+        Assert.Contains("subject-x · authorization — fail · acceptance 50% (1/2; unresolved=0)", text);
         Assert.Contains("✗ role-required [fail] — let it through", text);
-        Assert.Contains("– server-is-authoritative [skipped] — no seam", text);
+        Assert.Contains("– server-is-authoritative [not-applicable] — no seam", text);
+    }
+
+    [Fact]
+    public void an_empty_or_unresolved_verdict_is_inconclusive_and_cannot_be_accepted()
+    {
+        var empty = new Verdict("s", "authorization",
+            [new CriterionVerdict("own-resource-only", VerdictStatus.NotApplicable, "wrong shape")]);
+        var unresolved = new Verdict("s", "authorization",
+            [
+                new CriterionVerdict("own-resource-only", VerdictStatus.Pass, "held"),
+                new CriterionVerdict("role-required", VerdictStatus.Unresolved, "oracle unavailable"),
+            ]);
+
+        Assert.Equal(VerdictOutcome.Inconclusive, empty.Outcome);
+        Assert.Null(empty.AcceptanceScore);
+        Assert.Throws<AvpGateException>(() => empty.RequireAccepted());
+        Assert.Equal(VerdictOutcome.Inconclusive, unresolved.Outcome);
+        Assert.Equal(1.0, unresolved.AcceptanceScore);
+        Assert.Throws<AvpGateException>(() => unresolved.RequireAccepted());
+
+        var failed = new Verdict("s", "authorization",
+            [new CriterionVerdict("own-resource-only", VerdictStatus.Fail, "escaped")]);
+        Assert.Throws<AvpGateException>(() => failed.RequireAccepted());
+    }
+
+    [Fact]
+    public async Task runner_stamps_the_catalog_and_archetype_versions()
+    {
+        var verdict = await Runner.Run(TestCatalog.Load(), new Throwing(), "s", new NoSubject());
+
+        Assert.Equal("0.4.0", verdict.ProtocolVersion);
+        Assert.NotEqual("unknown", verdict.ArchetypeVersion);
     }
 
     [Fact]

@@ -40,12 +40,12 @@ describe('AVP — verifier accuracy (data-honesty · count-matches-source)', () 
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD feed with no false alarm (other data-honesty criteria skipped by seam)', async () => {
+  it('passes the GOOD feed with no false alarm (other data-honesty criteria are not applicable by seam)', async () => {
     const v = await verify(dataHonesty, countSubject('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'no-fabricated-media')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'no-fabricated-media')?.status).toBe('not-applicable');
   });
 
   it('emits the count-matches-source number', async () => {

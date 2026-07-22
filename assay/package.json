@@ -1,6 +1,6 @@
 {
   "name": "@aerofortress/assay",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
   "license": "MIT",
   "author": "Lucas Tinoco",
@@ -69,7 +69,9 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test:package": "npm run build && node test/package-entrypoints.mjs"
+    "test:package": "npm run build && node test/package-entrypoints.mjs",
+    "measure": "node tools/measure/measure.mjs",
+    "measure:check": "node tools/measure/measure.mjs --check"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.40.0",

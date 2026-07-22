@@ -11,11 +11,11 @@ import { aggregate } from './verdict';
 export interface VerifyHooks {
   /** Build the probe for a mechanical criterion under its condition. */
   probe(condition: Condition): Probe;
-  /** Applicability gate: return a skip reason when the criterion doesn't apply to this subject, else null. */
+  /** Applicability gate: return why the criterion is provably irrelevant to this subject, else null. */
   applies?(criterion: CompiledCriterion): string | null;
   /** Evidence handed to the judge for a `model` criterion. */
   gatherEvidence?(condition: Condition): Promise<unknown> | unknown;
-  /** Judge for `model` oracles. Without it, model criteria are `skipped`. */
+  /** Judge for `model` oracles. Without it, model criteria are unresolved. */
   readonly judge?: Judge;
 }
 
@@ -23,7 +23,8 @@ export interface VerifyHooks {
  * Runs an archetype's criteria through the adapter hooks and returns a Verdict.
  * The executor, not a test runner — it runs inside any host (Vitest, Jest,
  * node --test, a script). A criterion whose oracle isn't available, or that
- * doesn't apply, is `skipped` (honest coverage — never inflate the score).
+ * is irrelevant is `not-applicable`; a required oracle that cannot run is
+ * `unresolved`. Neither state can manufacture a green verdict.
  */
 export async function runVerification(
   subjectName: string,
@@ -41,8 +42,10 @@ export async function runVerification(
 }
 
 async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<CriterionVerdict> {
-  const skipReason = hooks.applies?.(c);
-  if (skipReason) return { criterionId: c.id, status: 'skipped', reason: skipReason };
+  const notApplicableReason = hooks.applies?.(c);
+  if (notApplicableReason) {
+    return { criterionId: c.id, status: 'not-applicable', reason: notApplicableReason };
+  }
 
   switch (c.oracleSpec.kind) {
     case 'mechanical': {
@@ -70,7 +73,7 @@ async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<C
       if (!hooks.judge) {
         return {
           criterionId: c.id,
-          status: 'skipped',
+          status: 'unresolved',
           reason: 'No judge provided — pass { judge } to verify() to evaluate model criteria.',
         };
       }
@@ -85,6 +88,6 @@ async function runCriterion(c: CompiledCriterion, hooks: VerifyHooks): Promise<C
     }
 
     case 'human':
-      return { criterionId: c.id, status: 'skipped', reason: `Human oracle (queued): ${c.oracleSpec.note}` };
+      return { criterionId: c.id, status: 'unresolved', reason: `Human oracle (queued): ${c.oracleSpec.note}` };
   }
 }

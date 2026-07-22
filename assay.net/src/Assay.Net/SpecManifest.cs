@@ -19,40 +19,22 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
     public IReadOnlyList<SpecObligation> DeclaredObligations =>
         Slices.SelectMany(slice => slice.Value.Select(criterion => new SpecObligation(slice.Key, criterion))).ToArray();
 
-    /// <summary>Every criterion id the manifest declares, across all slices (deduplicated, order-preserving).</summary>
-    public IReadOnlyList<string> DeclaredCriteria =>
-        Slices.Values.SelectMany(c => c).Distinct().ToArray();
-
     /// <summary>
-    /// Declared criteria with no DECIDED verdict (pass or fail) in <paramref name="verdicts"/> —
-    /// the standalone half of the doctor's bridge: the manifest is the expected set, the proofs'
-    /// verdicts are the observed set, and a declared-but-skipped criterion is still a gap.
-    /// </summary>
-    public IReadOnlyList<string> MissingFrom(IEnumerable<Verdict> verdicts)
-    {
-        var decided = verdicts
-            .SelectMany(v => v.Results)
-            .Where(r => r.Status != VerdictStatus.Skipped)
-            .Select(r => r.CriterionId)
-            .ToHashSet();
-        return DeclaredCriteria.Where(id => !decided.Contains(id)).ToArray();
-    }
-
-    /// <summary>
-    /// Declared subject × criterion obligations with no decided verdict. Unlike <see cref="MissingFrom"/>,
-    /// a verdict for one subject never pays another subject's debt, even when both use the same criterion id.
+    /// Declared subject × criterion obligations without a passing verdict. A failed,
+    /// unresolved, or not-applicable result remains unsatisfied, and a verdict for one
+    /// subject never pays another subject's debt.
     /// Subject matching is case-insensitive because runner subjects are human-facing identifiers.
     /// </summary>
     /// <param name="verdicts">The verdicts emitted by the proof run.</param>
-    public IReadOnlyList<SpecObligation> MissingObligationsFrom(IEnumerable<Verdict> verdicts)
+    public IReadOnlyList<SpecObligation> UnsatisfiedObligationsFrom(IEnumerable<Verdict> verdicts)
     {
-        var decided = verdicts
+        var passed = verdicts
             .SelectMany(verdict => verdict.Results
-                .Where(result => result.Status != VerdictStatus.Skipped)
+                .Where(result => result.Status == VerdictStatus.Pass)
                 .Select(result => (verdict.Subject, result.CriterionId)))
             .ToHashSet(SubjectCriterionComparer.Instance);
         return DeclaredObligations
-            .Where(obligation => !decided.Contains((obligation.Subject, obligation.CriterionId)))
+            .Where(obligation => !passed.Contains((obligation.Subject, obligation.CriterionId)))
             .ToArray();
     }
 
@@ -86,7 +68,8 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
             else if (line.StartsWith("[slices.", StringComparison.Ordinal) && line.EndsWith(']'))
             {
                 currentSlice = line["[slices.".Length..^1].Trim();
-                slices[currentSlice] = Array.Empty<string>();
+                if (currentSlice.Length == 0 || !slices.TryAdd(currentSlice, Array.Empty<string>()))
+                    throw new FormatException($"spec.toml has an empty or duplicate slice table: '{currentSlice}'.");
             }
             else if (currentSlice is not null && IsKey(line, "criteria"))
             {
@@ -96,6 +79,14 @@ public sealed record SpecManifest(string Module, IReadOnlyDictionary<string, IRe
 
         if (string.IsNullOrEmpty(module))
             throw new FormatException("spec.toml has no 'module = \"…\"' key.");
+        if (slices.Count == 0)
+            throw new FormatException("spec.toml declares no acceptance-bearing slices.");
+        var emptySlice = slices.FirstOrDefault(slice => slice.Value.Count == 0);
+        if (!emptySlice.Equals(default(KeyValuePair<string, IReadOnlyList<string>>)))
+            throw new FormatException($"slice '{emptySlice.Key}' declares no acceptance criteria.");
+        var duplicate = slices.FirstOrDefault(slice => slice.Value.Count != slice.Value.Distinct().Count());
+        if (!duplicate.Equals(default(KeyValuePair<string, IReadOnlyList<string>>)))
+            throw new FormatException($"slice '{duplicate.Key}' declares a duplicate acceptance criterion.");
         return new SpecManifest(module, slices);
     }
 

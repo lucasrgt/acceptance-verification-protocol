@@ -1,4 +1,4 @@
-# AVP — the Acceptance Verification Protocol (v0.1)
+# AVP — the Acceptance Verification Protocol (v0.4)
 
 > **AVP is the protocol; Assay is one implementation of it.** This document is the
 > language-neutral contract another implementation (Assay.NET, a Rails adapter, a
@@ -15,7 +15,7 @@
 ```
 Subject ──(adapter)──► observation ──(criterion's oracle)──► CriterionVerdict
             │                                                      │
-        a Specification (archetype + criteria)              aggregated ► Verdict { acceptanceScore }
+        a Specification (archetype + criteria)              aggregated ► Verdict { outcome, acceptanceScore }
 ```
 
 A **Subject** (a feature/flow) is verified against a **Specification** (an
@@ -54,9 +54,15 @@ an `acceptanceScore`.
   - `geometry` — the real layout (a headless browser): overflow, overlap, responsive,
     reading order, RTL mirroring, hit-area, layout shift.
   - `model` — an LLM-as-judge for a semantic call no mechanism can make (icon meaning-fit).
-- **CriterionVerdict** = `{ criterionId, status: pass|fail|skipped, reason, evidence? }`.
-- **Verdict** = `{ subject, archetype, results[], acceptanceScore }` where
-  `acceptanceScore = passed / applicable` (skipped excluded).
+- **CriterionVerdict** =
+  `{ criterionId, status: pass|fail|not-applicable|unresolved, reason, evidence? }`.
+  - `not-applicable` means the invariant genuinely does not belong to this subject.
+  - `unresolved` means the invariant belongs to the run but its oracle could not decide it.
+- **Verdict** = `{ subject, archetype, results[], outcome, acceptanceScore }` where
+  `acceptanceScore = passed / applicable` and `applicable = pass + fail`. The score is
+  `null` when nothing was applicable. `outcome` is `fail` if any criterion failed;
+  otherwise it is `inconclusive` if any criterion is unresolved or nothing was
+  applicable; otherwise it is `pass`.
 
 A **Subject** descriptor is adapter-specific (the DOM adapter declares how to
 mount + which control; the HTTP adapter declares the request) — it is the one part
@@ -71,16 +77,17 @@ runVerification(subjectName, archetype, hooks) -> Verdict
 
 hooks = {
   probe(condition) -> Probe          // build the observation for a mechanical criterion
-  applies?(criterion) -> skipReason? // applicability gate (else the criterion runs)
+  applies?(criterion) -> notApplicableReason? // domain applicability gate
   gatherEvidence?(condition) -> any  // evidence for a model criterion
-  judge?                             // decides model criteria; absent => skipped
+  judge?                             // decides model criteria; absent => unresolved
 }
 
 Probe = { act(): Promise<void>; expect: E }   // E = the archetype's assertion vocabulary
 ```
 
 The runner loops the criteria: mechanical → build probe, run the body, pass/fail on
-`AvpFail`; model → gather evidence, ask the judge (or skip); human → skip (queued).
+`AvpFail`; model → gather evidence, ask the judge (or mark unresolved); human →
+unresolved until a decision is supplied.
 The DOM and HTTP adapters both implement exactly this — that two substrates run
 through one runner is the proof the core is not framework-shaped.
 
@@ -88,8 +95,11 @@ through one runner is the proof the core is not framework-shaped.
 
 - An oracle failing with the implementation's fail signal (`AvpFail` / `AvpFailException`)
   → a `fail` verdict carrying the actionable reason + evidence.
-- An oracle raising the skip signal (`AvpSkipException` in .NET; `applies()` returning a
-  reason in JS) → a `skipped` verdict — honest non-applicability, never a pass.
+- An oracle raising `AvpNotApplicableException` in .NET, or `applies()` returning a
+  reason in JS, → `not-applicable`. This is only for a domain invariant that genuinely
+  does not belong to the subject; it is never a pass.
+- An oracle raising `AvpUnresolvedException`, or a missing model/human oracle, →
+  `unresolved`. The aggregate is inconclusive and every conforming gate fails closed.
 - An **unexpected** error (infrastructure, a bug in the probe) → still a `fail` verdict,
   with the error message/stack as evidence. A run ALWAYS ends in a Verdict; aborting the
   run on an oracle error is non-conformant.
@@ -119,8 +129,9 @@ An implementation is AVP-conformant for a substrate if it:
 2. provides `hooks` (probe/applies/…) binding the archetypes' criteria to that
    substrate, for every catalog archetype its substrate can observe;
 3. emits `Verdict`s in the shape above (status + acceptanceScore);
-4. is honest: a criterion whose oracle/seam is unavailable is `skipped`, never
-   silently passed (a false green is the catastrophic error).
+4. distinguishes genuine `not-applicable` from unavailable evidence/oracles as
+   `unresolved`; an unresolved or empty run is inconclusive and fails closed (a false
+   green is the catastrophic error).
 
 The `substrate` axis decides who covers what: `dom` archetypes → a frontend adapter; `http`
 archetypes (authorization, integration-integrity, second-order-effects) → an HTTP or
@@ -151,8 +162,9 @@ bring the JS archetypes into lockstep.
 
 ## Versioning
 
-`protocolVersion` (currently `0.2.0`) bumps when the data model or the condition/
+`protocolVersion` (currently `0.4.0`) bumps when the data model or the condition/
 oracle/substrate vocabularies change; archetype `version`s bump independently as their
 criteria evolve. v0.1 was the first extraction (5 substrates, 1 language); the
 Assay.NET extraction refined the model into its cross-language form (0.2.0) and the
-catalog is now emitted from the .NET side — the contract's final custody.
+catalog is now emitted from the .NET side — the contract's final custody. v0.4 split
+non-applicability from missing proof and made the empty/unresolved aggregate inconclusive.

@@ -71,9 +71,10 @@ npm i -D @stryker-mutator/core @stryker-mutator/vitest-runner
 score on a probe means the bench doesn't pin it — add a benchmark case. (Heavier +
 slower than Layer 1; run it periodically, not on every change.)
 
-**Backend (Assay.NET, future):** the same discipline with **Stryker.NET**
-(`dotnet stryker`) over the backend slices/criteria. The catalog's BE archetypes
-(authorization, integration-integrity, second-order-effects) are exactly the
+**Backend (Assay.NET):** good/bad Kestrel pairs already calibrate every bound backend
+criterion. A periodic **Stryker.NET** (`dotnet stryker`) layer can additionally mutate
+the adapter implementation itself. The catalog's BE archetypes
+(authorization, integration-integrity, mutation-atomicity, second-order-effects) are
 classes a backend mutation set should target — call as the wrong actor, forge the
 webhook signature, drop the notification — and require the BE criteria to kill them.
 

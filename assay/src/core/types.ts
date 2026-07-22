@@ -30,7 +30,7 @@ export type Substrate = 'static' | 'dom' | 'http' | 'style' | 'geometry' | 'mode
 export type Scope = 'invariant' | 'example';
 
 /** The protocol version every Verdict is stamped with (bumps when the data model or vocabularies change). */
-export const PROTOCOL_VERSION = '0.2.0';
+export const PROTOCOL_VERSION = '0.4.0';
 
 /**
  * The catalog's condition vocabulary. Three axes, all growing with the archetypes:
@@ -85,7 +85,15 @@ export interface Specification {
   readonly criteria: readonly Criterion[];
 }
 
-export type VerdictStatus = 'pass' | 'fail' | 'skipped';
+/** The aggregate decision for one subject against an archetype. */
+export type VerdictOutcome = 'pass' | 'fail' | 'inconclusive';
+
+/**
+ * Per-criterion result. `not-applicable` is a proved shape mismatch; `unresolved`
+ * means the criterion applies but the configured substrate could not decide it.
+ * Conflating those states is a false-green vector, so the protocol keeps them distinct.
+ */
+export type VerdictStatus = 'pass' | 'fail' | 'not-applicable' | 'unresolved';
 
 export interface CriterionVerdict {
   readonly criterionId: string;
@@ -105,15 +113,21 @@ export interface Verdict {
   /** The AVP protocol version the verdict shape conforms to. */
   readonly protocolVersion: string;
   readonly results: readonly CriterionVerdict[];
-  /** Criteria that actually applied (not skipped) — the denominator of the score. */
+  /** Aggregate decision. Inconclusive is never a green verdict. */
+  readonly outcome: VerdictOutcome;
+  /** Criteria actually decided as pass/fail — the denominator of the score. */
   readonly applicable: number;
   /** Criteria that passed — the numerator of the score. */
   readonly passed: number;
+  /** Criteria whose required oracle/seam was unavailable. */
+  readonly unresolved: number;
+  /** Criteria proved irrelevant to this subject shape. */
+  readonly notApplicable: number;
   /**
-   * passed / applicable, in [0,1]. `skipped` does not count. When `applicable` is 0 the
-   * score is 1 by convention — check `applicable` to tell a real green from a vacuous one.
+   * passed / applicable, in [0,1]. Null when nothing was decided: an absent
+   * denominator has no numerical acceptance meaning and must never resemble 100%.
    */
-  readonly acceptanceScore: number;
+  readonly acceptanceScore: number | null;
   /** Total wall-clock cost of the verification, in ms. */
   readonly durationMs: number;
 }

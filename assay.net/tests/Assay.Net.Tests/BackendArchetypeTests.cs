@@ -27,7 +27,8 @@ public class BackendArchetypeTests
 
         Assert.Equal(VerdictStatus.Pass, Of(v, "own-resource-only"));
         Assert.Equal(VerdictStatus.Pass, Of(v, "role-required"));
-        Assert.Equal(VerdictStatus.Skipped, Of(v, "server-is-authoritative")); // no oracle yet — honest skip
+        Assert.Equal(VerdictStatus.NotApplicable, Of(v, "server-is-authoritative"));
+        Assert.Equal(VerdictOutcome.Pass, v.Outcome);
         Assert.Equal(1.0, v.AcceptanceScore);
     }
 

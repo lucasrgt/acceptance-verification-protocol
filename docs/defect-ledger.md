@@ -38,11 +38,10 @@
   hostpoint@2a2c7f4d (three client-reported service regressions pinned by tests after the fact).
 - **Root-cause pattern:** a failure path returns/renders as if the action succeeded — the error is
   caught and dropped, or the UI never surfaces the mutation's error state.
-- **AVP candidate:** **covered in the catalog, not runnable in .NET.** `action-effect`
-  (`no-phantom-success`, `fires-primary-effect`) exists in the frontend/design tier with no .NET
-  oracle. Candidate: implement the **backend half** — a `phantom-success` oracle asserting a failed
-  dependency (mail/webhook/db) yields a non-2xx (or an error envelope), never a bare success.
-  Signal: force the dependency to fail; assert the response admits it.
+- **Resolution (0.4.0):** **covered and runnable in both HTTP adapters.** `failure-honesty`
+  (`dependency-failure-is-admitted`) forces the dependency-failure scenario and requires a
+  non-success response or the subject's declared error envelope. JS and .NET each calibrate
+  good/bad repro servers; a swallowed dependency error is now a deterministic red.
 
 ### 3. Second-order effect (notification) missing
 
@@ -51,11 +50,10 @@
   notification on new message), pauta@fc51908 (decision email's recipient resolution broken).
 - **Root-cause pattern:** the primary effect lands, the counterpart's notification is forgotten on
   SOME transitions — the matrix of (transition × recipient) is maintained by memory.
-- **AVP candidate:** **covered-but-not-bindable — harden.** `second-order-effects`
-  (`notifies-all-parties`) exists but is synthetic (a real endpoint can't bind it honestly; the
-  known false-green class). Candidate hardening: a **state-based signal** — a notifications outbox/
-  table the oracle can read after driving the transition, so the criterion binds a real subject
-  (`NotifySubject` gains an observable seam) instead of a synthetic contract.
+- **Resolution:** **covered with a state-based signal.** `second-order-effects`
+  (`notifies-all-parties`) drives the real transition and reads every declared party inbox after
+  it. Both reference adapters compare observable post-transition state; the repro servers only
+  calibrate the oracle and are not the consumer binding.
 
 ### 4. Lifecycle / submission gating not enforced server-side
 
@@ -78,10 +76,11 @@
   EXPO_PUBLIC_APP_ROLE built silently).
 - **Root-cause pattern:** a single codebase shipping N personas relies on scattered guards; one
   ungated route/system surface mounts the opposite persona.
-- **AVP candidate:** **no coverage — proposed archetype `persona-isolation`** (frontend tier).
-  Criterion `opposite-persona-never-mounts`: with the build role fixed to A, driving any route of
-  persona B never renders B's shell (redirect/refusal observed). Signal: route-table sweep against
-  a role-fixed build. Natural home: the `assay` JS adapter (DOM/route substrate).
+- **Resolution (0.4.0):** **covered by the hardened existing archetype, without a duplicate.**
+  `persona-scoped-visibility/no-cross-persona-route` now accepts the complete declared foreign
+  route set and sweeps it against one fixed actor/build. Its mutation family includes the subtle
+  case where one representative route is guarded but a sibling route still mounts the opposite
+  shell.
 
 ### 6. Concurrency / atomicity of multi-write mutations
 
@@ -91,11 +90,12 @@
   not enforced — silent last-write-wins).
 - **Root-cause pattern:** a mutation spanning several writes (or a token-carrying update) is not
   transactional/guarded; interleaving loses one side silently.
-- **AVP candidate:** **no runtime coverage — proposed archetype `mutation-atomicity`.** Criteria:
+- **Resolution (0.4.0):** **implemented in JS and .NET as `mutation-atomicity`.** Criteria:
   `concurrent-conflict-surfaces` (two conflicting updates with the same token: exactly one wins,
   the loser gets a visible conflict — never both 2xx with last-write-wins) and
   `multi-write-is-atomic` (force a failure mid-mutation; assert no partial state is observable).
-  Complements the static AF0026 (declared posture) with the runtime proof.
+  Both criteria have real HTTP caos→verde calibration. This complements static transaction
+  posture with runtime proof rather than trusting an annotation.
 
 ### 7. Integration / webhook state contract
 
@@ -106,10 +106,10 @@
 - **Root-cause pattern:** the contract with the provider is wider than the signature — ids/urls
   threaded through the round-trip, and the real invariant is the STATE the webhook leaves behind,
   not the response code.
-- **AVP candidate:** **harden `integration-integrity` with a state-based criterion** —
-  `webhook-effects-state` (proposed): after delivering a (valid, then invalid) webhook, the
-  domain state reflects exactly the valid one (invalid leaves no trace), observed via a read
-  endpoint. This is the bindable sibling of `webhook-signature-verified` for 200-always handlers.
+- **Resolution (0.4.0):** **`integration-integrity/webhook-effects-state` implemented in JS and
+  .NET.** The oracle snapshots domain state, delivers distinct authentic and forged events, then
+  requires a +1 authentic delta and zero forged delta. Its calibration deliberately uses
+  200-always handlers, proving response status is not being mistaken for the business effect.
 
 ### 8. Hand-rolled twin of a shipped primitive (package-first drift)
 
@@ -130,9 +130,10 @@
   refetch storm froze the boot splash).
 - **Root-cause pattern:** data persisted under an older shape (or an empty/anonymous state) reaches
   a view written for the newest shape only.
-- **AVP candidate:** **design-tier candidate `shape-tolerance`** (frontend): rendering a view over
-  the previous persisted shape (missing/null new fields) never throws — degraded, labeled, but
-  alive. Fits the design catalog (dom/model substrate); low urgency, high recurrence.
+- **Resolution:** **already covered; no duplicate archetype added.**
+  `render-resilience/survives-malformed-data` feeds null nested objects, absent arrays,
+  non-string fields, and missing nested metadata to the real render surface. Its mutation family
+  kills all four stale-shape crashes while requiring the guarded surface to remain green.
 
 ### 10. Test-infrastructure flakiness (watch only)
 
@@ -143,7 +144,7 @@
 
 ---
 
-**Reading the harvest:** classes 1–4 say the catalog's mechanism is right and the gap is
-*binding depth* — exactly what `af g slice --verify` (born-closed slices) and per-slice deepening
-attack. Classes 5–7 are the genuine catalog frontier (two new archetypes + one state-based
-criterion). Class 8 routes to the doctor, 9 to the design tier, 10 to framework infra.
+**Reading the harvest after 0.4.0:** classes 2, 5, 6 and 7 are now executable; classes 3 and 9
+were verified as already state/shape based and documented instead of duplicated. Classes 1 and 4
+remain binding-depth obligations for the host framework, class 8 routes to the doctor, and class
+10 stays with test infrastructure. No open runtime candidate is hidden in this harvest.

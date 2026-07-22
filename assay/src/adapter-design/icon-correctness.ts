@@ -31,7 +31,7 @@ function collectIcons(): IconEvidence {
  * The design adapter's `icon-correctness` hooks — a MODEL criterion, so no mechanical probe:
  * it mounts the surface, gathers each icon + its control's label as evidence, and hands it to
  * the injected judge. The probe stub is never invoked (the core only calls it for mechanical
- * criteria); without a judge the criterion is `skipped`.
+ * criteria); without a judge the criterion is unresolved and cannot produce a green gate.
  */
 export function iconHooks(subject: ReactDesignSubject, opts: { readonly judge?: Judge } = {}): VerifyHooks {
   return {

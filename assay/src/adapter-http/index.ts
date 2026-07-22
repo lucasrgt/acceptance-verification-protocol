@@ -7,12 +7,16 @@ export { integrationProbe } from './integration';
 export { notifyProbe } from './second-order';
 export { moneyProbe } from './money';
 export { lifecycleProbe } from './lifecycle';
+export { mutationAtomicityProbe } from './mutation-atomicity';
+export { failureHonestyProbe } from './failure-honesty';
 export type {
   HttpAuthSubject,
   HttpIntegrationSubject,
   HttpNotifySubject,
   HttpMoneySubject,
   HttpLifecycleSubject,
+  HttpMutationAtomicitySubject,
+  HttpFailureHonestySubject,
   HttpRequestSpec,
   ReturnTransition,
 } from './subject';

@@ -49,7 +49,7 @@ export const human = (note: string): Oracle => ({ kind: 'human', note });
  * A judge for `model` oracles: reads a rubric + evidence, returns a verdict.
  * Language-neutral and injectable — the real judge calls an LLM (configured via
  * env/options, never a config file); tests pass a deterministic stub. Without a
- * judge, model criteria are `skipped`.
+ * judge, model criteria are unresolved and the aggregate cannot be green.
  */
 export interface JudgeRequest {
   readonly criterion: { readonly id: string; readonly statement: string; readonly rubric: string };

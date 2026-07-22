@@ -38,7 +38,7 @@ describe('AVP — verifier accuracy (action-effect · optimistic-reconcile)', ()
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'no-phantom-success')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'no-phantom-success')?.status).toBe('not-applicable');
   });
 
   it('emits the optimistic-reconcile number', async () => {

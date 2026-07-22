@@ -8,7 +8,7 @@ import { archetype, criterion, model } from '../core/dsl';
  * file), a search shows a magnifier (not a bell). Whether a glyph's meaning fits a label is
  * a semantic judgment no mechanical check can make, so the oracle is an LLM-as-judge: the
  * adapter gathers each icon + the accessible label of its control as evidence, and the judge
- * decides fit against the rubric. Without a judge the criterion is honestly `skipped`.
+ * decides fit against the rubric. Without a judge the criterion is unresolved.
  *
  * Faithfully grounded in real wrong-icon fixes: Gitea "use repo-forked icon to display forks
  * count" (gitea:edf0dfd1) and "issue close timeline icon" (gitea:3102c04c), and Mastodon

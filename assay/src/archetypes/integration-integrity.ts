@@ -4,6 +4,8 @@ import { archetype, criterion, mechanical } from '../core/dsl';
 export interface IntegrationExpect {
   /** A forged/absent-signature webhook was refused, and a correctly-signed one accepted. */
   webhookSignatureVerified(): void;
+  /** State contains exactly the authentic webhook effect and no forged effect. */
+  webhookEffectsState(): void;
   /** A checkout/OAuth flow's return URLs are present, absolute, and bound to a real environment. */
   redirectUrlsBound(): void;
   /** A callback that can't be tied to a domain entity is refused — never accepted-and-misapplied. */
@@ -19,7 +21,7 @@ export interface IntegrationExpect {
  * by bitwarden's missing-RedirectUris fixes (aa1665065, 004e3c58e). Two seams, each
  * gating its own criterion. See docs/catalog.md #5 and docs/corpus-multistack.md.
  */
-export const integrationIntegrity = archetype('integration-integrity', '0.1.0', () => {
+export const integrationIntegrity = archetype('integration-integrity', '0.2.0', () => {
   criterion(
     'webhook-signature-verified',
     'An inbound webhook with a forged or absent signature is rejected; only an authentically-signed callback is accepted and allowed to mutate state.',
@@ -27,6 +29,16 @@ export const integrationIntegrity = archetype('integration-integrity', '0.1.0', 
     mechanical<IntegrationExpect>(async ({ act, expect }) => {
       await act();
       expect.webhookSignatureVerified();
+    }),
+  );
+
+  criterion(
+    'webhook-effects-state',
+    'After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.',
+    { under: 'success', scope: 'invariant', requires: 'webhook-state', seenIn: ['hostpoint:53fcf804', 'avp:8d6169d0'] },
+    mechanical<IntegrationExpect>(async ({ act, expect }) => {
+      await act();
+      expect.webhookEffectsState();
     }),
   );
 

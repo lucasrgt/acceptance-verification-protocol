@@ -30,7 +30,7 @@ real effect" is the invariant the example is one instance of.
   component state. Runnable today by **Assay** (the React reference adapter).
 - **BE** — backend-only behaviour (authorization, delivery, persistence,
   signatures, money math at rest). The frontend adapter *cannot see it*; it is
-  bound to a backend adapter (**Assay.NET**, future) or an HTTP adapter.
+  bound to **Assay.NET** or the JS HTTP adapter.
 - **STATIC** — best caught before runtime, by static analysis. These belong in the
   host project's linter/doctor (in this codebase's case, the AeroFortress `AF*`/`AFFE*`
   doctor), **not** in Assay. Listed here for completeness of the dictionary.
@@ -71,7 +71,7 @@ class in another?).
 | id | statement | oracle | reach | seen in |
 |---|---|---|---|---|
 | `no-cross-persona-affordance` | Signed in as actor X, no affordance scoped to actor Y is rendered or reachable. | mechanical | FE | persona leak on shared routes; cross-persona buttons in role-fixed builds |
-| `no-cross-persona-route` | A route scoped to actor Y refuses actor X at the guard, not only at the splash. | mechanical | FE | opposite-persona dashboard rendering on deep link |
+| `no-cross-persona-route` | With the build/session fixed as actor X, every declared actor-Y route is swept and refuses X at the guard. | mechanical | FE | opposite-persona shell mounted through an unguarded sibling route |
 | `chooser-scoped-to-build` | A role-fixed build refuses the role chooser / role switch entirely. | mechanical | FE | choose-role reachable in a single-persona build |
 
 ### 3. `action-effect` — an action produces its real effect *(FE)*
@@ -92,6 +92,12 @@ failure must tell the truth.
 | `optimistic-reconcile` | An optimistic update reconciles to the server truth (no permanent drift on count-based UIs). | mechanical | FE | count-based optimistic state never reconciled |
 | `cache-cleared-on-identity` | Signing in/out wipes the prior identity's cached rows — they never feed the next session's guards. | mechanical | FE | a prior account's rows feeding the new session |
 
+### 3b. `failure-honesty` — a failed dependency is never reported as success *(BE)*
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `dependency-failure-is-admitted` | When a required dependency is forced to fail, the operation returns a non-success response or its declared error envelope. | mechanical | BE | failed mail/save swallowed into a phantom success |
+
 ### 4. `lifecycle-gate` — a transition is gated on its real preconditions *(FE + BE)*
 
 | id | statement | oracle | reach | seen in |
@@ -106,6 +112,7 @@ Bound to Assay.NET / an HTTP adapter — the frontend cannot observe a webhook.
 | id | statement | oracle | reach | seen in |
 |---|---|---|---|---|
 | `webhook-signature-verified` | An inbound webhook with a forged/absent signature is rejected; only authentic callbacks mutate state. | mechanical | BE | unverified payment webhook could approve a charge |
+| `webhook-effects-state` | After an authentic and forged delivery, state gains exactly the authentic effect and no forged effect, even for 200-always handlers. | mechanical | BE | response-code checks could not bind provider acknowledgement semantics |
 | `callback-resolves-entity` | The callback carries enough to resolve the domain entity it concerns (the charge/order id). | mechanical | BE | webhook arriving without the charge id |
 | `redirect-urls-bound` | OAuth / checkout return URLs are bound to the real environment, not a placeholder. | mechanical | BE | missing `back_urls`; wrong OAuth redirect |
 
@@ -212,6 +219,13 @@ subscription sync" (3887aa67).
 |---|---|---|---|---|
 | `idempotency-key-honored` | Two requests with the same key yield one resource (the original, replayed); a different key yields a distinct one. Persist the key; never re-create, never dedup regardless of the key. | mechanical | BE | duplicate bookings without an idempotency key; non-idempotent stripe webhook sync |
 
+### 15b. `mutation-atomicity` — conflicts surface and failed multi-writes roll back *(BE)*
+
+| id | statement | oracle | reach | seen in |
+|---|---|---|---|---|
+| `concurrent-conflict-surfaces` | Two same-token conflicting updates produce exactly one winner and one explicit 409/412 conflict. | mechanical | BE | silent last-write-wins; raced read stamps |
+| `multi-write-is-atomic` | A forced fault after the first internal write leaves observable state identical to baseline. | mechanical | BE | job/member partial creation; category-change partial reuse |
+
 ---
 
 ## The coverage ledger (where each criterion lives)
@@ -219,7 +233,7 @@ subscription sync" (3887aa67).
 | reach | archetypes | home |
 |---|---|---|
 | **FE — Assay runs it** | action-effect, projections (within action-effect), data-honesty, navigation-integrity, persona-scoped-visibility (FE half), lifecycle-gate (FE half), temporal-integrity (zoned-to-user), pagination-integrity, render-resilience, money-integrity (amount-rendered-exact) | this repo, React adapter |
-| **BE — Assay.NET / HTTP adapter** | authorization, integration-integrity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency, access-control, credential-authority, token-rotation, resource-uniqueness, submission-gate | HTTP adapter today; Assay.NET for .NET-native proofs |
+| **BE — Assay.NET / HTTP adapter** | authorization, failure-honesty, integration-integrity, mutation-atomicity, second-order-effects, money-integrity (split), lifecycle-gate (server half), request-idempotency, access-control, credential-authority, token-rotation, resource-uniqueness, submission-gate | HTTP adapters with real-wire and in-process proofs |
 | **STATIC — host doctor** | contract-mints-no-routes, state-completeness, i18n-honesty, money-is-typed, money-formatted-once | the host project's linter (AeroFortress `AF*`/`AFFE*`) |
 
 This three-way split is the thesis in one table: **determinism is layered.** Some
@@ -242,21 +256,24 @@ runtime ledger unless a faithful Node/HTTP repro and adapter hook exist.
 |---|---|---|
 | action-effect | fires-primary-effect, no-phantom-success, error-is-specific (model), projections-converge, request-accepted, idempotent-retry, single-flight, survives-token-refresh, cache-cleared-on-identity, optimistic-reconcile | `bench/accuracy.test.ts` 3/3 + `bench/action-tail.test.ts` 3/3 + `bench/cache-identity.test.ts` 1/1 + `bench/optimistic-reconcile.test.ts` 1/1 + `bench/double-submit.test.ts` 1/1 + mutation 3/3+3/3+4/4 |
 | data-honesty | no-fixture-fallback, no-fabricated-media, no-raw-id-flash, count-matches-source | `bench/data-honesty.test.ts` 2/2 + `bench/data-detail.test.ts` 1/1 + `bench/count-source.test.ts` 1/1 + mutation 4/4 |
-| persona-scoped-visibility | no-cross-persona-affordance, no-cross-persona-route | `bench/persona-visibility.test.ts` 2/2 **cross-project** + `bench/persona-route.test.ts` 1/1 + mutation 4/4 |
+| persona-scoped-visibility | no-cross-persona-affordance, no-cross-persona-route | `bench/persona-visibility.test.ts` 2/2 **cross-project** + complete declared route sweep + mutation 5/5 |
 | navigation-integrity | target-resolves, nested-renders, back-has-fallback, required-params-guarded, no-redirect-loop | `bench/navigation.test.ts` 2/2 **cross-project** + `bench/navigation-nested.test.ts` 1/1 + `bench/navigation-back.test.ts` 1/1 + `bench/navigation-params.test.ts` 1/1 + `bench/redirect-loop.test.ts` 1/1 + mutation 4/4+3/3 |
 | mount-stability | settles-without-storm | `bench/mount-stability.test.ts` 1/1 |
 | **authorization** (HTTP adapter) | own-resource-only (IDOR), role-required, server-is-authoritative | `bench/authorization.test.ts` 2/2 + `bench/server-authoritative.test.ts` 1/1 + mutation 5/5 |
-| **integration-integrity** (HTTP adapter) | webhook-signature-verified, redirect-urls-bound, callback-resolves-entity | `bench/integration.test.ts` 1/1 + `bench/redirect-bound.test.ts` 1/1 + `bench/callback-resolves.test.ts` 1/1 + mutation 6/6+4/4 |
+| **failure-honesty** (HTTP adapters) | dependency-failure-is-admitted | `bench/failure-honesty.test.ts` 1/1 + .NET Kestrel pair |
+| **integration-integrity** (HTTP adapters) | webhook-signature-verified, webhook-effects-state, redirect-urls-bound, callback-resolves-entity | response and state-based pairs, including 200-always handlers |
 | **second-order-effects** (HTTP adapter) | notifies-all-parties | `bench/second-order.test.ts` 1/1 |
 | **request-idempotency** (HTTP adapter) | idempotency-key-honored | `bench/idempotency.test.ts` 1/1 + mutation 4/4 |
+| **mutation-atomicity** (HTTP adapters) | concurrent-conflict-surfaces, multi-write-is-atomic | `bench/mutation-atomicity.test.ts` 2/2 + .NET Kestrel pairs |
 | **money-integrity** (HTTP + React) | split-invariant (HTTP), amount-rendered-exact (display) | `bench/money-integrity.test.ts` 1/1 + `bench/money-display.test.ts` 1/1 + mutation 5/5+4/4 |
 | **lifecycle-gate** (HTTP + React) | gate-enforced-server-side (HTTP), blocked-action-is-disabled (DOM) | `bench/lifecycle-gate.test.ts` 1/1 + `bench/blocked-action.test.ts` 1/1 + mutation 4/4+4/4 |
 | **temporal-integrity** (React) | zoned-to-user, floating-date-not-shifted | `bench/temporal-integrity.test.ts` 1/1 + `bench/floating-date.test.ts` 1/1 + mutation 5/5+4/4 |
 | **pagination-integrity** (React) | pages-cover-the-set | `bench/pagination-integrity.test.ts` 1/1 + mutation 4/4 |
 | **render-resilience** (React) | survives-malformed-data | `bench/render-resilience.test.ts` 1/1 + mutation 4/4 |
 
-Total executed detection: **39/39, false-alarm 0**, across **14 archetypes** and 3
-independent projects (see `docs/transfer.md`), now over **two substrates**: the
+Current executed detection and false-alarm totals are generated in
+[`measurements.md`](measurements.md); they are not copied into this hand-maintained
+catalog. The calibration spans independent projects and **two substrates**: the
 React/DOM adapter AND an HTTP adapter — both plugging into the same neutral core
 runner (`src/core/run.ts`). That backend archetypes (authorization, money math at
 rest, lifecycle gating) run through the same runner as the DOM archetypes is the
@@ -266,10 +283,11 @@ gate-enforced-server-side over HTTP, DOM half blocked-action-is-disabled in Reac
 `money-integrity` (split-invariant at rest over HTTP, amount-rendered-exact in display
 over React) — the same invariant family gated at both layers, the "determinism is
 layered" thesis made concrete. `authorization`
-(3 criteria), `integration-integrity` (3), `navigation-integrity` (5), `data-honesty`
+(3 criteria), `integration-integrity` (4), `navigation-integrity` (5), `data-honesty`
 (4), `persona-scoped-visibility` (2) and `lifecycle-gate` (2, cross-substrate) now
 seam-gate multiple criteria — a subject declares only the seams it has, and the rest
-are honestly skipped, never failed. Probe substrates so far: RTL+MSW drive ·
+are explicitly `not-applicable`; unavailable required proof is `unresolved`, never
+green. Probe substrates so far: RTL+MSW drive ·
 render-vs-API · render-as-actor · navigate-spy · mount-and-count · a real mounted
 TanStack router · a paint-timing harness · a **real HTTP request** · an
 **integer-cent split swept across totals** · a **checkout return-URL binding check** ·

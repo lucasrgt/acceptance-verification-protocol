@@ -119,7 +119,8 @@ Transfer is now an operational loop, not a bespoke experiment:
 2. Author the subjects — one `*.assay.test.*` file per feature, declaring the seams that
    already exist (see `docs/getting-started.md`).
 3. Run **`npx assay verify`** — every criterion the archetypes can observe in that project
-   executes; criteria whose seams the subject lacks are skipped honestly.
+   executes; genuine domain non-applicability is reported separately, while missing
+   proof is unresolved and cannot produce a green gate.
 
 A criterion mined in project A catching an escape in project B **through that command,
 unchanged**, is the transfer claim holding. For .NET targets the same loop is

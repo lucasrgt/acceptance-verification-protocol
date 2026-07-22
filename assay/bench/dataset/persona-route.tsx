@@ -28,11 +28,11 @@ import {
  *   redirect-wrong     : redirects a non-host to /host/list (still a host route)
  *   splash-only        : the guard lives on /login, not the route — a deep link renders it
  */
-export type PersonaRouteVariant = 'good' | 'no-guard' | 'wrong-actor-check' | 'redirect-wrong' | 'splash-only';
+export type PersonaRouteVariant = 'good' | 'no-guard' | 'wrong-actor-check' | 'redirect-wrong' | 'splash-only' | 'one-route-only';
 
 const ACTOR: string = 'traveler';
 
-function build(variant: PersonaRouteVariant) {
+function build(variant: PersonaRouteVariant, initialRoute = '/host/dashboard') {
   const rootRoute = createRootRoute({ component: () => <Outlet /> });
 
   const travelerHome = createRoute({
@@ -41,18 +41,19 @@ function build(variant: PersonaRouteVariant) {
     component: () => <h1>Traveler home</h1>,
   });
 
-  const hostList = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/host/list',
-    component: () => <h1>Host listings</h1>,
-  });
-
   const guard = () => {
-    if (variant === 'good' && ACTOR !== 'host') throw redirect({ to: '/traveler/home' });
+    if ((variant === 'good' || variant === 'one-route-only') && ACTOR !== 'host') throw redirect({ to: '/traveler/home' });
     if (variant === 'wrong-actor-check' && !ACTOR) throw redirect({ to: '/traveler/home' }); // only blocks anonymous
     if (variant === 'redirect-wrong' && ACTOR !== 'host') throw redirect({ to: '/host/list' }); // wrong target
     // no-guard / splash-only: no route guard at all
   };
+
+  const hostList = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/host/list',
+    beforeLoad: variant === 'one-route-only' || variant === 'redirect-wrong' ? undefined : guard,
+    component: () => <h1>Host listings</h1>,
+  });
 
   const hostDashboard = createRoute({
     getParentRoute: () => rootRoute,
@@ -62,8 +63,8 @@ function build(variant: PersonaRouteVariant) {
   });
 
   const routeTree = rootRoute.addChildren([travelerHome, hostList, hostDashboard]);
-  return createRouter({ routeTree, history: createMemoryHistory({ initialEntries: ['/host/dashboard'] }) });
+  return createRouter({ routeTree, history: createMemoryHistory({ initialEntries: [initialRoute] }) });
 }
 
-export const buildPersonaRouter = (variant: PersonaRouteVariant) => () => build(variant);
+export const buildPersonaRouter = (variant: PersonaRouteVariant) => (foreignRoute?: string) => build(variant, foreignRoute);
 export const SIGNED_IN_ACTOR = ACTOR;

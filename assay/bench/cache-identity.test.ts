@@ -37,12 +37,12 @@ describe('AVP — verifier accuracy (action-effect · cache-cleared-on-identity)
     expect(target?.status, target?.reason).toBe('fail');
   });
 
-  it('passes the GOOD app with no false alarm (action criteria skipped by shape)', async () => {
+  it('passes the GOOD app with no false alarm (action criteria are not applicable to the identity shape)', async () => {
     const v = await verify(actionEffect, identity('good'));
     const fails = v.results.filter((r) => r.status === 'fail');
     expect(fails, JSON.stringify(fails, null, 2)).toHaveLength(0);
     expect(v.acceptanceScore).toBe(1);
-    expect(v.results.find((r) => r.criterionId === 'fires-primary-effect')?.status).toBe('skipped');
+    expect(v.results.find((r) => r.criterionId === 'fires-primary-effect')?.status).toBe('not-applicable');
   });
 
   it('emits the cache-cleared-on-identity number', async () => {
