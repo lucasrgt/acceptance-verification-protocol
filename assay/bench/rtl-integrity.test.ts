@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { rtlIntegrity } from '../src/archetypes/rtl-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -14,7 +14,6 @@ import { buildRtlNav, type RtlVariant } from './dataset/rtl-icons';
  * RTL is wrong. Measured in real Chrome by reading each directional icon's computed transform
  * under both writing directions. Faithful: Mastodon 51345e51. Skips honestly with no Chrome.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: RtlVariant): ReactDesignSubject => ({
   name: `rtl-${variant}`,
   render: buildRtlNav(variant),
@@ -24,7 +23,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -38,7 +36,7 @@ const rtlStatus = async (variant: RtlVariant) => {
   return v.results.find((r) => r.criterionId === 'directional-icons-mirror');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (rtl-integrity · directional-icons-mirror)', () => {
+describe('AVP Design — verifier accuracy (rtl-integrity · directional-icons-mirror)', () => {
   it('fails the BAD nav on "directional-icons-mirror" (back arrow not flipped under rtl — escape mastodon:51345e51)', async () => {
     const target = await rtlStatus('no-flip');
     expect(target, 'criterion missing').toBeDefined();
@@ -70,7 +68,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (rtl-integrity ·
  */
 const MUTANTS: readonly RtlVariant[] = ['no-flip', 'partial-flip', 'flip-always'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (rtl-integrity · directional-icons-mirror)', () => {
+describe('AVP Design — mutation testing (rtl-integrity · directional-icons-mirror)', () => {
   it('kills every RTL-mirroring mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await rtlStatus(m))?.status !== 'fail') survivors.push(m);

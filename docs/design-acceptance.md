@@ -194,7 +194,8 @@ hierarchy discrepancy that motivated the idea.)
    ~150MB download) — `src/adapter-design/browser.ts` + `browser-verify.ts`
    (`verifyDesignBrowser`, reuses `core/run.ts`); the probe renders the React surface to
    static markup, loads it in headless Chrome, and measures real `scrollWidth`/
-   `clientWidth`. The bench skips honestly if no Chrome/Edge is installed.
+   `clientWidth`. The scientific gate requires an installed Chrome/Edge and fails
+   when the geometry substrate is unavailable; missing evidence is never a green skip.
    - **layout-integrity** — ✅ **DONE.** `content-fits`: no element clips its own content
      (cut off by a too-small box with hidden overflow). Mutation 3/3 (horizontal clip,
      vertical clip, button-label clip), false-alarm 0. `bench/layout-integrity.test.ts`.

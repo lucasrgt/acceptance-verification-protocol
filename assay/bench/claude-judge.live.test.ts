@@ -3,13 +3,15 @@ import { claudeJudge } from '../src/judge/claude';
 
 /**
  * LIVE calibration of the model oracle — the fake-client tests prove the wiring; only a
- * real call measures whether the judge JUDGES. Gated on ANTHROPIC_API_KEY (skipped
- * otherwise — CI without the secret stays honest, a machine with it calibrates for real).
- * Two poles of the error-is-specific rubric: an unmistakable PASS and an unmistakable FAIL.
+ * real call measures whether the judge JUDGES. This experiment is deliberately outside
+ * the deterministic default suite and runs through `npm run test:live`; invoking it
+ * without its required key is a failure, never a skipped test.
  */
-const hasKey = !!process.env.ANTHROPIC_API_KEY;
+if (!process.env.ANTHROPIC_API_KEY) {
+  throw new Error('test:live requires ANTHROPIC_API_KEY; a missing live dependency is not a skipped pass.');
+}
 
-describe.skipIf(!hasKey)('claudeJudge — LIVE calibration (needs ANTHROPIC_API_KEY)', () => {
+describe('claudeJudge — LIVE calibration', () => {
   const judge = claudeJudge();
   const criterion = {
     id: 'error-is-specific',

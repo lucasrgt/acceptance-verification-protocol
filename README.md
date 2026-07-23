@@ -105,9 +105,11 @@ Two measurable claims are baked in: the criteria set **converges** from failures
 accrual — every escape becomes a criterion), and archetypes **transfer** across projects
 ([docs/transfer.md](docs/transfer.md)). `node tools/measure/measure.mjs` (from `assay/`)
 re-runs both implementations, records the executed good/bad calibration groups, audits
-catalog-to-test reach, and derives JSON + Markdown evidence. The current evidence proves
-the verifier legs; it does **not** yet claim a held-out external corpus or measured LLM
-repair rate. Those remain research milestones toward a SWE-bench-style benchmark for
+catalog-to-test reach, content-addresses every scientific input, and derives JSON + Markdown
+evidence. The first frozen held-out case now evaluates the already-published authorization
+oracle against Gitea's private-repository permission escape. One pair is a provenance proof,
+not yet a statistically useful external corpus; expanding that frozen set and measuring the
+LLM repair rate remain research milestones toward a SWE-bench-style benchmark for
 web-feature acceptance.
 
 ## Development
@@ -117,6 +119,11 @@ cd assay && npm ci
 npx tsc --noEmit && npm run lint && npx vitest run   # typecheck + lint + calibration bench
 cd ../assay.net && dotnet test                        # the .NET suite
 ```
+
+The deterministic calibration bench requires an installed Chrome/Edge for geometry
+criteria and contains no conditional skips: an unavailable substrate is red. The
+networked Claude experiment is a separate, explicit `npm run test:live` and fails
+immediately without `ANTHROPIC_API_KEY`; it is not counted as default-suite evidence.
 
 Releases: one `vX.Y.Z` tag publishes every package at that version (CI asserts it). See
 [CONTRIBUTING.md](CONTRIBUTING.md) and [CHANGELOG.md](CHANGELOG.md).

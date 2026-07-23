@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { layoutShiftIntegrity } from '../src/archetypes/layout-shift-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -15,7 +15,6 @@ import { buildLayoutShiftCard, type LayoutShiftVariant } from './dataset/layout-
  * getBoundingClientRect. Faithful: the layout-shift cluster (mastodon:511e10df,
  * gitea:32fdfb0b, documenso:1a23744d). Skips honestly with no Chrome.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: LayoutShiftVariant): ReactDesignSubject => ({
   name: `shift-${variant}`,
   renderState: buildLayoutShiftCard(variant),
@@ -25,7 +24,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -39,7 +37,7 @@ const shiftStatus = async (variant: LayoutShiftVariant) => {
   return v.results.find((r) => r.criterionId === 'reserved-space-stable');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layout-shift-integrity · reserved-space-stable)', () => {
+describe('AVP Design — verifier accuracy (layout-shift-integrity · reserved-space-stable)', () => {
   it('fails the BAD card on "reserved-space-stable" (an unsized image pushes the caption — escape mastodon:511e10df)', async () => {
     const target = await shiftStatus('unsized-image');
     expect(target, 'criterion missing').toBeDefined();
@@ -70,7 +68,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layout-shift-int
  */
 const MUTANTS: readonly LayoutShiftVariant[] = ['unsized-image', 'late-widget', 'expanding-banner'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (layout-shift-integrity · reserved-space-stable)', () => {
+describe('AVP Design — mutation testing (layout-shift-integrity · reserved-space-stable)', () => {
   it('kills every layout-shift mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await shiftStatus(m))?.status !== 'fail') survivors.push(m);

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { tapTargetIntegrity } from '../src/archetypes/tap-target-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -15,7 +15,6 @@ import { buildTapTargetBar, type TapTargetVariant } from './dataset/tap-targets'
  * getBoundingClientRect. Faithful: the "clickable area" cluster (mastodon:2b93a221,
  * gitea:8703b6c9). Skips honestly with no Chrome.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: TapTargetVariant): ReactDesignSubject => ({
   name: `tap-${variant}`,
   render: buildTapTargetBar(variant),
@@ -25,7 +24,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -39,7 +37,7 @@ const tapStatus = async (variant: TapTargetVariant) => {
   return v.results.find((r) => r.criterionId === 'targets-meet-minimum-size');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (tap-target-integrity · targets-meet-minimum-size)', () => {
+describe('AVP Design — verifier accuracy (tap-target-integrity · targets-meet-minimum-size)', () => {
   it('fails the BAD bar on "targets-meet-minimum-size" (a 20×20 icon button — escape mastodon:2b93a221)', async () => {
     const target = await tapStatus('tiny-icon');
     expect(target, 'criterion missing').toBeDefined();
@@ -70,7 +68,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (tap-target-integ
  */
 const MUTANTS: readonly TapTargetVariant[] = ['tiny-icon', 'thin-link', 'narrow-btn'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (tap-target-integrity · targets-meet-minimum-size)', () => {
+describe('AVP Design — mutation testing (tap-target-integrity · targets-meet-minimum-size)', () => {
   it('kills every undersized-target mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await tapStatus(m))?.status !== 'fail') survivors.push(m);

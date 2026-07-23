@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { responsiveIntegrity } from '../src/archetypes/responsive-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -15,7 +15,6 @@ import { buildResponsiveToolbar, type ResponsiveVariant } from './dataset/respon
  * breakpoint. Faithful: Mastodon "columns not using mobile styles" (98ec6991). Skips
  * honestly if no Chrome/Edge is installed.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: ResponsiveVariant): ReactDesignSubject => ({
   name: `responsive-${variant}`,
   render: buildResponsiveToolbar(variant),
@@ -25,7 +24,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -39,7 +37,7 @@ const responsiveStatus = async (variant: ResponsiveVariant) => {
   return v.results.find((r) => r.criterionId === 'holds-across-breakpoints');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (responsive-integrity · holds-across-breakpoints)', () => {
+describe('AVP Design — verifier accuracy (responsive-integrity · holds-across-breakpoints)', () => {
   it('fails the BAD surface on "holds-across-breakpoints" (fixed row overflows narrow — escape mastodon:98ec6991)', async () => {
     const target = await responsiveStatus('fixed-row');
     expect(target, 'criterion missing').toBeDefined();
@@ -71,7 +69,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (responsive-integ
  */
 const MUTANTS: readonly ResponsiveVariant[] = ['fixed-row', 'wide-block', 'nowrap-heading'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (responsive-integrity · holds-across-breakpoints)', () => {
+describe('AVP Design — mutation testing (responsive-integrity · holds-across-breakpoints)', () => {
   it('kills every narrow-viewport-overflow mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await responsiveStatus(m))?.status !== 'fail') survivors.push(m);

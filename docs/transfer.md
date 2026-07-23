@@ -1,6 +1,6 @@
 # Transfer evidence (RQ4) — the catalog isn't overfit
 
-> Numbers in this document are a snapshot (measured 2026-06; re-measure via `node tools/measure/measure.mjs`).
+> Numbers in this document are a snapshot (measured 2026-07; re-measure via `node tools/measure/measure.mjs`).
 
 > **RQ4: does a verifier mined from one project catch the same failure class in a
 > different project?** This is the question that separates "a checklist for one
@@ -87,6 +87,30 @@ A criterion authored from one product's history detecting a different product's
 real, historical escape — with no false alarm on the fix — is the transfer claim,
 executed.
 
+The two contributed runtime shapes are executable now as well:
+
+```
+[AVP] navigation nested-renders detection=1/1  false-alarm=0
+[AVP] data-honesty flash-of-id detection=1/1  false-alarm=0
+```
+
+- `bench/nested-route.test.tsx` mounts a real TanStack Router tree and distinguishes
+  the parent without `<Outlet>` from the fixed parent.
+- `bench/data-detail.test.ts` delays the split name lookup and observes the paint
+  sequence, rejecting a raw identifier before the resolved name.
+
+The external held-out ledger starts separately from these development calibrations.
+`bench/held-out/gitea-permission.test.ts` freezes Gitea commit
+`171df0c9ffcec1b0839431e75f3b59e35d39ddca` against the
+already-published 0.4.0 HTTP authorization oracle:
+
+```
+[AVP] held-out gitea role-required detection=1/1  false-alarm=0/1
+```
+
+The machine-readable freeze — source repository, full commit, oracle version,
+criterion, adapter and executable test — lives in `bench/held-out/corpus.json`.
+
 ## What this licenses (and what it doesn't)
 
 - **Licenses:** treating the catalog as a *portable dictionary* of acceptance
@@ -104,10 +128,10 @@ executed.
   shaped to trip a criterion. The benchmark reproduces the bug, then runs the whole
   archetype — a false-green is the catastrophic error, so the GOOD variant must pass
   with no false alarm.
-- `parent-without-Outlet` and `flash-of-id` are catalogued but **not yet executed**
-  here — they need a router-mounted probe (the real TanStack/expo router) and a
-  paint-timing probe respectively. Listed as the next runtime criteria, not claimed
-  as covered.
+- `parent-without-Outlet` and `flash-of-id` are executed development calibrations,
+  not held-out cases: their probes were built alongside the criteria. The Gitea
+  permission case is the first frozen held-out datapoint. One datapoint proves the
+  evaluation machinery and transfer instance, not population-level accuracy.
 
 
 ## Reproducing a transfer run (one command per project)

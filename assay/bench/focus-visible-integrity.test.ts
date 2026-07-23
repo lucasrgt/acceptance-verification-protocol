@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { focusVisibleIntegrity } from '../src/archetypes/focus-visible-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -13,9 +13,9 @@ import { buildFocusBar, type FocusVariant } from './dataset/focus-targets';
  * Distinct from tap-target (the control's SIZE) and state-coverage (jsdom, declared states): the
  * focus ring is a real `:focus` style change only a browser resolves — jsdom applies no
  * pseudo-class styles. Faithful: cal.com's focus-ring cluster (calcom:7393ba1d1, the "Fixing focus
- * visible" fix). Skips honestly with no Chrome.
+ * visible" fix). The scientific gate requires an installed Chrome/Edge; a missing
+ * geometry substrate fails setup instead of converting absent evidence into a skip.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: FocusVariant): ReactDesignSubject => ({
   name: `focus-${variant}`,
   render: buildFocusBar(variant),
@@ -25,7 +25,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -39,7 +38,7 @@ const focusStatus = async (variant: FocusVariant) => {
   return v.results.find((r) => r.criterionId === 'focus-is-visible');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (focus-visible-integrity · focus-is-visible)', () => {
+describe('AVP Design — verifier accuracy (focus-visible-integrity · focus-is-visible)', () => {
   it('fails the BAD bar on "focus-is-visible" (focus:outline-none, no ring — escape calcom:7393ba1d1)', async () => {
     const target = await focusStatus('no-indicator');
     expect(target, 'criterion missing').toBeDefined();
@@ -70,7 +69,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (focus-visible-in
  */
 const MUTANTS: readonly FocusVariant[] = ['no-indicator', 'transparent-ring', 'hover-only', 'zero-outline'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (focus-visible-integrity · focus-is-visible)', () => {
+describe('AVP Design — mutation testing (focus-visible-integrity · focus-is-visible)', () => {
   it('kills every invisible-focus mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await focusStatus(m))?.status !== 'fail') survivors.push(m);

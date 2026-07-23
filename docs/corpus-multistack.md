@@ -137,7 +137,9 @@ the catalog was never mined from:
 - **Tier-1 has false positives.** `data-honesty` here is mostly *test* fixtures, not
   shipped fake data; some `second-order-effects` rows are CSS fixes that mention
   "email". Treat rows as leads, the distribution as evidence.
-- **Classified ≠ executed.** These are tier-1 *labels*, not faithful repros. The
-  executed benchmark (the proof) still grows by hand from the best pairs — next, a
-  cross-stack repro (e.g. the bitwarden IDOR via an HTTP adapter) would be the first
-  executed backend transfer datapoint.
+- **Classified ≠ executed.** These tier-1 counts remain labels, not faithful repros.
+  Executed external pairs are tracked separately. The first frozen held-out backend
+  datapoint is Gitea `171df0c9`: the published 0.4.0 HTTP authorization oracle fails
+  the private-repository route without code-unit permission and passes the fixed
+  route. Its immutable provenance is `assay/bench/held-out/corpus.json`; one pair
+  establishes the machinery, not a broad accuracy estimate.

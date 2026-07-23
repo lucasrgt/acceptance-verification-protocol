@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { layerIntegrity } from '../src/archetypes/layer-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -14,7 +14,6 @@ import { buildOverlapForm, type LayerVariant } from './dataset/overlap-regions';
  * Faithful: cal.com "Continue button overlaps Bio textarea" (44ccc72f). Skips honestly
  * if no Chrome/Edge is installed.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: LayerVariant): ReactDesignSubject => ({
   name: `overlap-${variant}`,
   render: buildOverlapForm(variant),
@@ -24,7 +23,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -38,7 +36,7 @@ const layerStatus = async (variant: LayerVariant) => {
   return v.results.find((r) => r.criterionId === 'no-unintended-overlap');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layer-integrity · no-unintended-overlap)', () => {
+describe('AVP Design — verifier accuracy (layer-integrity · no-unintended-overlap)', () => {
   it('fails the BAD form on "no-unintended-overlap" (button over the textarea — escape calcom:44ccc72f)', async () => {
     const target = await layerStatus('absolute-overlap');
     expect(target, 'criterion missing').toBeDefined();
@@ -69,7 +67,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layer-integrity 
  */
 const MUTANTS: readonly LayerVariant[] = ['absolute-overlap', 'negative-margin', 'translate-overlap'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (layer-integrity · no-unintended-overlap)', () => {
+describe('AVP Design — mutation testing (layer-integrity · no-unintended-overlap)', () => {
   it('kills every region-collision mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await layerStatus(m))?.status !== 'fail') survivors.push(m);

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { truncationIntegrity } from '../src/archetypes/truncation-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -14,7 +14,6 @@ import { buildTruncCard, type TruncationVariant } from './dataset/truncation-tex
  * scrollWidth/scrollHeight + computed overflow. Faithful: cal.com's truncation cluster
  * (calcom:f63d70552, calcom:22201cbc7, calcom:3af6fee05). Skips honestly with no Chrome.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: TruncationVariant): ReactDesignSubject => ({
   name: `trunc-${variant}`,
   render: buildTruncCard(variant),
@@ -24,7 +23,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -38,7 +36,7 @@ const truncStatus = async (variant: TruncationVariant) => {
   return v.results.find((r) => r.criterionId === 'overflowing-text-is-truncated');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (truncation-integrity · overflowing-text-is-truncated)', () => {
+describe('AVP Design — verifier accuracy (truncation-integrity · overflowing-text-is-truncated)', () => {
   it('fails the BAD card on "overflowing-text-is-truncated" (a long URL spilling out — escape calcom:f63d70552)', async () => {
     const target = await truncStatus('spill-x');
     expect(target, 'criterion missing').toBeDefined();
@@ -73,7 +71,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (truncation-integ
 const MUTANTS: readonly TruncationVariant[] = ['spill-x', 'hard-clip-x', 'clip-y', 'spill-y'];
 const GOODS: readonly TruncationVariant[] = ['good', 'good-clamp', 'good-scroll'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (truncation-integrity · overflowing-text-is-truncated)', () => {
+describe('AVP Design — mutation testing (truncation-integrity · overflowing-text-is-truncated)', () => {
   it('kills every untruncated-overflow mutant + no false alarm on any affordance', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await truncStatus(m))?.status !== 'fail') survivors.push(m);

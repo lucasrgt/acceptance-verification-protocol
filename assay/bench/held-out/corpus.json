@@ -1,0 +1,23 @@
+[
+  {
+    "id": "gitea-private-repo-issue-config",
+    "frozenAt": "2026-07-23",
+    "oracleVersion": "0.4.0",
+    "adapter": "http",
+    "archetype": "authorization",
+    "criterion": "role-required",
+    "calibrationLabel": "held-out gitea role-required",
+    "source": {
+      "repository": "https://github.com/go-gitea/gitea",
+      "commit": "171df0c9ffcec1b0839431e75f3b59e35d39ddca",
+      "parent": "dbf4828169fecd43bc688c1d893d3406354276cc",
+      "stack": "Go",
+      "paths": [
+        "routers/api/v1/api.go",
+        "tests/integration/api_issue_config_test.go",
+        "tests/integration/api_issue_templates_test.go"
+      ]
+    },
+    "test": "assay/bench/held-out/gitea-permission.test.ts"
+  }
+]

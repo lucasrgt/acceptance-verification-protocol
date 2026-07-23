@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { readingOrderIntegrity } from '../src/archetypes/reading-order-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -15,7 +15,6 @@ import { buildReadingOrderHeader, type ReadingOrderVariant } from './dataset/rea
  * order vs a DECLARED spec) — here the VISUAL geometry is the ground truth. Measured in real
  * Chrome via getBoundingClientRect. Faithful: Mastodon d20d0492. Skips honestly with no Chrome.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: ReadingOrderVariant): ReactDesignSubject => ({
   name: `reading-order-${variant}`,
   render: buildReadingOrderHeader(variant),
@@ -25,7 +24,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -39,7 +37,7 @@ const orderStatus = async (variant: ReadingOrderVariant) => {
   return v.results.find((r) => r.criterionId === 'dom-order-matches-visual');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (reading-order-integrity · dom-order-matches-visual)', () => {
+describe('AVP Design — verifier accuracy (reading-order-integrity · dom-order-matches-visual)', () => {
   it('fails the BAD header on "dom-order-matches-visual" (flex order pulls time to the front — escape mastodon:d20d0492)', async () => {
     const target = await orderStatus('flex-order');
     expect(target, 'criterion missing').toBeDefined();
@@ -70,7 +68,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (reading-order-in
  */
 const MUTANTS: readonly ReadingOrderVariant[] = ['flex-order', 'column-reverse', 'absolute-bump'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (reading-order-integrity · dom-order-matches-visual)', () => {
+describe('AVP Design — mutation testing (reading-order-integrity · dom-order-matches-visual)', () => {
   it('kills every visual-vs-DOM desync mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await orderStatus(m))?.status !== 'fail') survivors.push(m);

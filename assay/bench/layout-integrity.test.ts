@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import type { Browser, Page } from 'puppeteer-core';
-import { openBrowser, chromePath } from '../src/adapter-design/browser';
+import { openBrowser } from '../src/adapter-design/browser';
 import { verifyDesignBrowser } from '../src/adapter-design/browser-verify';
 import { layoutIntegrity } from '../src/archetypes/layout-integrity';
 import type { ReactDesignSubject } from '../src/adapter-design/subject';
@@ -10,10 +10,9 @@ import { buildOverflowCard, type OverflowVariant } from './dataset/overflow-card
  * AVP Design — layout-integrity · content-fits. The eighth design criterion and the
  * FIRST of the geometry tier: content must not be clipped by a fixed box. Measured in a
  * REAL browser (headless Chrome via puppeteer-core) because jsdom has no layout engine
- * (offsetWidth = 0). Faithful: cal.com's overflow cluster (78 fixes). If no Chrome/Edge
- * is installed the suite skips (honest — the substrate is unavailable, not green).
+ * (offsetWidth = 0). Faithful: cal.com's overflow cluster (78 fixes). The scientific
+ * gate requires Chrome/Edge and fails setup when the geometry substrate is unavailable.
  */
-const hasBrowser = chromePath() !== null;
 const subject = (variant: OverflowVariant): ReactDesignSubject => ({
   name: `overflow-${variant}`,
   render: buildOverflowCard(variant),
@@ -23,7 +22,6 @@ let browser: Browser | undefined;
 let page: Page;
 
 beforeAll(async () => {
-  if (!hasBrowser) return;
   browser = await openBrowser();
   page = await browser.newPage();
 }, 60_000);
@@ -37,7 +35,7 @@ const layoutStatus = async (variant: OverflowVariant) => {
   return v.results.find((r) => r.criterionId === 'content-fits');
 };
 
-describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layout-integrity · content-fits)', () => {
+describe('AVP Design — verifier accuracy (layout-integrity · content-fits)', () => {
   it('fails the BAD card on "content-fits" (label cut off — escape calcom:a1124ede)', async () => {
     const target = await layoutStatus('clip-horizontal');
     expect(target, 'criterion missing').toBeDefined();
@@ -68,7 +66,7 @@ describe.skipIf(!hasBrowser)('AVP Design — verifier accuracy (layout-integrity
  */
 const MUTANTS: readonly OverflowVariant[] = ['clip-horizontal', 'clip-vertical', 'button-clip'];
 
-describe.skipIf(!hasBrowser)('AVP Design — mutation testing (layout-integrity · content-fits)', () => {
+describe('AVP Design — mutation testing (layout-integrity · content-fits)', () => {
   it('kills every clipped-content mutant + no false alarm', async () => {
     const survivors: string[] = [];
     for (const m of MUTANTS) if ((await layoutStatus(m))?.status !== 'fail') survivors.push(m);
