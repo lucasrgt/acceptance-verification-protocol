@@ -3,6 +3,10 @@ import { cleanup } from '@testing-library/react';
 import { server } from './src/adapter-react/msw-server';
 import { recordAccuracyMessage } from './bench/accuracy-record';
 
+// React 18 requires test runners to declare that state transitions are observed
+// through act(). Testing Library owns the act boundaries used by these benchmarks.
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
 // BAD mutants crash on purpose; React then re-prints the error with framework advice
 // ("The above error occurred in the <X> component…"). That duplicate advice is pure noise
 // over an intentional signal — drop ONLY it; every other console.error stays untouched.
@@ -43,9 +47,17 @@ window.addEventListener('error', (event) => {
 
 // The MSW server is the seam through which AVP forces network conditions
 // (success / api-error / slow) and observes the effects an action produces.
-// 'warn' (not 'bypass'): an endpoint the subject forgot to declare surfaces in the output
-// instead of failing silently — unmocked traffic is exactly the signal a verifier wants.
-beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+// Dataset benchmarks also exercise real loopback servers; those requests deliberately bypass
+// MSW. Any other endpoint the subject forgot to declare remains visible as a warning.
+beforeAll(() =>
+  server.listen({
+    onUnhandledRequest(request, print) {
+      const hostname = new URL(request.url).hostname;
+      if (hostname === '127.0.0.1' || hostname === 'localhost' || hostname === '::1') return;
+      print.warning();
+    },
+  }),
+);
 afterEach(() => {
   server.resetHandlers();
   cleanup();

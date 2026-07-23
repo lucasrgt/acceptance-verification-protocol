@@ -68,7 +68,9 @@ function inputFingerprint() {
   for (const path of files.sort()) {
     hash.update(relative(repoRoot, path).replaceAll('\\', '/'));
     hash.update('\0');
-    hash.update(readFileSync(path));
+    // Git may materialize the same text with CRLF on Windows and LF on Linux.
+    // Scientific identity follows the normalized source, not checkout policy.
+    hash.update(readFileSync(path, 'utf8').replaceAll('\r\n', '\n').replaceAll('\r', '\n'));
     hash.update('\0');
   }
   return `sha256:${hash.digest('hex')}`;
