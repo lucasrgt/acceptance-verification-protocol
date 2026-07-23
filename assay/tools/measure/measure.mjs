@@ -31,11 +31,15 @@ function run(file, args, cwd, env = process.env) {
   });
 }
 
+const GENERATED_DIRECTORIES = new Set(['bin', 'obj', 'node_modules']);
+
 function sourceFiles(root, extensions) {
   const found = [];
   for (const entry of readdirSync(root)) {
     const path = resolve(root, entry);
-    if (statSync(path).isDirectory()) found.push(...sourceFiles(path, extensions));
+    if (statSync(path).isDirectory()) {
+      if (!GENERATED_DIRECTORIES.has(entry)) found.push(...sourceFiles(path, extensions));
+    }
     else if (extensions.has(extname(path))) found.push(path);
   }
   return found;
@@ -227,7 +231,8 @@ if (checkOnly) {
 
   if (baseline.inputFingerprint !== fingerprint) {
     throw new Error(
-      'Scientific inputs differ from the versioned measurement fingerprint. Run `npm run measure`, review the evidence, and commit it.',
+      `Scientific inputs differ from the versioned measurement fingerprint (expected ${baseline.inputFingerprint}, actual ${fingerprint}). ` +
+        'Run `npm run measure`, review the evidence, and commit it.',
     );
   }
 
