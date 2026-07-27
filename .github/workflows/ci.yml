@@ -1,9 +1,8 @@
 name: ci
 
-# The verifier verifies itself: typecheck + lint + the unified JS/.NET measurement,
-# packaged entrypoints, eslint-plugin self-test, and the example app's verification — on
-# every push and PR. The geometry benches run for real here: ubuntu runners ship Chrome,
-# so `describe.skipIf(!hasBrowser)` does not skip in CI.
+# The verifier verifies itself through the same canonical mini harness used
+# locally and by releases. The geometry benches run for real here: Ubuntu
+# runners ship Chrome, so `describe.skipIf(!hasBrowser)` does not skip in CI.
 on:
   workflow_call:
   push:
@@ -15,7 +14,7 @@ permissions:
 
 jobs:
   js:
-    name: assay — tsc + eslint + bench
+    name: AVP mini harness
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -27,24 +26,12 @@ jobs:
       - uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
           dotnet-version: "10.0.x"
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: tokei
       - name: install
         working-directory: assay
         run: npm ci
-      - name: typecheck
+      - name: canonical verification
         working-directory: assay
-        run: npx tsc --noEmit
-      - name: lint
-        working-directory: assay
-        run: npm run lint
-      - name: unified measurement (JS + .NET + catalog evidence)
-        working-directory: assay
-        run: npm run measure:check
-      - name: packaged entrypoints smoke test
-        working-directory: assay
-        run: npm run test:package
-      - name: eslint-plugin self-test
-        working-directory: assay
-        run: node eslint-plugin-assay/index.test.cjs
-      - name: example verification (assay CLI end-to-end)
-        working-directory: assay/examples/todo-app
-        run: node ../../bin/assay.mjs verify
+        run: npm run verify

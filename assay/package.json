@@ -66,13 +66,16 @@
     "build": "tsup",
     "prepublishOnly": "npm run build",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:live": "vitest run --config vitest.live.config.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test:package": "npm run build && node test/package-entrypoints.mjs",
+    "benchmark:stress": "npm run build && node bench/stress.mjs",
     "measure": "node tools/measure/measure.mjs",
-    "measure:check": "node tools/measure/measure.mjs --check"
+    "measure:check": "node tools/measure/measure.mjs --check",
+    "verify": "node tools/harness/verify.mjs"
   },
   "peerDependencies": {
     "@anthropic-ai/sdk": ">=0.40.0",
@@ -107,6 +110,7 @@
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.17.0",
     "jsdom": "^25.0.1",
     "msw": "^2.6.8",

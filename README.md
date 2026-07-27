@@ -404,6 +404,30 @@ Read the [measurement methodology](docs/measurements.md),
 [machine-readable evidence](docs/measurements.json), [transfer protocol](docs/transfer.md),
 and [defect ledger](docs/defect-ledger.md).
 
+### Executor stress
+
+The dedicated executor stress uses an off-catalog deterministic fixture with
+16 criteria per subject. Half of the subjects are corrected controls and half
+contain one known failure. Missing oracles and unexpected verifier errors are
+also checked explicitly to ensure they cannot manufacture green verdicts.
+
+| Subjects | Criterion verdicts | Expected failures detected | Missed | False alarms | Fail-closed checks |
+| ---: | ---: | ---: | ---: | ---: | ---: |
+| 1,024 | 16,384 | 512 of 512 | 0 | 0 | pass |
+| 10,000 | 160,000 | 5,000 of 5,000 | 0 | 0 | pass |
+
+Run both corpora locally:
+
+```bash
+cd assay
+npm run benchmark:stress
+```
+
+This stress fixture measures executor integrity, verdict aggregation, and
+fail-closed behavior. It does not measure the semantic accuracy of public AVP
+criteria or include browser, network, model, or human latency. Read the
+[benchmark protocol and committed results](benchmarks/README.md).
+
 ---
 
 ## Scope
@@ -436,23 +460,26 @@ and [defect ledger](docs/defect-ledger.md).
 
 ## Build and contribute
 
-Run the JavaScript gates:
+Install the JavaScript dependencies and the `tokei` source counter, then run
+the same mini harness used by CI and releases:
 
 ```bash
+cargo install tokei --locked
 cd assay
 npm ci
-npm run typecheck
-npm run lint
-npm run measure:check
-npm run test:package
+npm run verify
 ```
 
-Run the .NET suite directly:
+The harness fails closed unless all of these remain green:
 
-```bash
-cd assay.net
-dotnet test
-```
+| Gate | Enforced contract |
+|---|---|
+| Production size | At most 7,000 code lines across both runtimes and at most 500 LOC per production file |
+| JavaScript coverage | At least 95 percent line coverage without rounding |
+| .NET coverage | At least 95 percent line coverage without rounding |
+| Static quality | TypeScript typecheck and ESLint |
+| Scientific evidence | Portable JS/.NET/catalog measurement remains identical to the committed evidence |
+| Distribution | Package entrypoints, ESLint plugin, and CLI example execute successfully |
 
 The deterministic browser calibration requires an installed Chrome or Edge.
 The networked model experiment is separate and explicit:

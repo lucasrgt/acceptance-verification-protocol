@@ -11,5 +11,13 @@ export default defineConfig({
     // Examples are their own packages with their own config (alias + react plugin).
     // eslint-plugin-assay is a plain-node CJS package with its own `node` self-test.
     exclude: [...configDefaults.exclude, 'examples/**', 'eslint-plugin-assay/**', '**/*.live.test.ts'],
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.{ts,tsx}'],
+      reporter: ['text', 'json-summary'],
+      thresholds: {
+        lines: 95,
+      },
+    },
   },
 });

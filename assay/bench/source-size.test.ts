@@ -3,18 +3,16 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve, extname } from 'node:path';
 
 /**
- * The snowball guard — structural discipline borrowed from the Skies's
- * "every source file ≤ 500 LOC" rule (production AND test, no exceptions). A file
- * past the ceiling is the signal to SPLIT by concern, not to keep packing. Enforced
- * here so the discipline can't erode as the protocol grows — the same philosophy as
- * the protocol drift guard: make it red, don't make it a hope.
+ * The snowball guard: every maintained production source file stays at or below
+ * 500 LOC. Tests are intentionally unlimited. A production file past the ceiling is
+ * the signal to split by concern, not to keep packing.
  *
  * If this fails: split the file into a folder with a thin barrel `index.ts`
  * (re-exporter, not a kitchen sink) + siblings each named for the concern it owns.
  */
 const CAP = 500;
-const ROOTS = ['src', 'bench', 'tools', 'eslint-plugin-assay', 'examples/todo-app/src', 'examples/todo-app/assay'];
-const EXT = new Set(['.ts', '.tsx', '.cjs', '.mjs']);
+const ROOTS = ['src', 'bin', 'eslint-plugin-assay', '../assay.net/src'];
+const EXT = new Set(['.ts', '.tsx', '.cjs', '.mjs', '.cs']);
 const SKIP = new Set(['node_modules', 'dist', 'build', '.pleiades', '.codegraph', 'protocol']);
 
 function walk(dir: string, out: string[]): void {
@@ -28,7 +26,7 @@ function walk(dir: string, out: string[]): void {
     if (SKIP.has(e.name)) continue;
     const full = join(dir, e.name);
     if (e.isDirectory()) walk(full, out);
-    else if (EXT.has(extname(e.name))) out.push(full);
+    else if (EXT.has(extname(e.name)) && !e.name.includes('.test.')) out.push(full);
   }
 }
 

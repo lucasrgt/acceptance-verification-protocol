@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "benchmark": "avp-executor-stress",
+  "protocolVersion": "0.4.0",
+  "corpus": {
+    "subjects": 10000,
+    "criteriaPerSubject": 16,
+    "criterionVerdicts": 160000,
+    "corrected": 5000,
+    "vulnerable": 5000,
+    "infrastructureFailures": 19
+  },
+  "accuracy": {
+    "expectedFailures": 5000,
+    "detectedFailures": 5000,
+    "missedFailures": 0,
+    "falseAlarms": 0,
+    "unexpectedCriterionResults": 0
+  },
+  "failClosed": {
+    "missingOracleOutcome": "inconclusive",
+    "missingOracleStatuses": [
+      "unresolved",
+      "unresolved"
+    ],
+    "infrastructureOutcome": "fail",
+    "infrastructureStatus": "fail",
+    "passed": true
+  },
+  "performance": {
+    "durationMs": 79,
+    "subjectsPerSecond": 126582.28,
+    "criterionVerdictsPerSecond": 2025316.46,
+    "heapDeltaBytes": 1616040
+  },
+  "passed": true,
+  "limitations": [
+    "The corpus is deterministic and synthetic.",
+    "This benchmark measures executor integrity and fail-closed behavior, not the semantic accuracy of public AVP criteria.",
+    "The fixture uses in-process mechanical probes and does not include browser, network, model, or human latency."
+  ]
+}
