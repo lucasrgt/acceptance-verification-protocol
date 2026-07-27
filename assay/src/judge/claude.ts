@@ -8,7 +8,7 @@ import type { Judge, JudgeRequest, JudgeVerdict } from '../core/dsl';
  * `@anthropic-ai/sdk` is an optional peer dependency. Configure via env/options,
  * never a config file (ADR 0001).
  *
- *   import { claudeJudge } from '@aerofortress/assay/judge';
+ *   import { claudeJudge } from 'avp-assay/judge';
  *   const verdict = await verify(actionEffect, subject, { judge: claudeJudge() });
  *
  * Tests inject a fake `client` so the prompt-building and parsing are deterministic

@@ -16,4 +16,4 @@ Please report vulnerabilities privately via
 
 ## Supported versions
 
-Only the latest published minor of `@aerofortress/assay` / `Assay.Net` receives fixes.
+Only the latest published minor of `avp-assay` / `Assay.Net` receives fixes.

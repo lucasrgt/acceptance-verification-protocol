@@ -16,7 +16,7 @@
 
 <p align="center">
   <a href="https://github.com/lucasrgt/acceptance-verification-protocol/actions/workflows/ci.yml"><img src="https://github.com/lucasrgt/acceptance-verification-protocol/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
-  <a href="https://www.npmjs.com/package/@aerofortress/assay"><img src="https://img.shields.io/npm/v/%40aerofortress%2Fassay?style=flat-square&label=assay" alt="@aerofortress/assay on npm"></a>
+  <a href="https://www.npmjs.com/package/avp-assay"><img src="https://img.shields.io/npm/v/avp-assay?style=flat-square&label=assay" alt="avp-assay on npm"></a>
   <a href="https://www.nuget.org/packages/Assay.Net"><img src="https://img.shields.io/nuget/v/Assay.Net?style=flat-square&label=Assay.Net" alt="Assay.Net on NuGet"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat-square" alt="MIT License"></a>
 </p>
@@ -45,7 +45,7 @@ catalogs:
 
 | Package | Runtime | Primary substrates |
 | --- | --- | --- |
-| [`@aerofortress/assay`](assay/) | Node 20+, ESM | React, Vitest, HTTP, jsdom, browser geometry, model judge |
+| [`avp-assay`](assay/) | Node 20+, ESM | React, Vitest, HTTP, jsdom, browser geometry, model judge |
 | [`Assay.Net`](assay.net/) | .NET 10 | HTTP, `HttpClient`, `WebApplicationFactory` |
 
 Both consume [`protocol/catalog.json`](protocol/catalog.json) and
@@ -65,7 +65,7 @@ Integrate the Acceptance Verification Protocol into this repository.
 Inspect the project before changing it. Select only the AVP reference
 implementation and adapters required by the existing stack:
 
-- @aerofortress/assay for JavaScript, TypeScript, React, HTTP, or design checks
+- avp-assay for JavaScript, TypeScript, React, HTTP, or design checks
 - Assay.Net for .NET HTTP backends
 
 Identify one concrete feature and its acceptance requirements. Map those
@@ -90,7 +90,7 @@ For React behavior verification:
 
 ```bash
 npm install --save-dev \
-  @aerofortress/assay \
+  avp-assay \
   vitest jsdom \
   @testing-library/react \
   @testing-library/user-event \
@@ -101,7 +101,7 @@ For HTTP-only JavaScript verification, install Assay and your existing test
 host. The HTTP adapter uses the platform `fetch` implementation:
 
 ```bash
-npm install --save-dev @aerofortress/assay vitest
+npm install --save-dev avp-assay vitest
 ```
 
 For .NET:
@@ -123,7 +123,7 @@ Declare how Assay reaches the real feature seams:
 
 ```tsx
 // features/send-message/send.subject.tsx
-import type { ActionEffectSubject } from '@aerofortress/assay/react';
+import type { ActionEffectSubject } from 'avp-assay/react';
 import { Composer } from './Composer';
 
 export const sendMessage: ActionEffectSubject = {
@@ -149,8 +149,8 @@ Bind that subject to a catalog archetype:
 
 ```ts
 // features/send-message/send.assay.test.ts
-import { actionEffect } from '@aerofortress/assay';
-import { defineVerification } from '@aerofortress/assay/react/vitest';
+import { actionEffect } from 'avp-assay';
+import { defineVerification } from 'avp-assay/react/vitest';
 import { sendMessage } from './send.subject';
 
 defineVerification(actionEffect, sendMessage);
@@ -194,12 +194,12 @@ opening a socket.
 
 | Surface | Entry point | What it verifies |
 | --- | --- | --- |
-| React DOM | `@aerofortress/assay/react` | User actions, requests, drafts, state, navigation, identity, and rendering |
-| Vitest binding | `@aerofortress/assay/react/vitest` | Co-located verification discovery and host gating |
-| HTTP | `@aerofortress/assay/http` | Server authority, authorization, money, callbacks, idempotency, and lifecycle rules |
-| Design style | `@aerofortress/assay/design` | Tokens, themes, contrast, accessible names, and computed styles |
-| Design geometry | `@aerofortress/assay/design/browser` | Overflow, overlap, responsive layout, RTL, tap targets, and layout shift |
-| Model oracle | `@aerofortress/assay/judge` | Criteria that require bounded semantic judgment, such as icon meaning |
+| React DOM | `avp-assay/react` | User actions, requests, drafts, state, navigation, identity, and rendering |
+| Vitest binding | `avp-assay/react/vitest` | Co-located verification discovery and host gating |
+| HTTP | `avp-assay/http` | Server authority, authorization, money, callbacks, idempotency, and lifecycle rules |
+| Design style | `avp-assay/design` | Tokens, themes, contrast, accessible names, and computed styles |
+| Design geometry | `avp-assay/design/browser` | Overflow, overlap, responsive layout, RTL, tap targets, and layout shift |
+| Model oracle | `avp-assay/judge` | Criteria that require bounded semantic judgment, such as icon meaning |
 | .NET HTTP | `Assay.Net` | Catalog-driven backend verification over real or in-process HTTP |
 
 The geometry tier uses an installed Chrome, Edge, or Brave through
@@ -298,7 +298,7 @@ import {
   criterion,
   mechanical,
   runVerification,
-} from '@aerofortress/assay';
+} from 'avp-assay';
 
 const accountProtocol = archetype(
   'account-protocol-conformance',
@@ -342,7 +342,7 @@ already use.
 
 ```mermaid
 flowchart TB
-    CATALOG["Neutral AVP catalogs"] --> JS["@aerofortress/assay"]
+    CATALOG["Neutral AVP catalogs"] --> JS["avp-assay"]
     CATALOG --> DOTNET["Assay.Net"]
 
     JS --> REACT["React and Vitest"]

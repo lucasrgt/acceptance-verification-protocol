@@ -37,7 +37,7 @@ module.exports = [
 ];
 ```
 
-An AeroFortress Framework app enables it from its doctor and maps its slice/view types to
+An Skies app enables it from its doctor and maps its slice/view types to
 archetypes — the rule itself is framework-neutral (matches "AVP is for everyone").
 
 ## Read-only coverage scan

@@ -1,5 +1,5 @@
 {
-  "name": "@aerofortress/assay",
+  "name": "avp-assay",
   "version": "0.4.0",
   "description": "Assay — the reference JS/React implementation of AVP (Acceptance Verification Protocol). Deterministic behavior verification for AI-built web features: tap the vein and confirm it's remediated.",
   "license": "MIT",

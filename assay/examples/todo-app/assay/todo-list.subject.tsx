@@ -1,4 +1,4 @@
-import type { DataHonestySubject } from '@aerofortress/assay/react';
+import type { DataHonestySubject } from 'avp-assay/react';
 import { TodoApp } from '../src/TodoApp';
 import { API_BASE } from '../src/api';
 

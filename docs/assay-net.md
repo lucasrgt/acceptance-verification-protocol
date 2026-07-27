@@ -10,8 +10,8 @@ returns the same portable verdict semantics as Assay JS.
 
 It is deliberately a thin library, not a runner or framework. A consumer calls
 `Runner.Run`, usually from xUnit, and owns app startup, fixtures, authentication, and
-fault injection. AeroFortress may enforce that every declared subject has proof, but
-Assay.NET has no dependency on AeroFortress.
+fault injection. Skies may enforce that every declared subject has proof, but
+Assay.NET has no dependency on Skies.
 
 ## Fail-closed contract
 

@@ -1,7 +1,7 @@
 name: publish
 
 # Publishes both AVP reference implementations off ONE version tag (e.g. `v0.2.0`):
-# Assay.Net to nuget.org, @aerofortress/assay (+ the eslint plugin) to npm.
+# Assay.Net to nuget.org, avp-assay (+ the eslint plugin) to npm.
 # VERSION POLICY: one tag = one version everywhere — the gate job asserts the tag equals
 # assay/package.json, eslint-plugin-assay/package.json AND the csproj <Version>; nothing
 # publishes from a red tree (tests run first). nuget auth is Trusted Publishing (OIDC —
@@ -65,7 +65,7 @@ jobs:
         run: dotnet nuget push "nupkgs/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
 
   npm:
-    name: publish @aerofortress/assay (+ eslint plugin) to npm
+    name: publish avp-assay (+ eslint plugin) to npm
     needs: version
     runs-on: ubuntu-latest
     permissions:
@@ -94,13 +94,13 @@ jobs:
             exit 0
           fi
           ver=$(node -p "require('./package.json').version")
-          if npm view "@aerofortress/assay@$ver" version >/dev/null 2>&1; then
-            echo "@aerofortress/assay@$ver already on npm — skip"
+          if npm view "avp-assay@$ver" version >/dev/null 2>&1; then
+            echo "avp-assay@$ver already on npm — skip"
           else
             npm publish --provenance
           fi
-          if npm view "@aerofortress/eslint-plugin-assay@$ver" version >/dev/null 2>&1; then
-            echo "@aerofortress/eslint-plugin-assay@$ver already on npm — skip"
+          if npm view "eslint-plugin-assay@$ver" version >/dev/null 2>&1; then
+            echo "eslint-plugin-assay@$ver already on npm — skip"
           else
             (cd eslint-plugin-assay && npm publish --provenance)
           fi

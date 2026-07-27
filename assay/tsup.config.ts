@@ -1,7 +1,7 @@
 import { defineConfig } from "tsup";
 
 // Published entry points → the exports map in package.json. The core barrel (`.`) is dependency-free;
-// the adapters are subpaths the consumer opts into (`@aerofortress/assay/react`, `/react/vitest`, `/http`,
+// the adapters are subpaths the consumer opts into (`avp-assay/react`, `/react/vitest`, `/http`,
 // `/design`, `/design/browser`, `/judge`). tsup auto-externalizes everything in dependencies +
 // peerDependencies, so the substrate libs (testing-library, msw) and the consumer's environment (react,
 // vitest, jsdom, puppeteer-core, the Anthropic SDK the judge lazy-loads) are never bundled in.

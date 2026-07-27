@@ -5,7 +5,7 @@ namespace Assay.Net;
 /// <c>[Fact]</c> of AVP. It carries the production subject and criterion id from
 /// <c>protocol/catalog.json</c>, making the proof an unambiguous subject × criterion claim.
 ///
-/// This is the AVP half of the cross-layer bridge: the static doctor (AeroFortress.Framework) reads
+/// This is the AVP half of the cross-layer bridge: the static doctor (Skies.Framework) reads
 /// it to enforce that every declared production element has a matching proof. AVP stays STANDALONE —
 /// it knows nothing of the framework; the framework depends
 /// on AVP, never the reverse, and recognizes this attribute by name in the user's compilation.

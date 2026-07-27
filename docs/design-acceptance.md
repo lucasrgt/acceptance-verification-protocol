@@ -24,7 +24,7 @@ the **design system** and confirms the screen is faithful to it.
 Same discipline as `docs/catalog.md`: every archetype comes from a real fix commit.
 We mined the design-discrepancy fixes of three independently-built products (the
 marketplace + project P + project F from `docs/transfer.md`) and one unrelated
-non-AeroFortress app (cal.com) for breadth.
+non-Skies app (cal.com) for breadth.
 
 | design escape class | marketplace | project P | cal.com (transfer) |
 |---|--:|--:|--:|
@@ -45,8 +45,8 @@ Two findings shape everything:
    system) has the same shapes at scale — theme 84, responsive 88, spacing 82, overflow
    78, icon 50. Design fidelity is a property of *UI software*, not of one team.
 
-2. **The distribution shifts with how codified the design system is.** The AeroFortress apps
-   already run a **static design-token doctor** (`AFFE012` design-tokens, `AFFE010`
+2. **The distribution shifts with how codified the design system is.** The Skies apps
+   already run a **static design-token doctor** (`SKYFE012` design-tokens, `SKYFE010`
    state-completeness) — so their *residual* runtime escapes skew to token/theme/
    composition (jsdom-reachable). cal.com, less codified, is dominated by **geometry**
    (overflow, overlap, responsive) that no DOM-only check can see. The more you codify
@@ -103,14 +103,14 @@ same three-way split as `docs/catalog.md`:
 
 - **STATIC (host doctor — already exists).** Hard-coded hex/spacing literals, a
   non-token value, a bespoke component where a DS one exists, an icon name off the
-  registry. This is `AFFE012`/`AFFE010` territory — caught before runtime, *not* Assay
+  registry. This is `SKYFE012`/`SKYFE010` territory — caught before runtime, *not* Assay
   Design's job to re-own. Assay Design *formalises the runtime half*, exactly as AVP
   does for behaviour.
 - **RUNTIME · jsdom (RTL + `getComputedStyle`).** Resolved **colours, fonts, contrast,
   composition structure, theme matrix, state matrix.** jsdom *can* do these — they are
   computed-style + tree-shape, not geometry. Covers token-adherence, theme-parity,
   type-hierarchy, color-hierarchy-contrast (axe-core runs in jsdom), state-coverage,
-  and the structural half of composition-canonical. This is where the AeroFortress residual
+  and the structural half of composition-canonical. This is where the Skies residual
   lives, so it's the **highest-ROI substrate to build first**.
 - **RUNTIME · real browser (Playwright — the `proof` plugin already wires it).** Pure
   **layout geometry**: spacing ratios, overflow/clip, overlap, z-index stacking,
@@ -139,7 +139,7 @@ Same protocol, new adapter. Concretely:
 ## Prerequisite: the design system *as data*
 
 The verifier is only as good as its ground truth. Assay Design needs the system
-codified: a **token set** (the legal colours/spaces/radii/type — the AeroFortress apps
+codified: a **token set** (the legal colours/spaces/radii/type — the Skies apps
 already have this), a **component manifest** (which DS component each role maps to), and
 **composition rules** (a screen header = back · icon · title, in order). Where this is
 missing, codifying it is the highest-value first step — and the verifier then *is* the
@@ -174,7 +174,7 @@ hierarchy discrepancy that motivated the idea.)
      missing icon, bespoke back, missing back), false-alarm 0.
      `bench/composition-canonical.test.ts`.
    - **state-coverage** — ✅ **DONE.** Renders default + each declared state and asserts
-     each is visually distinct (the runtime sibling of AFFE010): a `disabled` button
+     each is visually distinct (the runtime sibling of SKYFE010): a `disabled` button
      that isn't dimmed or a loading button with no spinner is the escape. Mutation 3/3
      (disabled-not-dimmed, loading-no-spinner, all-flat), false-alarm 0.
      `bench/state-coverage.test.ts`.

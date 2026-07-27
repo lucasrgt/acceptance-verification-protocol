@@ -10,7 +10,7 @@ neutral catalog that runs catalog-driven acceptance **archetypes** over a real s
 backend) and emits an actionable `Verdict` with an `Outcome` plus a nullable
 `AcceptanceScore`. Empty or unresolved proof is `Inconclusive`, never green.
 
-It is **standalone**: it knows nothing of any framework. `AeroFortress.Framework` depends on AVP,
+It is **standalone**: it knows nothing of any framework. `Skies.Framework` depends on AVP,
 never the reverse — the static doctor recognizes the `[AVP(typeof(Subject), "id")]` attribute by name to
 enforce that every declared production subject has its own matching proof.
 
@@ -54,7 +54,7 @@ public async Task split_is_exact_to_the_cent() { /* PASS good ∧ FAIL the escap
 `Catalog.LoadDefault()` reads the neutral `catalog.json` embedded in this package (the behaviour
 catalog). To verify against a specific or newer catalog, `Catalog.Load(path)` reads any
 `protocol/catalog.json` from disk. The catalog is the shared source of truth both the JS
-(`@aerofortress/assay`) and .NET implementations conform to — this adapter reads it, it never owns it.
+(`avp-assay`) and .NET implementations conform to — this adapter reads it, it never owns it.
 
 ## License
 

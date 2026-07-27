@@ -119,8 +119,8 @@
 - **Root-cause pattern:** a spine/framework primitive exists; the pilot re-implements it inline
   and drifts.
 - **AVP candidate:** **not an AVP class — graduate to the doctor.** Cross-repo recurrence of the
-  same twin is the signal for a new `AFFE`/framework-sync leg (the conformance loop's criterion 4).
-  Tracked here so the recurrence count is visible; route to `aerofortress-framework`, not the
+  same twin is the signal for a new `SKYFE`/framework-sync leg (the conformance loop's criterion 4).
+  Tracked here so the recurrence count is visible; route to `skies`, not the
   catalog.
 
 ### 9. Stale/absent data shape breaks the UI

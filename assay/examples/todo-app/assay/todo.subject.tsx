@@ -1,4 +1,4 @@
-import type { ActionEffectSubject } from '@aerofortress/assay/react';
+import type { ActionEffectSubject } from 'avp-assay/react';
 import { TodoApp } from '../src/TodoApp';
 import { API_BASE } from '../src/api';
 

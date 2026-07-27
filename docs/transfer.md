@@ -138,7 +138,7 @@ criterion, adapter and executable test — lives in `bench/held-out/corpus.json`
 
 Transfer is now an operational loop, not a bespoke experiment:
 
-1. In the TARGET repo, install the verifier: `npm i -D @aerofortress/assay vitest` (+ the
+1. In the TARGET repo, install the verifier: `npm i -D avp-assay vitest` (+ the
    react peers if verifying DOM criteria).
 2. Author the subjects — one `*.assay.test.*` file per feature, declaring the seams that
    already exist (see `docs/getting-started.md`).

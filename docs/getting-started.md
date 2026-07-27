@@ -6,7 +6,7 @@ Assay is a library plus a thin `assay` bin, never a runner or a config file (ADR
 ## 1. React (DOM) — "the button actually does the thing"
 
 ```bash
-npm i -D @aerofortress/assay vitest jsdom @testing-library/react @testing-library/user-event msw
+npm i -D avp-assay vitest jsdom @testing-library/react @testing-library/user-event msw
 ```
 
 Declare the feature's **seams** (what already exists) as a subject, pick the archetype,
@@ -14,7 +14,7 @@ and register the verification:
 
 ```ts
 // features/send/send.subject.tsx
-import type { ActionEffectSubject } from '@aerofortress/assay/react';
+import type { ActionEffectSubject } from 'avp-assay/react';
 import { Composer } from './Composer';
 
 export const sendMessage: ActionEffectSubject = {
@@ -41,8 +41,8 @@ Assay fills the complete form and, under failure, requires every declared draft 
 
 ```ts
 // features/send/send.assay.test.ts
-import { actionEffect } from '@aerofortress/assay';
-import { defineVerification } from '@aerofortress/assay/react/vitest';
+import { actionEffect } from 'avp-assay';
+import { defineVerification } from 'avp-assay/react/vitest';
 import { sendMessage } from './send.subject';
 
 defineVerification(actionEffect, sendMessage);
@@ -65,8 +65,8 @@ No extra installs — `fetch` is the substrate. Point subjects at an environment
 (local/staging with seeded data; see SECURITY.md):
 
 ```ts
-import { verifyHttp } from '@aerofortress/assay/http';
-import { authorization, formatVerdict } from '@aerofortress/assay';
+import { verifyHttp } from 'avp-assay/http';
+import { authorization, formatVerdict } from 'avp-assay';
 
 const verdict = await verifyHttp(authorization, {
   name: 'quotes-api',
@@ -88,8 +88,8 @@ including in-process over `WebApplicationFactory` — see [assay-net.md](assay-n
 **Style tier (jsdom):** tokens, themes, WCAG contrast, accessible names —
 
 ```ts
-import { verifyDesign, tokens } from '@aerofortress/assay/design';
-import { tokenAdherence } from '@aerofortress/assay';
+import { verifyDesign, tokens } from 'avp-assay/design';
+import { tokenAdherence } from 'avp-assay';
 
 await verifyDesign(tokenAdherence, { name: 'card', render: () => <Card /> }, {
   tokens: myDesignSystemTokens,   // YOUR token export replaces the demo ground truth
@@ -101,8 +101,8 @@ await verifyDesign(tokenAdherence, { name: 'card', render: () => <Card /> }, {
 RTL, tap targets, layout shift —
 
 ```ts
-import { openBrowser, verifyDesignBrowser } from '@aerofortress/assay/design/browser';
-import { responsiveIntegrity } from '@aerofortress/assay';
+import { openBrowser, verifyDesignBrowser } from 'avp-assay/design/browser';
+import { responsiveIntegrity } from 'avp-assay';
 
 const browser = await openBrowser();          // finds Chrome/Edge/Brave; CHROME_PATH overrides
 const page = await browser.newPage();
@@ -117,7 +117,7 @@ benchmark. Worked example: [`assay/test/custom-criterion.test.ts`](../assay/test
 
 ## 5. The static half
 
-`@aerofortress/eslint-plugin-assay` fails the lint when a feature file lacks a co-located
+`eslint-plugin-assay` fails the lint when a feature file lacks a co-located
 `*.assay.test.*` covering the archetypes its type demands — "did you even write a
 verification?" is a static question. See
 [`assay/eslint-plugin-assay/README.md`](../assay/eslint-plugin-assay/README.md).
