@@ -1395,7 +1395,7 @@
   {
     "date": "2026-07-27",
     "commit": "9dd1327",
-    "inputFingerprint": "sha256:4f06a7a22d239b6a9fef067807a103258f04ec1957739f5921df102a049b6abe",
+    "inputFingerprint": "sha256:df20c6c128f1d0ec95b9d5e97d3c8f38ac6c0451fda4f99e1c8cb5c386e19ac0",
     "archetypes": 41,
     "criteria": 70,
     "criteriaReferencedByTests": 70,
@@ -1742,8 +1742,8 @@
   },
   {
     "date": "2026-07-27",
-    "commit": "edc670c",
-    "inputFingerprint": "sha256:9b5c3f0a6b54a910e932fab3d230118333764e446ac124d35d80941b3b3d5225",
+    "commit": "1ae4a14",
+    "inputFingerprint": "sha256:13850e21e423652ab20302ada5aa2ad084b7b2fdae896dd1345651d2d761549f",
     "archetypes": 41,
     "criteria": 70,
     "criteriaReferencedByTests": 70,

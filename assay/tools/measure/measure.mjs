@@ -68,9 +68,12 @@ function inputFingerprint() {
     if (existsSync(path)) files.push(path);
   }
 
+  const inputs = files
+    .map((path) => ({ path, name: relative(repoRoot, path).replaceAll('\\', '/') }))
+    .sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
   const hash = createHash('sha256');
-  for (const path of files.sort()) {
-    hash.update(relative(repoRoot, path).replaceAll('\\', '/'));
+  for (const { path, name } of inputs) {
+    hash.update(name);
     hash.update('\0');
     // Git may materialize the same text with CRLF on Windows and LF on Linux.
     // Scientific identity follows the normalized source, not checkout policy.
