@@ -22,6 +22,7 @@ const resultsFile = resolve(pkgRoot, 'bench/results/latest.jsonl');
 const historyFile = resolve(repoRoot, 'docs/measurements.json');
 const tableFile = resolve(repoRoot, 'docs/measurements.md');
 const checkOnly = process.argv.includes('--check');
+const generatedPaths = new Set([resolve(pkgRoot, 'bench/results')]);
 
 function run(file, args, cwd, env = process.env) {
   execFileSync(file, args, {
@@ -38,7 +39,9 @@ function sourceFiles(root, extensions) {
   for (const entry of readdirSync(root)) {
     const path = resolve(root, entry);
     if (statSync(path).isDirectory()) {
-      if (!GENERATED_DIRECTORIES.has(entry)) found.push(...sourceFiles(path, extensions));
+      if (!GENERATED_DIRECTORIES.has(entry) && !generatedPaths.has(path)) {
+        found.push(...sourceFiles(path, extensions));
+      }
     }
     else if (extensions.has(extname(path))) found.push(path);
   }
