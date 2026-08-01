@@ -45,7 +45,7 @@ catalogs:
 
 | Package | Runtime | Primary substrates |
 | --- | --- | --- |
-| [`avp-assay`](assay/) | Node 20+, ESM | React, Vitest, HTTP, jsdom, browser geometry, model judge |
+| [`avp-assay`](assay/) | Node 24+, ESM | React, Vitest, HTTP, jsdom, browser geometry, model judge |
 | [`Assay.Net`](assay.net/) | .NET 10 | HTTP, `HttpClient`, `WebApplicationFactory` |
 
 Both consume [`protocol/catalog.json`](protocol/catalog.json) and

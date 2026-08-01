@@ -20,3 +20,4 @@ check mode and rejects evidence, input-fingerprint, or rendered-table drift.
 | 2026-07-23 | f8d4b26 | sha256:5dbb56abbaa8 | 41 | 70 | 70 | 55 | 63 | 63 | 0 | 1 | 1 | 0 |
 | 2026-07-27 | 9dd1327 | sha256:df20c6c128f1 | 41 | 70 | 70 | 55 | 63 | 63 | 0 | 1 | 1 | 0 |
 | 2026-07-27 | c707c77 | sha256:31be54442b58 | 41 | 70 | 70 | 55 | 63 | 63 | 0 | 1 | 1 | 0 |
+| 2026-08-01 | c1d30de | sha256:d21211cbb42d | 41 | 70 | 70 | 55 | 63 | 63 | 0 | 1 | 1 | 0 |

@@ -17,7 +17,7 @@ export default defineConfig({
     judge: "src/judge/claude.ts",
   },
   format: ["esm"],
-  target: "node20",
+  target: "node24",
   dts: true,
   clean: true,
   treeshake: true,
