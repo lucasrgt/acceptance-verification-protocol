@@ -47,12 +47,21 @@ function productionLineGate() {
   ];
   console.log(`\n[production lines] tokei ${roots.join(' ')}`);
   const report = JSON.parse(capture('tokei', [...roots, '--output', 'json']));
-  const lines = ['TypeScript', 'TSX', 'JavaScript', 'C#']
-    .reduce((total, language) => total + (report[language]?.code ?? 0), 0);
+  const languages = ['TypeScript', 'TSX', 'JavaScript', 'C#'];
+  const lines = languages.reduce((total, language) => total + (report[language]?.code ?? 0), 0);
   if (lines > MAX_PRODUCTION_LINES) {
     fail(`production line budget exceeded: ${lines}/${MAX_PRODUCTION_LINES}`);
   }
-  console.log(`production lines: ${lines}/${MAX_PRODUCTION_LINES}`);
+  const MAX_FILE_LINES = 500;
+  const oversized = languages.flatMap((language) =>
+    (report[language]?.reports ?? [])
+      .map((item) => ({ file: item.name, lines: item.stats?.code ?? 0 }))
+      .filter((item) => item.lines > MAX_FILE_LINES),
+  );
+  if (oversized.length) {
+    fail(`production file budget exceeded (>${MAX_FILE_LINES} tokei code lines): ${JSON.stringify(oversized)}`);
+  }
+  console.log(`production lines: ${lines}/${MAX_PRODUCTION_LINES} (max file ${MAX_FILE_LINES})`);
 }
 
 function findCoverageFile(directory) {

@@ -474,7 +474,7 @@ The harness fails closed unless all of these remain green:
 
 | Gate | Enforced contract |
 |---|---|
-| Production size | At most 7,000 code lines across both runtimes and at most 500 LOC per production file |
+| Production size | At most 7,000 tokei code lines across both runtimes and at most 500 tokei code lines per production file |
 | JavaScript coverage | At least 95 percent line coverage without rounding |
 | .NET coverage | At least 95 percent line coverage without rounding |
 | Static quality | TypeScript typecheck and ESLint |

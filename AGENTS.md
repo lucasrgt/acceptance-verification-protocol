@@ -9,7 +9,8 @@ All repository artifacts must be written in English.
 2. The .NET runtime under `assay.net/src/` must retain at least 95 percent
    line coverage without rounding.
 3. Maintained production code must remain within the 7,000-line repository
-   budget and each production source file must remain at or below 500 LOC.
+   budget as measured by `tokei` code lines, and each production source file
+   must remain at or below 500 tokei code lines.
 4. Test code is unlimited. Production behavior may not be moved into tests,
    generated artifacts, benchmarks, or harness scripts to evade a gate.
 5. Every public criterion remains escape-grounded and calibrated with a
