@@ -49,6 +49,28 @@ The subject is mandatory for coverage: sharing a criterion never lets one featur
 public async Task split_is_exact_to_the_cent() { /* PASS good ∧ FAIL the escape */ }
 ```
 
+## Authorization request shapes
+
+Ownership probes default to PUT with the original name payloads; role probes default to bodyless GET.
+For commands that identify the resource in JSON, set the method and the two bodies on the subject:
+
+```csharp
+var subject = new AuthorizationSubject(baseUrl, ownerToken,
+    "/sessions/revoke", "/sessions/revoke", "/admin/disable", adminToken, memberToken)
+{
+    ResourceMethod = HttpMethod.Post,
+    OwnBody = new { sessionId = ownedSessionId },
+    OthersBody = new { sessionId = anotherUsersSessionId },
+    PrivilegedMethod = HttpMethod.Post,
+    PrivilegedBody = new { sessionId = targetSessionId },
+};
+```
+
+The verifier sends those requests directly: the owned operation must succeed, the other owner's operation
+must be refused, and the privileged operation must distinguish its two bearer identities. Set a body to
+`null` for a bodyless operation such as DELETE. Existing constructor calls and their default behavior remain
+unchanged. These are transport choices for the existing criteria, not new criteria or alternative oracles.
+
 ## The catalog
 
 `Catalog.LoadDefault()` reads the neutral `catalog.json` embedded in this package (the behaviour
