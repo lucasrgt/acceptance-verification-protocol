@@ -18,7 +18,19 @@ public sealed record AuthorizationSubject(
     string LesserToken,
     string WritePath = "",
     string ReadPath = "",
-    string Token = "");
+    string Token = "")
+{
+    /// <summary>Method used for both ownership probes; defaults to the original PUT contract.</summary>
+    public HttpMethod ResourceMethod { get; init; } = HttpMethod.Put;
+    /// <summary>Body for the owned resource; null sends no content.</summary>
+    public object? OwnBody { get; init; } = new { name = "ok" };
+    /// <summary>Body identifying the other owner's resource; null sends no content.</summary>
+    public object? OthersBody { get; init; } = new { name = "pwned" };
+    /// <summary>Method used for both privileged-role probes; defaults to GET.</summary>
+    public HttpMethod PrivilegedMethod { get; init; } = HttpMethod.Get;
+    /// <summary>The same operation body is sent with the privileged and lesser-role tokens.</summary>
+    public object? PrivilegedBody { get; init; }
+}
 
 /// <summary>authorization — the caller may only touch what it owns, at the role its operation implies.</summary>
 public sealed class Authorization : Archetype<AuthorizationSubject>
@@ -34,21 +46,23 @@ public sealed class Authorization : Archetype<AuthorizationSubject>
             {
                 using var http = Http.Client(s.BaseUrl);
                 var own = await http.SendAsync(Http.Request(
-                    HttpMethod.Put, s.OwnResource, s.OwnerToken, JsonContent.Create(new { name = "ok" })));
+                    s.ResourceMethod, s.OwnResource, s.OwnerToken, s.OwnBody is null ? null : JsonContent.Create(s.OwnBody)));
                 Http.Accepted(own, "owner writing its own resource");
 
                 var cross = await http.SendAsync(Http.Request(
-                    HttpMethod.Put, s.OthersResource, s.OwnerToken, JsonContent.Create(new { name = "pwned" })));
+                    s.ResourceMethod, s.OthersResource, s.OwnerToken, s.OthersBody is null ? null : JsonContent.Create(s.OthersBody)));
                 Http.Refused(cross, "caller writing another account's resource id (IDOR)");
             },
 
             ["role-required"] = async s =>
             {
                 using var http = Http.Client(s.BaseUrl);
-                var asAdmin = await http.SendAsync(Http.Request(HttpMethod.Get, s.AdminPath, s.AdminToken));
+                var asAdmin = await http.SendAsync(Http.Request(
+                    s.PrivilegedMethod, s.AdminPath, s.AdminToken, s.PrivilegedBody is null ? null : JsonContent.Create(s.PrivilegedBody)));
                 Http.Accepted(asAdmin, "admin calling a privileged endpoint");
 
-                var asLesser = await http.SendAsync(Http.Request(HttpMethod.Get, s.AdminPath, s.LesserToken));
+                var asLesser = await http.SendAsync(Http.Request(
+                    s.PrivilegedMethod, s.AdminPath, s.LesserToken, s.PrivilegedBody is null ? null : JsonContent.Create(s.PrivilegedBody)));
                 Http.Refused(asLesser, "a lesser role calling a privileged endpoint");
             },
 
