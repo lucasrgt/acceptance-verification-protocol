@@ -71,6 +71,30 @@ must be refused, and the privileged operation must distinguish its two bearer id
 `null` for a bodyless operation such as DELETE. Existing constructor calls and their default behavior remain
 unchanged. These are transport choices for the existing criteria, not new criteria or alternative oracles.
 
+## Notification effects
+
+`SecondOrderEffects` snapshots every inbox before posting the transition and requires each inbox to grow.
+Old messages alone never prove delivery. Existing `NotifySubject` constructor calls still work with array
+responses and the default booking payload. For authenticated APIs with wrapped inbox responses:
+
+```csharp
+var subject = new NotifySubject(baseUrl, "/bookings/123/cancel", ["/host/inbox", "/guest/inbox"])
+{
+    TriggerToken = actorToken,
+    TriggerBody = new { reason = "Changed plans" },
+    PartyInboxTokens = [hostToken, guestToken],
+    InboxItemsField = "notifications",
+};
+var verdict = await Runner.Run(catalog, new SecondOrderEffects(), "booking-cancellation", subject);
+verdict.RequireAccepted();
+```
+
+Set `TriggerBody` to `null` for a bodyless POST. Each supplied inbox token corresponds to the path at the
+same index. Empty inbox lists, mismatched credential lists, refused requests, and malformed arrays fail.
+Use isolated inboxes with synchronous delivery and enough capacity to expose count growth: this probe
+does not correlate message IDs, poll eventual delivery, or distinguish unrelated concurrent messages.
+An inbox whose page stays full fails rather than assuming a new notification was delivered.
+
 ## The catalog
 
 `Catalog.LoadDefault()` reads the neutral `catalog.json` embedded in this package (the behaviour

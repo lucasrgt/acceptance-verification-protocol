@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### 0.4.2 — notification delivery evidence
+
+- The .NET `notifies-all-parties` oracle now requires every inbox to grow after the transition;
+  pre-existing messages no longer produce a false pass for missing notifications.
+- `NotifySubject` supports a real transition bearer token and payload, per-party inbox credentials,
+  and a top-level inbox array field while retaining its existing constructor and request defaults.
+- Real HTTP calibrations cover stale inboxes, correct and missing delivery, authenticated requests,
+  bodyless transitions, malformed responses, refused reads and transitions, and invalid party setup.
+
 ### 0.4.0 — fail-closed verdicts
 
 - Protocol verdicts now distinguish `not-applicable` from `unresolved` and carry an
