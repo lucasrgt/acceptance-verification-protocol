@@ -37,10 +37,7 @@ public sealed class ResourceUniqueness : Archetype<ResourceUniquenessSubject>
 
                 // Second create of the SAME key must be rejected (a conflict) — never a 2xx that silently duplicates.
                 var second = await http.SendAsync(Create(s));
-                if (second.IsSuccessStatusCode)
-                    throw new AvpFailException(
-                        $"creating the same unique key twice was accepted ({(int)second.StatusCode}) at {s.CreatePath} — " +
-                        "the second create must be rejected (conflict), never silently duplicated.");
+                Http.Rejected(second, $"second create of the same unique key at {s.CreatePath}");
             },
         };
 

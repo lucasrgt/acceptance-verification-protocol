@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-assay",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Static coverage rule for Assay (AVP) — require a co-located verification for the archetypes a feature must cover.",
   "license": "MIT",
   "author": "Lucas Tinoco",

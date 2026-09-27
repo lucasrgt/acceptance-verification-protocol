@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### 0.4.3 — credential refusal evidence
+
+- The .NET credential oracle requires a 4xx refusal for invalid credentials. Server errors and redirects no longer count as authentication protection.
+- Duplicate creation, refresh-token replay and use of a burned token family likewise require client-error refusals, preventing server failures from masquerading as uniqueness or revocation enforcement.
+- A refusal response containing a non-empty token fails even when its status is 4xx. Null and empty token fields remain valid denial envelopes.
+- Real HTTP calibration pairs reproduce both false passes and check correct denial responses alongside the valid-credential control.
+
 ### 0.4.2 — notification delivery evidence
 
 - The .NET `notifies-all-parties` oracle now requires every inbox to grow after the transition;
