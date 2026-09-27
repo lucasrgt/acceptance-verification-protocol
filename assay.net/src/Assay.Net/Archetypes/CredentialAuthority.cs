@@ -43,6 +43,9 @@ public sealed class CredentialAuthority : Archetype<CredentialAuthoritySubject>
                           "an auth endpoint must deny wrong credentials, never issue a token (auth bypass)."
                         : $"invalid credentials returned {(int)res.StatusCode} (success) — the deny path must be a non-2xx rejection.");
                 }
+                Http.Rejected(res, "login with invalid credentials");
+                if (await TryReadToken(res, s.TokenField) is not null)
+                    throw new AvpFailException($"invalid credentials yielded a '{s.TokenField}' despite the refusal status — the deny path must never issue a token.");
             },
             ["issues-token-on-valid"] = async s =>
             {
@@ -68,7 +71,7 @@ public sealed class CredentialAuthority : Archetype<CredentialAuthoritySubject>
         try
         {
             using var doc = JsonDocument.Parse(raw);
-            if (!doc.RootElement.TryGetProperty(field, out var value))
+            if (!doc.RootElement.TryGetProperty(field, out var value) || value.ValueKind == JsonValueKind.Null)
                 return null;
             var text = value.ValueKind == JsonValueKind.String ? value.GetString() : value.GetRawText();
             return string.IsNullOrEmpty(text) ? null : text;
