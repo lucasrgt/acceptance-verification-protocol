@@ -60,15 +60,11 @@ public sealed class TokenRotation : Archetype<TokenRotationSubject>
                 // Replay the now-SPENT initial token: a live client still holds the rotated one, so a second
                 // presentation means it leaked — it must be rejected.
                 var replay = await http.SendAsync(Refresh(s.RefreshPath, initial));
-                if (replay.IsSuccessStatusCode)
-                    throw new AvpFailException(
-                        $"replaying the spent refresh token was accepted ({(int)replay.StatusCode}) — a rotated token must never be honored again (theft).");
+                Http.Rejected(replay, "replaying the spent refresh token");
 
                 // The family must be BURNED: even the legitimate just-rotated token is now dead, forcing a fresh login.
                 var afterBurn = await http.SendAsync(Refresh(s.RefreshPath, legit));
-                if (afterBurn.IsSuccessStatusCode)
-                    throw new AvpFailException(
-                        "after a replayed (stolen) token, the legitimate rotated token still worked — replay must burn the WHOLE family, not just the replayed token.");
+                Http.Rejected(afterBurn, "refresh with a token from the burned family");
             },
         };
 
