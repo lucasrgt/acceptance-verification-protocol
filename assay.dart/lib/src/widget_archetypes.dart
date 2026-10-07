@@ -119,6 +119,9 @@ final class WidgetActionEffect extends Archetype<WidgetActionSubject> {
       await s.tester.pump();
       await s.tester.tap(s.action, warnIfMissed: false);
       await s.tester.pumpAndSettle();
+      // A slow call is a timer, not a frame: let every activation land.
+      await s.tester.pump(backend.latency * 2);
+      await s.tester.pumpAndSettle();
       final fired = backend.count(s.effect);
       if (fired != 1) {
         throw AvpFail(
