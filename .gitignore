@@ -12,3 +12,14 @@ nupkgs/
 
 # Accuracy datapoints (ASSAY_RECORD=1) — aggregated into docs/measurements.md, never committed raw
 assay/bench/results/
+
+# assay.ex
+assay.ex/_build/
+assay.ex/deps/
+assay.ex/cover/
+assay.ex/.home/
+
+# assay.dart
+assay.dart/.dart_tool/
+assay.dart/build/
+assay.dart/coverage/

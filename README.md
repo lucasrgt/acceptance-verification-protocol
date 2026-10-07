@@ -47,6 +47,8 @@ catalogs:
 | --- | --- | --- |
 | [`avp-assay`](assay/) | Node 24+, ESM | React, Vitest, HTTP, jsdom, browser geometry, model judge |
 | [`Assay.Net`](assay.net/) | .NET 10 | HTTP, `HttpClient`, `WebApplicationFactory` |
+| [`Assay.Ex`](assay.ex/) | Elixir 1.17+ | HTTP, in-process Plug/Phoenix, `:httpc` |
+| [`Assay.Flutter`](assay.dart/) | Flutter | widgets over `flutter_test`, a controllable backend |
 
 Both consume [`protocol/catalog.json`](protocol/catalog.json) and
 [`protocol/design-catalog.json`](protocol/design-catalog.json). The .NET source
@@ -370,6 +372,8 @@ constraint.
 protocol/        Language-neutral behavior and design catalogs
 assay/           JavaScript, TypeScript, React, HTTP, and design implementation
 assay.net/       .NET HTTP implementation
+assay.ex/        Elixir HTTP implementation
+assay.dart/      Flutter widget implementation
 docs/            Protocol, catalog, evidence, security, and architecture notes
 ```
 

@@ -7,9 +7,14 @@ All repository artifacts must be written in English.
 1. The JavaScript runtime under `assay/src/` must retain at least 95 percent
    line coverage without rounding.
 2. The .NET runtime under `assay.net/src/` must retain at least 95 percent
-   line coverage without rounding.
-3. Maintained production code must remain within the 7,000-line repository
+   line coverage without rounding. The Elixir runtime under `assay.ex/lib/`
+   must too (enforced by `mix test --cover` through its `mix.exs` threshold),
+   and so must the Flutter runtime under `assay.dart/lib/`.
+3. Maintained production code must remain within the 8,000-line repository
    budget and each production source file must remain at or below 500 LOC.
+   The budget moved from 7,000 to 8,000 when the Elixir (`assay.ex/`) and
+   Flutter (`assay.dart/`) reference implementations joined; they count toward
+   the same total (the Flutter package's embedded catalog is data and excluded).
 4. Test code is unlimited. Production behavior may not be moved into tests,
    generated artifacts, benchmarks, or harness scripts to evade a gate.
 5. Every public criterion remains escape-grounded and calibrated with a
@@ -17,7 +22,7 @@ All repository artifacts must be written in English.
 6. Missing evidence, missing infrastructure, and unresolved criteria fail
    closed.
 
-The 7,000-line budget covers both reference implementations, their public CLI,
+The 8,000-line budget covers the four reference implementations, their public CLI,
 and the ESLint integration. A deliberate protocol expansion may revise that
 budget in the same reviewed change, but silent growth is forbidden.
 

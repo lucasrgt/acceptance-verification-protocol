@@ -1,0 +1,832 @@
+// Generated from protocol/catalog.json; test/calibration_test.dart keeps it byte-identical.
+const catalogJson = r'''{
+  "protocol": "AVP",
+  "protocolVersion": "0.4.0",
+  "conditionAxes": {
+    "fault": [
+      "success",
+      "api-error",
+      "slow",
+      "offline"
+    ],
+    "data": [
+      "empty",
+      "partial"
+    ],
+    "interaction": [
+      "retry",
+      "double-activate",
+      "token-expired"
+    ]
+  },
+  "oracleKinds": [
+    "mechanical",
+    "model",
+    "human"
+  ],
+  "archetypes": [
+    {
+      "archetype": "action-effect",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "fires-primary-effect",
+          "statement": "The action fires its primary effect; no visible action is a no-op.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "615ed1a7",
+            "92d99ad2"
+          ]
+        },
+        {
+          "id": "no-phantom-success",
+          "statement": "On failure, the user input persists and an error is visible — never a phantom success.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "input",
+          "seenIn": [
+            "04677bf9"
+          ]
+        },
+        {
+          "id": "error-is-specific",
+          "statement": "On failure, the error message names the real problem and a next step — not a generic \"something went wrong\".",
+          "oracle": "model",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "input"
+        },
+        {
+          "id": "projections-converge",
+          "statement": "After a successful mutation, sibling projections of the data (lists, badges, counts) reflect the change without a manual reload.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "projection",
+          "seenIn": [
+            "b9659b46",
+            "5a0f2acb"
+          ]
+        },
+        {
+          "id": "request-accepted",
+          "statement": "The request the UI sends is well-formed enough for the backend to accept it — no 400 from a malformed body (e.g. a datetime where a date-only field is expected).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "contract",
+          "seenIn": [
+            "c1849234"
+          ]
+        },
+        {
+          "id": "idempotent-retry",
+          "statement": "A retry after a partial failure does not duplicate the effect — the same logical action fires once.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "retry"
+          },
+          "requires": "retryable",
+          "seenIn": [
+            "0188869f"
+          ]
+        },
+        {
+          "id": "single-flight",
+          "statement": "A fast double-activation fires the effect once, not twice: a primary action guards itself while in flight (disables/locks on submit) so a double-click does not create a duplicate. Distinct from idempotent-retry — no failure is involved, only concurrency of clicks.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "requires": "singleFlight",
+          "seenIn": [
+            "calcom:d7226fc3",
+            "calcom:5b50a469",
+            "documenso:56683aa9"
+          ]
+        },
+        {
+          "id": "survives-token-refresh",
+          "statement": "An expired token mid-action recovers via a refresh-and-retry instead of erroring the user.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "token-expired"
+          },
+          "requires": "refresh",
+          "seenIn": [
+            "b4b0fc07"
+          ]
+        },
+        {
+          "id": "cache-cleared-on-identity",
+          "statement": "Signing in/out wipes the prior identity's cached rows: after an identity switch, the previous account's data never feeds the new session — the UI shows the new identity's data, not the old.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "identity",
+          "seenIn": [
+            "documenso:8fca029d",
+            "documenso:d2976cb1"
+          ]
+        },
+        {
+          "id": "optimistic-reconcile",
+          "statement": "An optimistic update reconciles to the server's authoritative value: when the response differs from the optimistic guess, the UI settles on the server's truth — a count-based optimistic state never drifts permanently.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "reconcile",
+          "seenIn": [
+            "documenso:eb45d1e5",
+            "documenso:ed7a0011"
+          ]
+        }
+      ],
+      "description": "An action produces its real effect — no visible control is a no-op, failures tell the truth."
+    },
+    {
+      "archetype": "failure-honesty",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "dependency-failure-is-admitted",
+          "statement": "When a required dependency is forced to fail, the operation admits failure through a non-success response or its declared error envelope — it never returns a bare success while the effect was lost.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "dependency-failure",
+          "seenIn": [
+            "pauta:381187c",
+            "pauta:b831091",
+            "hostpoint:4b5f4230"
+          ]
+        }
+      ],
+      "description": "A failed dependency can never be reported as a successful operation."
+    },
+    {
+      "archetype": "data-honesty",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "no-fixture-fallback",
+          "statement": "When the API returns no rows, the UI renders the empty state — it never falls back to fixture/demo rows.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "empty"
+          },
+          "seenIn": [
+            "8ec5dae5",
+            "74f546d1"
+          ]
+        },
+        {
+          "id": "no-fabricated-media",
+          "statement": "A missing image renders a neutral placeholder — never a stock photo or a randomly generated face.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "partial"
+          },
+          "requires": "media",
+          "seenIn": [
+            "dfb23261"
+          ]
+        },
+        {
+          "id": "no-raw-id-flash",
+          "statement": "A detail view renders resolved data (a name) or a skeleton — never a raw entity id flashed before the name resolves.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "detail",
+          "seenIn": [
+            "projp:ce04d0f",
+            "projp:33a0d5a"
+          ]
+        },
+        {
+          "id": "count-matches-source",
+          "statement": "The number of items rendered equals the number the API returned — a client-side filter or fixture merge never silently drops or invents rows.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "count",
+          "seenIn": [
+            "documenso:b8e08e88",
+            "documenso:5f4e0ccf"
+          ]
+        }
+      ],
+      "description": "Rendered data traces to a real source — never fixtures, stock media, or invented rows."
+    },
+    {
+      "archetype": "persona-scoped-visibility",
+      "version": "0.2.0",
+      "criteria": [
+        {
+          "id": "no-cross-persona-affordance",
+          "statement": "Rendered as one actor, no affordance scoped to another actor (or tier) is visible or reachable.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "16c6cd43",
+            "1e6ba089",
+            "projf:5512811"
+          ]
+        },
+        {
+          "id": "no-cross-persona-route",
+          "statement": "Every declared route scoped to one actor refuses another actor at the guard: with the build/session fixed as actor X, sweeping actor-Y routes redirects X to its own area — no foreign shell mounts through an unguarded sibling route.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "router",
+          "seenIn": [
+            "documenso:2ba0f48c",
+            "bitwarden:e4359f071",
+            "hostpoint:28670a98"
+          ]
+        }
+      ],
+      "description": "An actor sees and reaches only the affordances/routes of its role."
+    },
+    {
+      "archetype": "navigation-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "target-resolves",
+          "statement": "Every navigation affordance targets a registered route; no tap lands on not-found.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "routes",
+          "seenIn": [
+            "287ab352",
+            "2a3f9251",
+            "projp:7ba900d"
+          ]
+        },
+        {
+          "id": "nested-renders",
+          "statement": "Navigating to a nested route renders its content — the parent layout renders its outlet, not a blank screen.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "router",
+          "seenIn": [
+            "projp:37af286",
+            "projp:039aaf2"
+          ]
+        },
+        {
+          "id": "back-has-fallback",
+          "statement": "Back is never a dead no-op: opened deep with no history, it lands on a real fallback instead of doing nothing.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "router",
+          "seenIn": [
+            "3aa1c80a"
+          ]
+        },
+        {
+          "id": "required-params-guarded",
+          "statement": "A route that needs a param redirects to a real parent when the param is absent or empty — it never renders the detail with an undefined/empty param (a ghost screen).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "router",
+          "seenIn": [
+            "documenso:184cbd67",
+            "documenso:04b1ce1a"
+          ]
+        },
+        {
+          "id": "no-redirect-loop",
+          "statement": "A guard/redirect resolves in finitely many hops: opened where a guard fires, the router settles on a real screen — it never bounces between routes forever (a replace-in-effect storm).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "router",
+          "seenIn": [
+            "documenso:849885b5",
+            "documenso:ef79eb3c"
+          ]
+        }
+      ],
+      "description": "Every affordance leads somewhere real — no dead ends, loops, or ghost params."
+    },
+    {
+      "archetype": "mount-stability",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "settles-without-storm",
+          "statement": "Mounting a screen settles to a bounded number of requests — no refetch/redirect storm that freezes the screen.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "e6c81abe",
+            "projp:626c8ce"
+          ]
+        }
+      ],
+      "description": "Mounting is quiet and convergent — no request storms or render loops."
+    },
+    {
+      "archetype": "authorization",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "own-resource-only",
+          "statement": "A write resolves the target scoped to the caller; another account's id is refused (401/403/404), never a cross-account write.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "ownership",
+          "seenIn": [
+            "1db3c2fd",
+            "bitwarden:0ad7a10c"
+          ]
+        },
+        {
+          "id": "role-required",
+          "statement": "An endpoint enforces the role its operation implies; a privileged op called as a lesser role is refused — \"any authenticated\" is not a policy.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "role",
+          "seenIn": [
+            "d36af822",
+            "gitea:171df0c9"
+          ]
+        },
+        {
+          "id": "server-is-authoritative",
+          "statement": "The server records its own truth (price, version, quantity), never the client's word for it: writes that send a tampered value are recorded identically, as the server-resolved value.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "authority",
+          "seenIn": [
+            "bitwarden:ae5508d14",
+            "bitwarden:3b5bb7680"
+          ]
+        }
+      ],
+      "description": "A caller acts only on resources it owns, with the role the operation implies."
+    },
+    {
+      "archetype": "access-control",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "requires-authentication",
+          "statement": "A protected endpoint refuses an unauthenticated request (401/403) — it is never silently reachable without a credential. The baseline guard every authenticated slice must hold; richer authorization (own-resource-only, role-required) layers on top.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          }
+        }
+      ],
+      "description": "A protected endpoint refuses unauthenticated callers."
+    },
+    {
+      "archetype": "integration-integrity",
+      "version": "0.2.0",
+      "criteria": [
+        {
+          "id": "webhook-signature-verified",
+          "statement": "An inbound webhook with a forged or absent signature is rejected; only an authentically-signed callback is accepted and allowed to mutate state.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "webhook",
+          "seenIn": [
+            "692d85af",
+            "documenso:3887aa67"
+          ]
+        },
+        {
+          "id": "webhook-effects-state",
+          "statement": "After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "webhook-state",
+          "seenIn": [
+            "hostpoint:53fcf804",
+            "avp:8d6169d0"
+          ]
+        },
+        {
+          "id": "redirect-urls-bound",
+          "statement": "A checkout/OAuth flow binds its return URLs to the real environment: every required transition (success, failure) is present, an absolute http(s) URL, and never a placeholder, relative path, or dev host.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "checkout",
+          "seenIn": [
+            "bitwarden:aa1665065",
+            "bitwarden:004e3c58e"
+          ]
+        },
+        {
+          "id": "callback-resolves-entity",
+          "statement": "An inbound callback carries enough to resolve the domain entity it concerns: a callback with a missing or unknown reference is refused, never accepted and silently dropped or applied to the wrong entity.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "resolve",
+          "seenIn": [
+            "documenso:a99bdf5e",
+            "documenso:8fbace0f"
+          ]
+        }
+      ],
+      "description": "External callbacks are verified, resolvable, and bound to the real environment."
+    },
+    {
+      "archetype": "second-order-effects",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "notifies-all-parties",
+          "statement": "Every state transition notifies every party it concerns — both sides of a booking, both ends of a message — not one party or none.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "81c919ed",
+            "fbc56236"
+          ]
+        }
+      ],
+      "description": "A state transition fires ALL its downstream effects (every party notified)."
+    },
+    {
+      "archetype": "money-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "split-invariant",
+          "statement": "A money split sums to the whole, exact to the cent: over every total, platform + host === total, each share is non-negative, and the platform share matches the policy fraction to the cent — no float-rounding leak.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "split",
+          "seenIn": [
+            "bitwarden:2e0e10307",
+            "bitwarden:6d69c9bb9"
+          ]
+        },
+        {
+          "id": "amount-rendered-exact",
+          "statement": "A money amount is displayed at the currency's exact precision: the rendered string equals the value formatted to its minor units — no float artifact (0.30000000000000004), no dropped or extra decimals (10.5 / 10.5000 for 10.50), no wrong rounding. Format from integer minor units, never raw float arithmetic.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "amount-display",
+          "seenIn": [
+            "firefly:797064a1",
+            "firefly:d55cc03e",
+            "firefly:ebc7ea0e"
+          ]
+        }
+      ],
+      "description": "Money is exact at rest and in display — splits sum to the whole, no float artifacts."
+    },
+    {
+      "archetype": "lifecycle-gate",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "gate-enforced-server-side",
+          "statement": "The server enforces the transition's precondition: a transition requested on a resource whose precondition is unmet is refused (4xx), and a ready resource's transition still succeeds — the FE gate is a courtesy, not the guard.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "transition",
+          "seenIn": [
+            "documenso:6e09a470",
+            "bitwarden:43d14971f"
+          ]
+        },
+        {
+          "id": "blocked-action-is-disabled",
+          "statement": "When a precondition is unmet, the FE disables the action and says why — it does not offer a live control that will fail (e.g. publishing offered on an incomplete listing).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "blocked",
+          "seenIn": [
+            "documenso:41ed6c9a",
+            "documenso:6d754acf"
+          ]
+        }
+      ],
+      "description": "A transition is gated on its real preconditions, server-side, with the FE disabled+explained."
+    },
+    {
+      "archetype": "temporal-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "zoned-to-user",
+          "statement": "A displayed instant is rendered in the user's timezone: a stored UTC timestamp near a day boundary shows the user's local calendar date, not the UTC/server/ambient date — no off-by-one day.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "instant",
+          "seenIn": [
+            "documenso:22fd1b5b",
+            "calcom:c1d0a6bb",
+            "calcom:d70fa462"
+          ]
+        },
+        {
+          "id": "floating-date-not-shifted",
+          "statement": "A date-only value (an expiry date, a birthday — no time, no zone) is displayed as authored: it is never zone-shifted a day by a round-trip through `new Date()` / `dayjs.tz()`. A floating date has no timezone; render its calendar parts, don't localize it.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "floating-date",
+          "seenIn": [
+            "calcom:26e85823",
+            "calcom:f7b2f276",
+            "documenso:22fd1b5b"
+          ]
+        }
+      ],
+      "description": "Time renders in the user's zone; date-only values are never zone-shifted."
+    },
+    {
+      "archetype": "pagination-integrity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "pages-cover-the-set",
+          "statement": "Paging through the entire list yields every item exactly once: the union of all pages equals the full set — nothing dropped at a page boundary, nothing duplicated across pages, nothing stranded by an unstable sort.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "paging",
+          "seenIn": [
+            "documenso:7d257236",
+            "documenso:0488442",
+            "calcom:367e2666"
+          ]
+        }
+      ],
+      "description": "Paging the whole list yields every item exactly once."
+    },
+    {
+      "archetype": "render-resilience",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "survives-malformed-data",
+          "statement": "Rendering the surface with the empty/null/malformed data it can actually receive does not throw: it degrades to a fallback or empty state instead of crashing the screen. A guard for a happy-path shape is not optional — the real data is not always the fixture.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "requires": "malformed",
+          "seenIn": [
+            "calcom:000324c0",
+            "calcom:013e6143",
+            "documenso:43fe5584"
+          ]
+        }
+      ],
+      "description": "A surface degrades gracefully on bad data — it never white-screens."
+    },
+    {
+      "archetype": "request-idempotency",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "idempotency-key-honored",
+          "statement": "A mutation carrying an idempotency key is applied at most once: two requests with the SAME key yield one resource (the original, replayed), and a request with a DIFFERENT key yields a distinct resource. Persist the key and replay on a repeat — never re-create, never dedup regardless of the key.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          },
+          "seenIn": [
+            "calcom:d85e0b51",
+            "documenso:3887aa67",
+            "documenso:31be5489"
+          ]
+        }
+      ],
+      "description": "A mutation with an idempotency key applies at most once."
+    },
+    {
+      "archetype": "mutation-atomicity",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "concurrent-conflict-surfaces",
+          "statement": "Two conflicting updates carrying the same concurrency token cannot both succeed: exactly one wins and the loser receives an explicit conflict response (409/412), never silent last-write-wins.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          },
+          "requires": "conflict",
+          "seenIn": [
+            "pauta:f85820f",
+            "fluxoterra:1b479706"
+          ]
+        },
+        {
+          "id": "multi-write-is-atomic",
+          "statement": "When a fault is forced after one write in a multi-write mutation, the request fails and the observable state is identical to its baseline — no partial write escapes the transaction.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          },
+          "requires": "fault-state",
+          "seenIn": [
+            "pauta:b00c9c4",
+            "hostpoint:c0a0c63c"
+          ]
+        }
+      ],
+      "description": "Concurrent and multi-write mutations surface conflicts and never expose partial state."
+    },
+    {
+      "archetype": "credential-authority",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rejects-invalid-credentials",
+          "statement": "An authentication endpoint denies invalid credentials and never issues a token on the deny path — a silent accept (a token for a wrong credential) is an auth bypass.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "api-error"
+          }
+        },
+        {
+          "id": "issues-token-on-valid",
+          "statement": "An authentication endpoint issues a session token for valid credentials.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          }
+        }
+      ],
+      "description": "An auth endpoint denies invalid credentials and issues tokens only on valid ones."
+    },
+    {
+      "archetype": "token-rotation",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rotates-on-refresh",
+          "statement": "Exchanging a valid refresh token mints a NEW refresh token (rotation), never reissues the same one.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          }
+        },
+        {
+          "id": "replay-burns-family",
+          "statement": "Replaying an already-rotated (spent) refresh token is rejected AND revokes the whole token family — a leaked token cannot outlive its rotation (theft detection).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          }
+        }
+      ],
+      "description": "Session tokens rotate and expire the way the flow promises."
+    },
+    {
+      "archetype": "resource-uniqueness",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "rejects-duplicate",
+          "statement": "Creating a resource whose unique key already exists is rejected (a conflict) — the second create of the same key must fail, never silently duplicate (a duplicate breaks the invariant the key holds, e.g. one-human-one-account).",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "double-activate"
+          }
+        }
+      ],
+      "description": "A uniqueness rule holds server-side — duplicates are refused."
+    },
+    {
+      "archetype": "submission-gate",
+      "version": "0.1.0",
+      "criteria": [
+        {
+          "id": "gate-enforced-on-submission",
+          "statement": "The server enforces the precondition of a body-bearing submission: the SAME well-formed payload is accepted (2xx) on a resource whose precondition is met (ready) and refused (4xx) on one whose precondition is unmet. The ready acceptance proves the payload is well-formed, so the unmet refusal is the gate firing on the precondition — not the body being rejected. A required body is never a key past the gate; the FE form-gate is a courtesy, the server is the guard. The body-bearing sibling of lifecycle-gate's gate-enforced-server-side, for a mutation a body-less probe cannot reach.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          }
+        },
+        {
+          "id": "gate-enforced-on-body-target",
+          "statement": "The server enforces the precondition of a body-bearing mutation where the discriminating resource id is carried in the body, not the URL. Two submissions to the same endpoint carry bodies of the same shape but targeting different resource ids: one whose precondition is met (ready), one whose precondition is unmet. The ready submission is accepted (2xx); the unmet submission is refused (4xx). The gate fires on the body-carried id — FE form-gating is a courtesy; the server is the guard. Covers patterns like POST /charges or POST /request where the target resource is identified by a body field such as transactionId or serviceId.",
+          "oracle": "mechanical",
+          "scope": "invariant",
+          "condition": {
+            "id": "success"
+          }
+        }
+      ],
+      "description": "A body-bearing submission is gated on its precondition; a valid body is never a key past the gate."
+    }
+  ]
+}
+''';
