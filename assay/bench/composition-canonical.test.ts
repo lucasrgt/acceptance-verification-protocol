@@ -9,7 +9,7 @@ import { buildHeader, COMPOSITION, type HeaderVariant } from './dataset/page-hea
  * criterion (atoms/molecules/organisms): the screen header's slots are the canonical
  * DS components, present and in order — back · icon · title. The escape is a bespoke
  * fork, a missing slot, or the back affordance below the title. Faithful: "consolidate
- * … into one <TabBar>" (897c6aa0), "ícone da tela no page header" (c596531b).
+ * … into one <TabBar>" (897c6aa0), "the screen's icon in the page header" (c596531b).
  */
 const subject = (variant: HeaderVariant): ReactDesignSubject => ({
   name: `header-${variant}`,

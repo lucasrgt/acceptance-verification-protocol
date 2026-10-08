@@ -36,7 +36,7 @@ public static class CatalogSource
             "An action produces its real effect — no visible control is a no-op, failures tell the truth."),
         new("failure-honesty", "0.1.0",
             [
-                new("dependency-failure-is-admitted", "When a required dependency is forced to fail, the operation admits failure through a non-success response or its declared error envelope — it never returns a bare success while the effect was lost.", "mechanical", "invariant", new("api-error"), Requires: "dependency-failure", SeenIn: ["pauta:381187c", "pauta:b831091", "hostpoint:4b5f4230"]),
+                new("dependency-failure-is-admitted", "When a required dependency is forced to fail, the operation admits failure through a non-success response or its declared error envelope — it never returns a bare success while the effect was lost.", "mechanical", "invariant", new("api-error"), Requires: "dependency-failure", SeenIn: ["app-b:381187c", "app-b:b831091", "app-a:4b5f4230"]),
             ],
             "A failed dependency can never be reported as a successful operation."),
         new("data-honesty", "0.1.0",
@@ -50,7 +50,7 @@ public static class CatalogSource
         new("persona-scoped-visibility", "0.2.0",
             [
                 new("no-cross-persona-affordance", "Rendered as one actor, no affordance scoped to another actor (or tier) is visible or reachable.", "mechanical", "invariant", new("success"), SeenIn: ["16c6cd43", "1e6ba089", "projf:5512811"]),
-                new("no-cross-persona-route", "Every declared route scoped to one actor refuses another actor at the guard: with the build/session fixed as actor X, sweeping actor-Y routes redirects X to its own area — no foreign shell mounts through an unguarded sibling route.", "mechanical", "invariant", new("success"), Requires: "router", SeenIn: ["documenso:2ba0f48c", "bitwarden:e4359f071", "hostpoint:28670a98"]),
+                new("no-cross-persona-route", "Every declared route scoped to one actor refuses another actor at the guard: with the build/session fixed as actor X, sweeping actor-Y routes redirects X to its own area — no foreign shell mounts through an unguarded sibling route.", "mechanical", "invariant", new("success"), Requires: "router", SeenIn: ["documenso:2ba0f48c", "bitwarden:e4359f071", "app-a:28670a98"]),
             ],
             "An actor sees and reaches only the affordances/routes of its role."),
         new("navigation-integrity", "0.1.0",
@@ -82,7 +82,7 @@ public static class CatalogSource
         new("integration-integrity", "0.2.0",
             [
                 new("webhook-signature-verified", "An inbound webhook with a forged or absent signature is rejected; only an authentically-signed callback is accepted and allowed to mutate state.", "mechanical", "invariant", new("success"), Requires: "webhook", SeenIn: ["692d85af", "documenso:3887aa67"]),
-                new("webhook-effects-state", "After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.", "mechanical", "invariant", new("success"), Requires: "webhook-state", SeenIn: ["hostpoint:53fcf804", "avp:8d6169d0"]),
+                new("webhook-effects-state", "After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.", "mechanical", "invariant", new("success"), Requires: "webhook-state", SeenIn: ["app-a:53fcf804", "avp:8d6169d0"]),
                 new("redirect-urls-bound", "A checkout/OAuth flow binds its return URLs to the real environment: every required transition (success, failure) is present, an absolute http(s) URL, and never a placeholder, relative path, or dev host.", "mechanical", "invariant", new("success"), Requires: "checkout", SeenIn: ["bitwarden:aa1665065", "bitwarden:004e3c58e"]),
                 new("callback-resolves-entity", "An inbound callback carries enough to resolve the domain entity it concerns: a callback with a missing or unknown reference is refused, never accepted and silently dropped or applied to the wrong entity.", "mechanical", "invariant", new("success"), Requires: "resolve", SeenIn: ["documenso:a99bdf5e", "documenso:8fbace0f"]),
             ],
@@ -127,8 +127,8 @@ public static class CatalogSource
             "A mutation with an idempotency key applies at most once."),
         new("mutation-atomicity", "0.1.0",
             [
-                new("concurrent-conflict-surfaces", "Two conflicting updates carrying the same concurrency token cannot both succeed: exactly one wins and the loser receives an explicit conflict response (409/412), never silent last-write-wins.", "mechanical", "invariant", new("double-activate"), Requires: "conflict", SeenIn: ["pauta:f85820f", "fluxoterra:1b479706"]),
-                new("multi-write-is-atomic", "When a fault is forced after one write in a multi-write mutation, the request fails and the observable state is identical to its baseline — no partial write escapes the transaction.", "mechanical", "invariant", new("api-error"), Requires: "fault-state", SeenIn: ["pauta:b00c9c4", "hostpoint:c0a0c63c"]),
+                new("concurrent-conflict-surfaces", "Two conflicting updates carrying the same concurrency token cannot both succeed: exactly one wins and the loser receives an explicit conflict response (409/412), never silent last-write-wins.", "mechanical", "invariant", new("double-activate"), Requires: "conflict", SeenIn: ["app-b:f85820f", "app-c:1b479706"]),
+                new("multi-write-is-atomic", "When a fault is forced after one write in a multi-write mutation, the request fails and the observable state is identical to its baseline — no partial write escapes the transaction.", "mechanical", "invariant", new("api-error"), Requires: "fault-state", SeenIn: ["app-b:b00c9c4", "app-a:c0a0c63c"]),
             ],
             "Concurrent and multi-write mutations surface conflicts and never expose partial state."),
         new("credential-authority", "0.1.0",

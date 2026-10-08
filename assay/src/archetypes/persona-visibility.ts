@@ -31,7 +31,7 @@ export const personaVisibility = archetype('persona-scoped-visibility', '0.2.0',
   criterion(
     'no-cross-persona-route',
     'Every declared route scoped to one actor refuses another actor at the guard: with the build/session fixed as actor X, sweeping actor-Y routes redirects X to its own area — no foreign shell mounts through an unguarded sibling route.',
-    { under: 'success', scope: 'invariant', requires: 'router', seenIn: ['documenso:2ba0f48c', 'bitwarden:e4359f071', 'hostpoint:28670a98'] },
+    { under: 'success', scope: 'invariant', requires: 'router', seenIn: ['documenso:2ba0f48c', 'bitwarden:e4359f071', 'app-a:28670a98'] },
     mechanical<PersonaExpect>(async ({ act, expect }) => {
       await act();
       expect.noCrossPersonaRoute();

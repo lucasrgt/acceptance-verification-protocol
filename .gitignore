@@ -23,3 +23,5 @@ assay.ex/.home/
 assay.dart/.dart_tool/
 assay.dart/build/
 assay.dart/coverage/
+
+.aerofortress/

@@ -13,7 +13,7 @@ export const mutationAtomicity = archetype('mutation-atomicity', '0.1.0', () => 
   criterion(
     'concurrent-conflict-surfaces',
     'Two conflicting updates carrying the same concurrency token cannot both succeed: exactly one wins and the loser receives an explicit conflict response (409/412), never silent last-write-wins.',
-    { under: 'double-activate', scope: 'invariant', requires: 'conflict', seenIn: ['pauta:f85820f', 'fluxoterra:1b479706'] },
+    { under: 'double-activate', scope: 'invariant', requires: 'conflict', seenIn: ['app-b:f85820f', 'app-c:1b479706'] },
     mechanical<MutationAtomicityExpect>(async ({ act, expect }) => {
       await act();
       expect.concurrentConflictSurfaces();
@@ -22,7 +22,7 @@ export const mutationAtomicity = archetype('mutation-atomicity', '0.1.0', () => 
   criterion(
     'multi-write-is-atomic',
     'When a fault is forced after one write in a multi-write mutation, the request fails and the observable state is identical to its baseline — no partial write escapes the transaction.',
-    { under: 'api-error', scope: 'invariant', requires: 'fault-state', seenIn: ['pauta:b00c9c4', 'hostpoint:c0a0c63c'] },
+    { under: 'api-error', scope: 'invariant', requires: 'fault-state', seenIn: ['app-b:b00c9c4', 'app-a:c0a0c63c'] },
     mechanical<MutationAtomicityExpect>(async ({ act, expect }) => {
       await act();
       expect.multiWriteIsAtomic();

@@ -16,7 +16,7 @@ system** — the tokens, the component registry, and the composition rules. A sc
 element is the canonical component (not a hand-rolled fork), and the composition obeys
 the declared hierarchy. That is checkable, not a matter of taste.
 
-The pun even survives: AVP = *acesso venoso periférico*; Assay Design taps the vein of
+The pun even survives: AVP = *acesso venoso periférico* (Portuguese for peripheral venous access); Assay Design taps the vein of
 the **design system** and confirms the screen is faithful to it.
 
 ## Mined by error analysis, not taste
@@ -63,7 +63,7 @@ Representative real escapes (faithful, the way the catalog was built):
 - *"consolidate hand-rolled tab bars into one `<TabBar>`"*, *"…confirm dialogs into one
   `<ConfirmDialog>`"*, *"…label-value fields into one `<Field>`"* → **composition-canonical**.
 - *"every screen rides PageContainer + PageHeader — one padding, one type scale"* /
-  *"identidade dos títulos — ícone da tela no page header e cor heading"* →
+  *"title identity — the screen's icon in the page header and the heading colour"* →
   **composition-canonical** + **spacing-rhythm** + **type-hierarchy** (this is the
   user's "back button above the blue XL title with the right icon", generalized).
 - *"'Banheiro' uses a toilet icon, not a shower"* → **icon-correctness** (the icon must

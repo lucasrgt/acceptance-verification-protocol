@@ -178,9 +178,9 @@ const catalogJson = r'''{
           },
           "requires": "dependency-failure",
           "seenIn": [
-            "pauta:381187c",
-            "pauta:b831091",
-            "hostpoint:4b5f4230"
+            "app-b:381187c",
+            "app-b:b831091",
+            "app-a:4b5f4230"
           ]
         }
       ],
@@ -277,7 +277,7 @@ const catalogJson = r'''{
           "seenIn": [
             "documenso:2ba0f48c",
             "bitwarden:e4359f071",
-            "hostpoint:28670a98"
+            "app-a:28670a98"
           ]
         }
       ],
@@ -473,7 +473,7 @@ const catalogJson = r'''{
           },
           "requires": "webhook-state",
           "seenIn": [
-            "hostpoint:53fcf804",
+            "app-a:53fcf804",
             "avp:8d6169d0"
           ]
         },
@@ -715,8 +715,8 @@ const catalogJson = r'''{
           },
           "requires": "conflict",
           "seenIn": [
-            "pauta:f85820f",
-            "fluxoterra:1b479706"
+            "app-b:f85820f",
+            "app-c:1b479706"
           ]
         },
         {
@@ -729,8 +729,8 @@ const catalogJson = r'''{
           },
           "requires": "fault-state",
           "seenIn": [
-            "pauta:b00c9c4",
-            "hostpoint:c0a0c63c"
+            "app-b:b00c9c4",
+            "app-a:c0a0c63c"
           ]
         }
       ],

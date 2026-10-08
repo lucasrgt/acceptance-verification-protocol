@@ -9,18 +9,18 @@
 > input, never auto-applied.
 >
 > Maintained by the `defect-collector` routine (dev workspace). Harvest window ~90 days; pilots
-> discovered by `*.spec.toml`: pauta-web-monorepo, hostpoint-monorepo, fluxoterra-monorepo, and the
+> discovered by `*.spec.toml`: three private product monorepos (app-a, app-b, app-c) and the
 > framework's sample-app. Evidence is `repo@sha` / network scar ids — nothing here is invented.
 
 ## First harvest — 2026-07-02
 
 ### 1. Authorization scope missing (act beyond the caller's own resources)
 
-- **Occurrences:** hostpoint@1db3c2fd (UpdateHost not scoped to the caller's host),
-  hostpoint@d0f1d0c8 (account row not bound to the host's real document), hostpoint@085a5c20
-  (operator audit + owned-asset binding; session org by membership), hostpoint@ab63c1e6
-  (asset upload owned-binding guard), pauta@d2373ab (activity assignment not scoped to the job's
-  members), pauta@fc51908 (attendant resolved without the tenant filter).
+- **Occurrences:** app-a@1db3c2fd (UpdateHost not scoped to the caller's host),
+  app-a@d0f1d0c8 (account row not bound to the host's real document), app-a@085a5c20
+  (operator audit + owned-asset binding; session org by membership), app-a@ab63c1e6
+  (asset upload owned-binding guard), app-b@d2373ab (activity assignment not scoped to the job's
+  members), app-b@fc51908 (attendant resolved without the tenant filter).
 - **Root-cause pattern:** the handler trusts an id from the request without pinning it to the
   authenticated principal's ownership/tenancy; the check exists on sibling slices but not this one.
 - **AVP candidate:** **covered-but-escaped.** `authorization` (`own-resource-only`,
@@ -28,14 +28,14 @@
   on slices that never *declared* the criterion — the repo-wide representative binding proves the
   mechanism once, not each surface. Harden by **declaring per-slice** on every mutation that takes
   a foreign id (the `af g slice --verify` path makes this cheap at birth) and deepening the pilots'
-  manifests (the hostpoint deep-pass board already recommends exactly this).
+  manifests (the app-a deep-pass board already recommends exactly this).
 
 ### 2. Silent failure / phantom success
 
-- **Occurrences:** pauta@381187c (failed supplier send reported as success), pauta@b831091
-  (Resend error body swallowed — undiagnosable send failures), hostpoint@6c6579f1 (consent write
-  failure swallowed instead of re-armed), hostpoint@4b5f4230 (property save failed silently),
-  hostpoint@2a2c7f4d (three client-reported service regressions pinned by tests after the fact).
+- **Occurrences:** app-b@381187c (failed supplier send reported as success), app-b@b831091
+  (Resend error body swallowed — undiagnosable send failures), app-a@6c6579f1 (consent write
+  failure swallowed instead of re-armed), app-a@4b5f4230 (property save failed silently),
+  app-a@2a2c7f4d (three client-reported service regressions pinned by tests after the fact).
 - **Root-cause pattern:** a failure path returns/renders as if the action succeeded — the error is
   caught and dropped, or the UI never surfaces the mutation's error state.
 - **Resolution (0.4.0):** **covered and runnable in both HTTP adapters.** `failure-honesty`
@@ -45,9 +45,9 @@
 
 ### 3. Second-order effect (notification) missing
 
-- **Occurrences:** hostpoint@81c919ed (notify BOTH parties on every booking transition),
-  hostpoint@fd1493e7 (new-request notifications not live/actionable), hostpoint@fbc56236 (no
-  notification on new message), pauta@fc51908 (decision email's recipient resolution broken).
+- **Occurrences:** app-a@81c919ed (notify BOTH parties on every booking transition),
+  app-a@fd1493e7 (new-request notifications not live/actionable), app-a@fbc56236 (no
+  notification on new message), app-b@fc51908 (decision email's recipient resolution broken).
 - **Root-cause pattern:** the primary effect lands, the counterpart's notification is forgotten on
   SOME transitions — the matrix of (transition × recipient) is maintained by memory.
 - **Resolution:** **covered with a state-based signal.** `second-order-effects`
@@ -57,22 +57,22 @@
 
 ### 4. Lifecycle / submission gating not enforced server-side
 
-- **Occurrences:** hostpoint@fbd99841 (going-live not gated on completed lifecycle),
-  hostpoint@4330c057 (traveler map showed non-bookable listings), hostpoint@982b95bb (the inverse:
-  gate too strict — promotions blocked pre-live), scar hostpoint/7dbad6cb (body-gate lacunas in
+- **Occurrences:** app-a@fbd99841 (going-live not gated on completed lifecycle),
+  app-a@4330c057 (traveler map showed non-bookable listings), app-a@982b95bb (the inverse:
+  gate too strict — promotions blocked pre-live), scar app-a/7dbad6cb (body-gate lacunas in
   RequestService/CreateCheckoutPreference, later closed).
 - **Root-cause pattern:** the FE hides the button but the server accepts the mutation (or a
   projection ignores the lifecycle) — the gate lives client-side only.
 - **AVP candidate:** **covered — bind deeper.** `lifecycle-gate` + `submission-gate` (incl. the
   body-target variant minted from these pilots) are runnable. The escapes predate their per-slice
-  binding; the standing recommendation is declaring them on every transition slice (hostpoint's
+  binding; the standing recommendation is declaring them on every transition slice (app-a's
   Operations ×6) rather than new mechanism.
 
 ### 5. Persona / role isolation leak (two-apps builds)
 
-- **Occurrences:** hostpoint@28670a98 (absolute persona isolation wave), hostpoint@1e6ba089
-  (persona leak on shared routes), hostpoint@e768c8ad (role-fixed build accepted the opposite
-  persona), hostpoint@311e9504 (persona hardcoded), hostpoint@f0d10d51 (unrecognized
+- **Occurrences:** app-a@28670a98 (absolute persona isolation wave), app-a@1e6ba089
+  (persona leak on shared routes), app-a@e768c8ad (role-fixed build accepted the opposite
+  persona), app-a@311e9504 (persona hardcoded), app-a@f0d10d51 (unrecognized
   EXPO_PUBLIC_APP_ROLE built silently).
 - **Root-cause pattern:** a single codebase shipping N personas relies on scattered guards; one
   ungated route/system surface mounts the opposite persona.
@@ -84,9 +84,9 @@
 
 ### 6. Concurrency / atomicity of multi-write mutations
 
-- **Occurrences:** pauta@b00c9c4 (job + members created non-atomically — ADR 0008),
-  pauta@f85820f (public read stamp raced on concurrency conflicts), hostpoint@c0a0c63c (draft row
-  reused across a category change), scar fluxoterra/1b479706 (modeled optimistic-concurrency token
+- **Occurrences:** app-b@b00c9c4 (job + members created non-atomically — ADR 0008),
+  app-b@f85820f (public read stamp raced on concurrency conflicts), app-a@c0a0c63c (draft row
+  reused across a category change), scar app-c/1b479706 (modeled optimistic-concurrency token
   not enforced — silent last-write-wins).
 - **Root-cause pattern:** a mutation spanning several writes (or a token-carrying update) is not
   transactional/guarded; interleaving loses one side silently.
@@ -99,8 +99,8 @@
 
 ### 7. Integration / webhook state contract
 
-- **Occurrences:** hostpoint@53fcf804 (charge id missing on the webhook notification URL),
-  hostpoint@596f1594 (checkout preference without back_urls), hostpoint@0d8d81d5 (OAuth url not
+- **Occurrences:** app-a@53fcf804 (charge id missing on the webhook notification URL),
+  app-a@596f1594 (checkout preference without back_urls), app-a@0d8d81d5 (OAuth url not
   opened on connect), scar avp/8d6169d0 (gate oracles are path-discriminated; webhook flows that
   answer 200-always can't bind `webhook-signature-verified` honestly).
 - **Root-cause pattern:** the contract with the provider is wider than the signature — ids/urls
@@ -113,9 +113,9 @@
 
 ### 8. Hand-rolled twin of a shipped primitive (package-first drift)
 
-- **Occurrences:** pauta@6128cf9 + fluxoterra@453460c (the SAME fix in two repos: error code read
-  by hand instead of the spine's `apiErrorCode`), hostpoint@11de28da (hand-rolled safeBack +
-  api-error bridge), scar pauta/5c987c72 (TestDatabase reimplemented inline).
+- **Occurrences:** app-b@6128cf9 + app-c@453460c (the SAME fix in two repos: error code read
+  by hand instead of the spine's `apiErrorCode`), app-a@11de28da (hand-rolled safeBack +
+  api-error bridge), scar app-b/5c987c72 (TestDatabase reimplemented inline).
 - **Root-cause pattern:** a spine/framework primitive exists; the pilot re-implements it inline
   and drifts.
 - **AVP candidate:** **not an AVP class — graduate to the doctor.** Cross-repo recurrence of the
@@ -125,8 +125,8 @@
 
 ### 9. Stale/absent data shape breaks the UI
 
-- **Occurrences:** fluxoterra@c5c44d9 (old snapshot with null buyers broke the analysis screen),
-  pauta@b1b4b6c (approvals list crashed on an undefined page), hostpoint@e6c81abe (anonymous /me
+- **Occurrences:** app-c@c5c44d9 (old snapshot with null buyers broke the analysis screen),
+  app-b@b1b4b6c (approvals list crashed on an undefined page), app-a@e6c81abe (anonymous /me
   refetch storm froze the boot splash).
 - **Root-cause pattern:** data persisted under an older shape (or an empty/anonymous state) reaches
   a view written for the newest shape only.

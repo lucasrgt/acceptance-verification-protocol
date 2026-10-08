@@ -15,7 +15,7 @@ export interface CompositionExpect {
  *
  * Faithfully grounded in the consolidation history: "consolidate hand-rolled tab bars
  * into one `<TabBar>`" (897c6aa0), "consolidate destructive confirm dialogs into one
- * `<ConfirmDialog>`" (2c9376e7), "identidade dos títulos — ícone da tela no page header
+ * `<ConfirmDialog>`" (2c9376e7), "title identity — the screen's icon in the page header
  * e cor heading" (c596531b). One canonical component, imported everywhere — repos rot
  * when the same element is built four ways.
  */

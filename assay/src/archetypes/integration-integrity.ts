@@ -35,7 +35,7 @@ export const integrationIntegrity = archetype('integration-integrity', '0.2.0', 
   criterion(
     'webhook-effects-state',
     'After one authentic and one forged webhook are delivered, domain state reflects exactly the authentic event: the valid event is applied once and the forged event leaves no trace, even when the provider-facing endpoint answers 2xx to both.',
-    { under: 'success', scope: 'invariant', requires: 'webhook-state', seenIn: ['hostpoint:53fcf804', 'avp:8d6169d0'] },
+    { under: 'success', scope: 'invariant', requires: 'webhook-state', seenIn: ['app-a:53fcf804', 'avp:8d6169d0'] },
     mechanical<IntegrationExpect>(async ({ act, expect }) => {
       await act();
       expect.webhookEffectsState();

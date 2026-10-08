@@ -2,7 +2,7 @@
  * Faithful reproduction of the composition-canonical escape: a screen header whose
  * slots are a hand-rolled fork, missing, or out of order. Grounded in "consolidate
  * hand-rolled tab bars into one <TabBar>" (897c6aa0), "…confirm dialogs into one
- * <ConfirmDialog>" (2c9376e7), "identidade dos títulos — ícone da tela no page header"
+ * <ConfirmDialog>" (2c9376e7), "title identity — the screen's icon in the page header"
  * (c596531b). The canonical header is back · icon · title, each a DS component
  * (carrying its `data-ds` marker).
  *
